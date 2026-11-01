@@ -3,36 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Organisation Sales — Interactive Studio</title>
-    <link rel="icon" type="image/png" href="../tabletop.png">
+    <title>Contact Us — Interactive Studio</title>
+    <link rel="icon" type="image/png" href="../tablogo.png">
     <link rel="stylesheet" href="../style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="auth-page">
-    <div class="auth-container" style="max-width: 500px;">
-        <div class="auth-header">
-            <img src="../logo.png" alt="Logo" class="auth-logo">
-            <h1>Set Up an Organisation</h1>
-            <p>Contact our team to provision a custom enterprise workspace.</p>
+<body class="page-body">
+
+    <header class="home-nav">
+        <div class="nav-brand">
+            <a href="/home/"><img src="../headerlogo.png" alt="Interactive Studio Logo" class="brand-logo"></a>
+            <span class="brand-name">Interactive Studio</span>
         </div>
-        <form class="auth-form" onsubmit="event.preventDefault(); alert('Request submitted successfully! We will contact you soon.'); window.location.href='/home/index.html';">
-            <div class="input-group">
-                <label>Work Email</label>
-                <input type="email" placeholder="you@company.com" required>
-            </div>
-            <div class="input-group">
-                <label>Organisation Name</label>
-                <input type="text" placeholder="Acme Corp" required>
-            </div>
-            <div class="input-group">
-                <label>Team Size</label>
-                <input type="text" placeholder="e.g. 20 seats">
-            </div>
-            <button type="submit" class="btn-submit">Submit Request</button>
-        </form>
-        <div class="back-link-wrap">
-            <a href="/home/index.html">← Back to Home</a>
+        <nav class="nav-links">
+            <a href="/product/">Product</a>
+            <a href="/solutions/">Solutions</a>
+            <a href="/pricing/">Pricing</a>
+            <a href="/resources/">Resources</a>
+            <a href="/contact/" class="active">Contact</a>
+        </nav>
+        <div class="nav-actions">
+            <a href="/auth/personal/login/" class="btn-launch">Sign In</a>
+            <a href="/editor/" class="btn-primary-small">Launch App</a>
         </div>
-    </div>
+    </header>
+
+    <main class="content-container">
+        <section class="page-hero">
+            <h1 class="hero-title">Get in Touch</h1>
+            <p class="hero-subtitle">Have a question about Interactive Studio? We're here to help.</p>
+        </section>
+
+        <div class="contact-grid">
+            <div class="contact-card">
+                <h3>General Support</h3>
+                <p>Questions about using the app, reporting bugs, or general help.</p>
+                <a href="mailto:support@interactivestudio.abrdns.com" class="link-action">support@interactivestudio.abrdns.com →</a>
+            </div>
+
+            <div class="contact-card highlight-card">
+                <h3>Organisation</h3>
+                <p>Looking to set up a dedicated workspace for your team or company?</p>
+                <a href="/contact/setup/organisation/" class="btn-primary-small">Setup Organisation →</a>
+            </div>
+
+            <div class="contact-card">
+                <h3>Sales & Press</h3>
+                <p>Inquiries regarding partnerships, licensing, and media relations.</p>
+                <a href="mailto:sales@interactivestudio.abrdns.com" class="link-action">sales@interactivestudio.abrdns.com →</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 Interactive Studio. All rights reserved.</p>
+    </footer>
+
 </body>
 </html>
