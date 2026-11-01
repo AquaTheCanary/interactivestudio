@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Organisation Sales — Interactive Studio</title>
+    <link rel="icon" type="image/png" href="../tabletop.png">
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+    <div class="auth-container" style="max-width: 500px;">
+        <div class="auth-header">
+            <img src="../logo.png" alt="Logo" class="auth-logo">
+            <h1>Set Up an Organisation</h1>
+            <p>Contact our team to provision a custom enterprise workspace.</p>
+        </div>
+        <form class="auth-form" onsubmit="event.preventDefault(); alert('Request submitted successfully! We will contact you soon.'); window.location.href='/home/index.html';">
+            <div class="input-group">
+                <label>Work Email</label>
+                <input type="email" placeholder="you@company.com" required>
+            </div>
+            <div class="input-group">
+                <label>Organisation Name</label>
+                <input type="text" placeholder="Acme Corp" required>
+            </div>
+            <div class="input-group">
+                <label>Team Size</label>
+                <input type="text" placeholder="e.g. 20 seats">
+            </div>
+            <button type="submit" class="btn-submit">Submit Request</button>
+        </form>
+        <div class="back-link-wrap">
+            <a href="/home/index.html">← Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>
