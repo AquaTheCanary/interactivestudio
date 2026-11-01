@@ -15,7 +15,7 @@ const firebaseConfig = {
 // 2. Microsoft MSAL Configuration (Enterprise SSO)
 const msalConfig = {
     auth: {
-        clientId: "cd935dfc-f852-41cf-bc5b-1cb17c3a8c85", // Azure AD Application (client) ID
+        clientId: "9be15a5a-1acc-4365-bdbd-6f206627af88", // Azure AD Application (client) ID
         authority: "https://login.microsoftonline.com/common",
         redirectUri: window.location.origin + (window.getAppUrl ? window.getAppUrl('/dashboard/') : '/dashboard/')
     },
