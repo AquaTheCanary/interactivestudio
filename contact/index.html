@@ -3,30 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us — Interactive Studio</title>
+    <title>Contact Us | Interactive Studio</title>
     <link rel="icon" type="image/png" href="../tablogo.png">
     <link rel="stylesheet" href="../style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="../router.js"></script>
 </head>
 <body class="page-body">
 
     <header class="home-nav">
         <div class="nav-brand">
-            <a href="/home/"><img src="../headerlogo.png" alt="Interactive Studio Logo" class="brand-logo"></a>
+            <a data-route="/home/"><img src="../headerlogo.png" alt="Interactive Studio" class="brand-logo"></a>
             <span class="brand-name">Interactive Studio</span>
         </div>
         <nav class="nav-links">
-            <a href="/product/">Product</a>
-            <a href="/solutions/">Solutions</a>
-            <a href="/pricing/">Pricing</a>
-            <a href="/resources/">Resources</a>
-            <a href="/contact/" class="active">Contact</a>
+            <a data-route="/product/">Product</a>
+            <a data-route="/solutions/">Solutions</a>
+            <a data-route="/pricing/">Pricing</a>
+            <a data-route="/resources/">Resources</a>
+            <a data-route="/contact/" class="active">Contact</a>
         </nav>
         <div class="nav-actions">
-            <a href="/auth/personal/login/" class="btn-launch">Sign In</a>
-            <a href="/editor/" class="btn-primary-small">Launch App</a>
+            <a data-route="/auth/personal/login/" class="btn-launch">Sign In</a>
+            <a data-route="/editor/" class="btn-primary-small">Launch App</a>
         </div>
     </header>
 
@@ -44,9 +43,9 @@
             </div>
 
             <div class="contact-card highlight-card">
-                <h3>Organisation</h3>
+                <h3>Organisation & Enterprise</h3>
                 <p>Looking to set up a dedicated workspace for your team or company?</p>
-                <a href="/contact/setup/organisation/" class="btn-primary-small">Setup Organisation →</a>
+                <a data-route="/contact/setup/organisation/" class="btn-primary-small">Setup Organisation Workspace →</a>
             </div>
 
             <div class="contact-card">
