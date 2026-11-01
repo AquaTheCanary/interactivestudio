@@ -3,28 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pricing — Interactive Studio</title>
+    <title>Plans and Pricing | Interactive Studio</title>
     <link rel="icon" type="image/png" href="../tablogo.png">
     <link rel="stylesheet" href="../style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="../router.js"></script>
 </head>
 <body class="page-body">
 
     <header class="home-nav">
         <div class="nav-brand">
-            <a href="/home/"><img src="../headerlogo.png" alt="Interactive Studio Logo" class="brand-logo"></a>
+            <a data-route="/home/"><img src="../headerlogo.png" alt="Interactive Studio" class="brand-logo"></a>
             <span class="brand-name">Interactive Studio</span>
         </div>
         <nav class="nav-links">
-            <a href="/product/">Product</a>
-            <a href="/solutions/">Solutions</a>
-            <a href="/pricing/" class="active">Pricing</a>
-            <a href="/resources/">Resources</a>
-            <a href="/contact/">Contact</a>
+            <a data-route="/product/">Product</a>
+            <a data-route="/solutions/">Solutions</a>
+            <a data-route="/pricing/" class="active">Pricing</a>
+            <a data-route="/resources/">Resources</a>
+            <a data-route="/contact/">Contact</a>
         </nav>
         <div class="nav-actions">
-            <a href="/auth/personal/login/" class="btn-launch">Sign In</a>
-            <a href="/editor/" class="btn-primary-small">Launch App</a>
+            <a data-route="/auth/personal/login/" class="btn-launch">Sign In</a>
+            <a data-route="/editor/" class="btn-primary-small">Launch App</a>
         </div>
     </header>
 
@@ -39,7 +40,7 @@
                 <h3>Personal</h3>
                 <div class="price">$0 <span>/ forever</span></div>
                 <p>Ideal for individual creators building web presentations.</p>
-                <a href="/auth/personal/register/" class="btn-secondary-large">Get Started Free</a>
+                <a data-route="/auth/personal/register/" class="btn-secondary-large">Get Started Free</a>
             </div>
 
             <div class="pricing-card featured-pricing">
@@ -47,7 +48,7 @@
                 <h3>Organisation</h3>
                 <div class="price">Custom</div>
                 <p>SSO Authentication, team workspace management, and native builds.</p>
-                <a href="/contact/setup/organisation/" class="btn-primary-large">Request Workspace</a>
+                <a data-route="/contact/setup/organisation/" class="btn-primary-large">Request Workspace</a>
             </div>
         </div>
     </main>
