@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Organisation — Interactive Studio</title>
+    <link rel="icon" type="image/png" href="../../../../tablogo.png">
+    <link rel="stylesheet" href="../../../../style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+
+    <div class="auth-container" style="max-width: 520px;">
+        <div class="auth-header">
+            <img src="../../../../headerlogo.png" alt="Interactive Studio Logo" class="auth-logo">
+            <h1>Request Organisation Access</h1>
+            <p>Provision a dedicated enterprise workspace for your company</p>
+        </div>
+
+        <form class="auth-form" onsubmit="event.preventDefault(); alert('Request submitted! Our team will contact you shortly.'); window.location.href='/home/';">
+            <div class="input-group">
+                <label>Work Email</label>
+                <input type="email" placeholder="you@company.com" required>
+            </div>
+            <div class="input-group">
+                <label>Organisation Name</label>
+                <input type="text" placeholder="Acme Corporation" required>
+            </div>
+            <div class="input-group">
+                <label>Estimated Team Seats</label>
+                <select required>
+                    <option value="" disabled selected>Select seat count</option>
+                    <option value="5-20">5 - 20 Seats</option>
+                    <option value="21-100">21 - 100 Seats</option>
+                    <option value="100+">100+ Enterprise Seats</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Additional Notes / SSO Requirements</label>
+                <textarea rows="3" placeholder="Tell us about your SSO preference (e.g., Azure AD / Okta)..."></textarea>
+            </div>
+            <button type="submit" class="btn-submit">Submit Provision Request</button>
+        </form>
+
+        <div class="back-link-wrap">
+            <a href="/auth/organisation/login/">← Back to Organisation Sign In</a>
+        </div>
+    </div>
+
+</body>
+</html>
