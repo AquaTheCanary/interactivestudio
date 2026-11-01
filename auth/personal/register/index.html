@@ -1,1 +1,41 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Register — Interactive Studio</title>
+    <link rel="icon" type="image/png" href="../../../tabletop.png">
+    <link rel="stylesheet" href="../../../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-header">
+            <img src="../../../logo.png" alt="Logo" class="auth-logo">
+            <h1>Create Account</h1>
+            <p>Get started with Interactive Studio for free</p>
+        </div>
+        <form class="auth-form" onsubmit="event.preventDefault(); window.location.href='../../../editor/index.html';">
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" placeholder="Jane Doe" required>
+            </div>
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" placeholder="name@example.com" required>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn-submit">Create Account</button>
+        </form>
+        <div class="auth-footer">
+            <p>Already have an account? <a href="../login/index.html">Login</a></p>
+        </div>
+        <div class="back-link-wrap">
+            <a href="../../../home/index.html">← Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>
