@@ -1,1 +1,100 @@
--
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Studio — Design & Present Without Limits</title>
+    <!-- Browser Tab Icon -->
+    <link rel="icon" type="image/png" href="../tabletop.png">
+    <link rel="stylesheet" href="../style.css">
+    <!-- Figma-style typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <header class="home-nav">
+        <div class="nav-brand">
+            <img src="../logo.png" alt="Interactive Studio Logo" class="brand-logo">
+            <span class="brand-name">Interactive Studio</span>
+        </div>
+        
+        <nav class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#apps">Native Apps</a>
+            <a href="/contact/">Contact</a>
+        </nav>
+
+        <div class="nav-actions">
+            <a href="/auth/personal/login/" class="btn-launch">Sign In</a>
+            <a href="/editor/" class="btn-primary-small">Launch App</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-badge">⚡ Next-Gen Presentation Engine</div>
+        <h1 class="hero-title">Interactive presentations.<br><span class="highlight-text">Designed like Figma.</span></h1>
+        <p class="hero-subtitle">Build professional, highly interactive decks on the web or download zero-watermark native apps for desktop & mobile.</p>
+        
+        <div class="hero-cta-group">
+            <a href="/editor/" class="btn-primary-large">Open Studio in Browser</a>
+            <a href="#apps" class="btn-secondary-large">Download Native Apps</a>
+        </div>
+
+        <div class="app-preview-mockup">
+            <div class="mockup-header">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+                <span class="mockup-title">Interactive Studio — Presentation Canvas</span>
+            </div>
+            <div class="mockup-body">
+                <img src="../logo.png" alt="Studio Preview Logo" class="preview-hero-logo">
+                <h3>Collaborative Interactive Presentations</h3>
+                <p>Click below to jump straight into the canvas</p>
+                <a href="/editor/" class="btn-preview-launch">Start Creating →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Native App Download Section -->
+    <section class="download-section" id="apps">
+        <div class="section-header">
+            <h2>Download Desktop & Mobile Apps</h2>
+            <p>Bypass app store fees and run Interactive Studio offline with zero watermarks.</p>
+        </div>
+
+        <div class="download-grid">
+            <div class="download-card">
+                <div class="platform-icon">💻</div>
+                <h3>Windows Executable</h3>
+                <p>Standalone desktop installer for Windows 10 & 11.</p>
+                <a href="#" class="btn-app-dl">Download .EXE</a>
+            </div>
+
+            <div class="download-card">
+                <div class="platform-icon">🍏</div>
+                <h3>macOS Installer</h3>
+                <p>Optimized build for Apple Silicon & Intel Macs.</p>
+                <a href="#" class="btn-app-dl">Download .DMG</a>
+            </div>
+
+            <div class="download-card">
+                <div class="platform-icon">📱</div>
+                <h3>Android Package</h3>
+                <p>Direct APK installer for Android tablets and smartphones.</p>
+                <a href="#" class="btn-app-dl">Download .APK</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 Interactive Studio. All rights reserved.</p>
+    </footer>
+
+    <script src="../app.js"></script>
+</body>
+</html>
