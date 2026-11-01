@@ -3,137 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Studio — Professional Presentation Engine</title>
+    <title>Interactive Studio — Design & Present Without Limits</title>
     <!-- Browser Tab Icon -->
     <link rel="icon" type="image/png" href="tabletop.png">
     <link rel="stylesheet" href="style.css">
-    <!-- Google Fonts for sleek Figma-like typography -->
+    <!-- Figma-style typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <!-- Figma-style Top App Bar -->
-    <header class="app-header">
-        <div class="header-left">
+    <!-- Header Navbar -->
+    <header class="home-nav">
+        <div class="nav-brand">
             <img src="logo.png" alt="Interactive Studio Logo" class="brand-logo">
-            <div class="project-info">
-                <span class="project-title">Untitled Presentation</span>
-                <span class="save-status">Saved to Cloud</span>
-            </div>
+            <span class="brand-name">Interactive Studio</span>
         </div>
+        
+        <nav class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#apps">Native Apps</a>
+            <a href="#about">About</a>
+        </nav>
 
-        <!-- Center Toolbar -->
-        <div class="toolbar">
-            <button class="tool-btn active" title="Select Tool (V)">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l7 18 3-7 7-3L3 3z"/></svg>
-            </button>
-            <button class="tool-btn" title="Slide Frame (F)">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-            </button>
-            <button class="tool-btn" title="Add Shape (R)">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
-            </button>
-            <button class="tool-btn" title="Add Text (T)">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
-            </button>
-            <button class="tool-btn" title="Interactivity / Animations">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            </button>
-        </div>
-
-        <!-- Right Action Buttons & App Downloads -->
-        <div class="header-right">
-            <button class="btn-present" id="present-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                Present
-            </button>
-            <div class="download-dropdown-wrapper">
-                <button class="btn-download" id="download-menu-btn">Get Desktop/Mobile Apps</button>
-                <div class="dropdown-menu" id="download-dropdown">
-                    <a href="#" class="dropdown-item">
-                        <span>Windows Executable</span>
-                        <span class="badge-ext">.EXE</span>
-                    </a>
-                    <a href="#" class="dropdown-item">
-                        <span>macOS Installer</span>
-                        <span class="badge-ext">.DMG</span>
-                    </a>
-                    <a href="#" class="dropdown-item">
-                        <span>Android Package</span>
-                        <span class="badge-ext">.APK</span>
-                    </a>
-                </div>
-            </div>
+        <div class="nav-actions">
+            <a href="editor/index.html" class="btn-launch">Launch App</a>
         </div>
     </header>
 
-    <!-- Main Workspace Studio Layout -->
-    <div class="studio-body">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-badge">⚡ Next-Gen Presentation Engine</div>
+        <h1 class="hero-title">Interactive presentations.<br><span class="highlight-text">Designed like Figma.</span></h1>
+        <p class="hero-subtitle">Build professional, highly interactive decks on the web or download zero-watermark native apps for desktop & mobile.</p>
         
-        <!-- Left Sidebar: Slides Overview & Layers -->
-        <aside class="sidebar-left">
-            <div class="sidebar-tabs">
-                <button class="tab-btn active">Slides</button>
-                <button class="tab-btn">Layers</button>
-            </div>
-            <div class="slides-list" id="slides-container">
-                <div class="slide-card active" data-slide="1">
-                    <span class="slide-num">1</span>
-                    <div class="slide-thumb">Cover Slide</div>
-                </div>
-                <div class="slide-card" data-slide="2">
-                    <span class="slide-num">2</span>
-                    <div class="slide-thumb">Interactive Data</div>
-                </div>
-            </div>
-            <button class="btn-add-slide" id="add-slide-btn">+ New Slide</button>
-        </aside>
+        <div class="hero-cta-group">
+            <a href="editor/index.html" class="btn-primary-large">Open Studio in Browser</a>
+            <a href="#apps" class="btn-secondary-large">Download Native Apps</a>
+        </div>
 
-        <!-- Center Canvas Workspace -->
-        <main class="canvas-viewport">
-            <div class="presentation-slide" id="active-slide">
-                <div class="slide-content">
-                    <h1 contenteditable="true" class="editable-title">Interactive Studio</h1>
-                    <p contenteditable="true" class="editable-subtitle">Click anywhere to edit or test interactive triggers</p>
-                    <div class="interactive-widget-preview">
-                        <button class="action-trigger" id="interactive-trigger">Test Interactive Trigger</button>
-                        <p id="trigger-status" class="status-text">Ready for interaction</p>
-                    </div>
-                </div>
+        <div class="app-preview-mockup">
+            <div class="mockup-header">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+                <span class="mockup-title">Interactive Studio — Presentation Canvas</span>
             </div>
-        </main>
+            <div class="mockup-body">
+                <img src="logo.png" alt="Studio Preview Logo" class="preview-hero-logo">
+                <h3>Collaborative Interactive Presentations</h3>
+                <p>Click below to jump straight into the canvas</p>
+                <a href="editor/index.html" class="btn-preview-launch">Start Creating →</a>
+            </div>
+        </div>
+    </section>
 
-        <!-- Right Inspector Panel -->
-        <aside class="sidebar-right">
-            <div class="panel-header">Design & Interactivity</div>
-            <div class="control-group">
-                <label>Background Fill</label>
-                <div class="color-picker-row">
-                    <input type="color" id="bg-picker" value="#ffffff">
-                    <span id="color-hex-label">#FFFFFF</span>
-                </div>
+    <!-- Native App Download Section -->
+    <section class="download-section" id="apps">
+        <div class="section-header">
+            <h2>Download Desktop & Mobile Apps</h2>
+            <p>Bypass app store fees and run Interactive Studio offline with zero watermarks.</p>
+        </div>
+
+        <div class="download-grid">
+            <div class="download-card">
+                <div class="platform-icon">💻</div>
+                <h3>Windows Executable</h3>
+                <p>Standalone desktop installer for Windows 10 & 11.</p>
+                <a href="#" class="btn-app-dl">Download .EXE</a>
             </div>
-            <div class="control-group">
-                <label>Slide Transition</label>
-                <select id="transition-select">
-                    <option value="fade">Smooth Fade</option>
-                    <option value="slide">Figma Push</option>
-                    <option value="zoom">Zoom Scale</option>
-                </select>
+
+            <div class="download-card">
+                <div class="platform-icon">🍏</div>
+                <h3>macOS Installer</h3>
+                <p>Optimized build for Apple Silicon & Intel Macs.</p>
+                <a href="#" class="btn-app-dl">Download .DMG</a>
             </div>
-            <div class="control-group">
-                <label>IS Accent Theme</label>
-                <div class="theme-bubbles">
-                    <span class="bubble" style="background:#88ff00;" data-color="#88ff00"></span>
-                    <span class="bubble" style="background:#ff00cd;" data-color="#ff00cd"></span>
-                    <span class="bubble" style="background:#00f0ff;" data-color="#00f0ff"></span>
-                    <span class="bubble" style="background:#ff2a4b;" data-color="#ff2a4b"></span>
-                </div>
+
+            <div class="download-card">
+                <div class="platform-icon">📱</div>
+                <h3>Android Package</h3>
+                <p>Direct APK installer for Android tablets and smartphones.</p>
+                <a href="#" class="btn-app-dl">Download .APK</a>
             </div>
-        </aside>
-    </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 Interactive Studio. Built with AI, hosted on GitHub Pages.</p>
+    </footer>
 
     <script src="app.js"></script>
 </body>
