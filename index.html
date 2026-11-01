@@ -3,66 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Studio</title>
+    <title>Interactive Studio — Professional Presentation Engine</title>
     <!-- Browser Tab Icon -->
-    <link rel="icon" type="image/png" href="tablogo.png">
+    <link rel="icon" type="image/png" href="tabletop.png">
     <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts for sleek Figma-like typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <div class="brand">
-            <!-- Header Logo (Optimized for High-Res) -->
-            <img src="headerlogo.png" alt="Interactive Studio Logo" class="brand-logo">
-            <span class="brand-name">Interactive Studio</span>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="#" class="active">Canvas</a></li>
-                <li><a href="#">Tools</a></li>
-                <li><a href="#">Downloads</a></li>
-            </ul>
-        </nav>
-    </header>
 
-    <main>
-        <section class="workspace">
-            <div class="workspace-header">
-                <h1 class="workspace-title">Studio Environment</h1>
-                <span class="badge">v1.0 Live</span>
+    <!-- Figma-style Top App Bar -->
+    <header class="app-header">
+        <div class="header-left">
+            <img src="logo.png" alt="Interactive Studio Logo" class="brand-logo">
+            <div class="project-info">
+                <span class="project-title">Untitled Presentation</span>
+                <span class="save-status">Saved to Cloud</span>
             </div>
-            
-            <div class="canvas-preview">
-                <div class="interactive-demo">
-                    <h2 id="demo-heading">Interactive Studio</h2>
-                    <p id="demo-subtext">Click below to test live state</p>
+        </div>
+
+        <!-- Center Toolbar -->
+        <div class="toolbar">
+            <button class="tool-btn active" title="Select Tool (V)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l7 18 3-7 7-3L3 3z"/></svg>
+            </button>
+            <button class="tool-btn" title="Slide Frame (F)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+            </button>
+            <button class="tool-btn" title="Add Shape (R)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
+            </button>
+            <button class="tool-btn" title="Add Text (T)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
+            </button>
+            <button class="tool-btn" title="Interactivity / Animations">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </button>
+        </div>
+
+        <!-- Right Action Buttons & App Downloads -->
+        <div class="header-right">
+            <button class="btn-present" id="present-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Present
+            </button>
+            <div class="download-dropdown-wrapper">
+                <button class="btn-download" id="download-menu-btn">Get Desktop/Mobile Apps</button>
+                <div class="dropdown-menu" id="download-dropdown">
+                    <a href="#" class="dropdown-item">
+                        <span>Windows Executable</span>
+                        <span class="badge-ext">.EXE</span>
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <span>macOS Installer</span>
+                        <span class="badge-ext">.DMG</span>
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <span>Android Package</span>
+                        <span class="badge-ext">.APK</span>
+                    </a>
                 </div>
             </div>
+        </div>
+    </header>
 
-            <div class="action-bar">
-                <button class="btn-primary" id="interact-btn">Run Action</button>
+    <!-- Main Workspace Studio Layout -->
+    <div class="studio-body">
+        
+        <!-- Left Sidebar: Slides Overview & Layers -->
+        <aside class="sidebar-left">
+            <div class="sidebar-tabs">
+                <button class="tab-btn active">Slides</button>
+                <button class="tab-btn">Layers</button>
             </div>
-        </section>
+            <div class="slides-list" id="slides-container">
+                <div class="slide-card active" data-slide="1">
+                    <span class="slide-num">1</span>
+                    <div class="slide-thumb">Cover Slide</div>
+                </div>
+                <div class="slide-card" data-slide="2">
+                    <span class="slide-num">2</span>
+                    <div class="slide-thumb">Interactive Data</div>
+                </div>
+            </div>
+            <button class="btn-add-slide" id="add-slide-btn">+ New Slide</button>
+        </aside>
 
-        <aside class="downloads-panel">
-            <div class="panel-card">
-                <h3>Native Apps</h3>
-                <div class="download-list">
-                    <a href="#" class="download-item">
-                        <span>Windows Executable</span>
-                        <span class="platform">.EXE</span>
-                    </a>
-                    <a href="#" class="download-item">
-                        <span>macOS Installer</span>
-                        <span class="platform">.DMG</span>
-                    </a>
-                    <a href="#" class="download-item">
-                        <span>Android Package</span>
-                        <span class="platform">.APK</span>
-                    </a>
+        <!-- Center Canvas Workspace -->
+        <main class="canvas-viewport">
+            <div class="presentation-slide" id="active-slide">
+                <div class="slide-content">
+                    <h1 contenteditable="true" class="editable-title">Interactive Studio</h1>
+                    <p contenteditable="true" class="editable-subtitle">Click anywhere to edit or test interactive triggers</p>
+                    <div class="interactive-widget-preview">
+                        <button class="action-trigger" id="interactive-trigger">Test Interactive Trigger</button>
+                        <p id="trigger-status" class="status-text">Ready for interaction</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Inspector Panel -->
+        <aside class="sidebar-right">
+            <div class="panel-header">Design & Interactivity</div>
+            <div class="control-group">
+                <label>Background Fill</label>
+                <div class="color-picker-row">
+                    <input type="color" id="bg-picker" value="#ffffff">
+                    <span id="color-hex-label">#FFFFFF</span>
+                </div>
+            </div>
+            <div class="control-group">
+                <label>Slide Transition</label>
+                <select id="transition-select">
+                    <option value="fade">Smooth Fade</option>
+                    <option value="slide">Figma Push</option>
+                    <option value="zoom">Zoom Scale</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>IS Accent Theme</label>
+                <div class="theme-bubbles">
+                    <span class="bubble" style="background:#88ff00;" data-color="#88ff00"></span>
+                    <span class="bubble" style="background:#ff00cd;" data-color="#ff00cd"></span>
+                    <span class="bubble" style="background:#00f0ff;" data-color="#00f0ff"></span>
+                    <span class="bubble" style="background:#ff2a4b;" data-color="#ff2a4b"></span>
                 </div>
             </div>
         </aside>
-    </main>
+    </div>
 
     <script src="app.js"></script>
 </body>
