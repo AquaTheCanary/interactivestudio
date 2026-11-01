@@ -3,39 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Register — Interactive Studio</title>
-    <link rel="icon" type="image/png" href="../../../tabletop.png">
+    <title>Personal Register | Interactive Studio</title>
+    <link rel="icon" type="image/png" href="../../../tablogo.png">
     <link rel="stylesheet" href="../../../style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="../../../router.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="../../../auth-config.js"></script>
 </head>
 <body class="auth-page">
+
     <div class="auth-container">
         <div class="auth-header">
-            <img src="../../../logo.png" alt="Logo" class="auth-logo">
+            <img src="../../../headerlogo.png" alt="Interactive Studio" class="auth-logo">
             <h1>Create Account</h1>
             <p>Get started with Interactive Studio for free</p>
         </div>
-        <form class="auth-form" onsubmit="event.preventDefault(); window.location.href='../../../editor/index.html';">
+
+        <form class="auth-form" id="register-form">
             <div class="input-group">
                 <label>Full Name</label>
-                <input type="text" placeholder="Jane Doe" required>
+                <input type="text" id="reg-name" placeholder="Jane Doe" required>
             </div>
             <div class="input-group">
                 <label>Email Address</label>
-                <input type="email" placeholder="name@example.com" required>
+                <input type="email" id="reg-email" placeholder="name@example.com" required>
             </div>
             <div class="input-group">
                 <label>Password</label>
-                <input type="password" placeholder="••••••••" required>
+                <input type="password" id="reg-password" placeholder="••••••••" required>
             </div>
             <button type="submit" class="btn-submit">Create Account</button>
         </form>
+
         <div class="auth-footer">
-            <p>Already have an account? <a href="../login/index.html">Login</a></p>
+            <p>Already have an account? <a data-route="/auth/personal/login/">Login</a></p>
         </div>
         <div class="back-link-wrap">
-            <a href="../../../home/index.html">← Back to Home</a>
+            <a data-route="/home/">← Back to Home</a>
         </div>
     </div>
+
+    <script>
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        document.getElementById("register-form").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const email = document.getElementById("reg-email").value;
+            const password = document.getElementById("reg-password").value;
+            const name = document.getElementById("reg-name").value;
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    user.updateProfile({ displayName: name });
+                    user.sendEmailVerification().then(() => {
+                        alert("Account created! A verification email has been sent to " + email);
+                        window.location.href = window.getAppUrl('/dashboard/');
+                    });
+                })
+                .catch(err => alert(err.message));
+        });
+    </script>
 </body>
 </html>
