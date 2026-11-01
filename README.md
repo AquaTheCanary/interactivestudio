@@ -2,10 +2,13 @@
 
 Welcome to Interactive Studio.
 
-Before signing up, make sure to read our Terms of Service [http://www.aquathecanary.github.io/interactivestudio/legal/terms-of-service] and Privacy Policy [http://www.aquathecanary.github.io/interactivestudio/legal/privacy-policy]
+Before signing up, make sure to read our:
+Terms of Service [aquathecanary.github.io/interactivestudio/legal/terms-of-service] 
+and 
+Privacy Policy [aquathecanary.github.io/interactivestudio/legal/privacy-policy]
 
-Get started today.
+# Get started today.
 
-http://www.aquathecanary.github.io/interactivestudio
+aquathecanary.github.io/interactivestudio
 
 
