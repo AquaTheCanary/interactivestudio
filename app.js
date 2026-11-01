@@ -1,17 +1,49 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const interactBtn = document.getElementById('interact-btn');
-    const demoHeading = document.getElementById('demo-heading');
-    const demoSubtext = document.getElementById('demo-subtext');
+    // Dropdown toggle for native app downloads (.EXE, .DMG, .APK)
+    const downloadMenuBtn = document.getElementById('download-menu-btn');
+    const downloadDropdown = document.getElementById('download-dropdown');
 
-    const colorAccents = ['#88ff00', '#ff00cd', '#00f0ff', '#ff2a4b'];
-    let clickCount = 0;
+    downloadMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        downloadDropdown.classList.toggle('show');
+    });
 
-    interactBtn.addEventListener('click', () => {
-        clickCount++;
-        const nextColor = colorAccents[clickCount % colorAccents.length];
-        
-        demoHeading.style.color = nextColor;
-        demoHeading.style.textShadow = `0 0 25px ${nextColor}`;
-        demoSubtext.textContent = `Action executed ${clickCount} times!`;
+    document.addEventListener('click', () => {
+        downloadDropdown.classList.remove('show');
+    });
+
+    // Interactive Trigger button inside slide
+    const triggerBtn = document.getElementById('interactive-trigger');
+    const statusText = document.getElementById('trigger-status');
+    let triggerCount = 0;
+
+    triggerBtn.addEventListener('click', () => {
+        triggerCount++;
+        statusText.textContent = `Interactive event fired (${triggerCount} times)`;
+        statusText.style.color = '#0066ff';
+    });
+
+    // Background color picker for slide
+    const bgPicker = document.getElementById('bg-picker');
+    const activeSlide = document.getElementById('active-slide');
+    const hexLabel = document.getElementById('color-hex-label');
+
+    bgPicker.addEventListener('input', (e) => {
+        activeSlide.style.backgroundColor = e.target.value;
+        hexLabel.textContent = e.target.value.toUpperCase();
+    });
+
+    // IS Theme bubbles listener
+    const themeBubbles = document.querySelectorAll('.bubble');
+    themeBubbles.forEach(bubble => {
+        bubble.addEventListener('click', () => {
+            const color = bubble.getAttribute('data-color');
+            triggerBtn.style.backgroundColor = color;
+            if(color === '#88ff00' || color === '#00f0ff') {
+                triggerBtn.style.color = '#000';
+            } else {
+                triggerBtn.style.color = '#fff';
+            }
+        });
     });
 });
