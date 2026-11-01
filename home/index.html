@@ -4,45 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home | Interactive Studio: Design & Present Without Limits</title>
-    <!-- Browser Tab Icon -->
     <link rel="icon" type="image/png" href="../tablogo.png">
     <link rel="stylesheet" href="../style.css">
-    <!-- Figma-style typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="../router.js"></script>
 </head>
-<body>
+<body class="page-body">
 
-    <!-- Header Navbar -->
     <header class="home-nav">
         <div class="nav-brand">
-            <img src="../tablogo.png" alt="Interactive Studio Logo" class="brand-logo">
+            <a data-route="/home/"><img src="../headerlogo.png" alt="Interactive Studio" class="brand-logo"></a>
             <span class="brand-name">Interactive Studio</span>
         </div>
-        
         <nav class="nav-links">
-            <a href="#products">Products</a>
-            <a href="#solutions">Solutions</a>
-            <a href="#resouces">Resources</a>
-            <a href="#pricing">Pricing</a>
-            <a href="/../interactivestudio/contact/">Contact</a>
+            <a data-route="/product/">Product</a>
+            <a data-route="/solutions/">Solutions</a>
+            <a data-route="/pricing/">Pricing</a>
+            <a data-route="/resources/">Resources</a>
+            <a data-route="/contact/">Contact</a>
         </nav>
-
         <div class="nav-actions">
-            <a href="/../interactivestudio/auth/personal/login/" class="btn-launch">Sign In</a>
+            <a data-route="/auth/personal/login/" class="btn-launch">Sign In</a>
+            <a data-route="/editor/" class="btn-primary-small">Launch App</a>
         </div>
     </header>
 
-    <!-- Hero Section -->
     <section class="hero-section">
-        <h1 class="hero-badge">Coming soon: Imagine and generate presentations using high-power Artificial Intelligence. Coming on all plans with credits.</h1>
-        <h1 class="hero-title">Build presentations that will <br><span class="highlight-text">change the world.</span></h1>
-        <p class="hero-subtitle">With Interactive Studio, anyone can build life-changing presentations easily.</p>
+        <div class="hero-badge">⚡ Next-Gen Presentation Engine</div>
+        <h1 class="hero-title">Interactive presentations.<br><span class="highlight-text">Designed like Figma.</span></h1>
+        <p class="hero-subtitle">Build professional, highly interactive decks on the web or download zero-watermark native apps for desktop & mobile.</p>
         
         <div class="hero-cta-group">
-            <a href="interactivestudio/editor/" class="btn-primary-large">Register a free account today</a>
-            <a href="interactivestudio/pricing/" class="btn-secondary-large">Plans and Pricing</a>
+            <a data-route="/editor/" class="btn-primary-large">Open Studio in Browser</a>
+            <a href="#apps" class="btn-secondary-large">Download Native Apps</a>
         </div>
 
         <div class="app-preview-mockup">
@@ -50,42 +44,38 @@
                 <span class="dot red"></span>
                 <span class="dot yellow"></span>
                 <span class="dot green"></span>
-                <span class="mockup-title">Presentation Canvas</span>
+                <span class="mockup-title">Interactive Studio — Presentation Canvas</span>
             </div>
             <div class="mockup-body">
-                <img src="../tablogo.png" alt="Studio Preview Logo" class="preview-hero-logo">
-                <h3>Interactive presentations. That's what we're all about.</h3>
-                <p>Get going for free today</p>
-                <a href="/editor/" class="btn-preview-launch">Start Creating →</a>
+                <img src="../headerlogo.png" alt="Studio Preview Logo" class="preview-hero-logo">
+                <h3>Collaborative Interactive Presentations</h3>
+                <p>Click below to jump straight into the canvas</p>
+                <a data-route="/editor/" class="btn-preview-launch">Start Creating →</a>
             </div>
         </div>
     </section>
 
-    <!-- Native App Download Section -->
     <section class="download-section" id="apps">
         <div class="section-header">
             <h2>Download Desktop & Mobile Apps</h2>
-            <p>Get the same experience as the web, just more portable.</p>
+            <p>Bypass app store fees and run Interactive Studio offline with zero watermarks.</p>
         </div>
-
         <div class="download-grid">
             <div class="download-card">
                 <div class="platform-icon">💻</div>
-                <h3>Windows</h3>
+                <h3>Windows Executable</h3>
                 <p>Standalone desktop installer for Windows 10 & 11.</p>
                 <a href="#" class="btn-app-dl">Download .EXE</a>
             </div>
-
             <div class="download-card">
                 <div class="platform-icon">🍏</div>
-                <h3>MacOS</h3>
+                <h3>macOS Installer</h3>
                 <p>Optimized build for Apple Silicon & Intel Macs.</p>
                 <a href="#" class="btn-app-dl">Download .DMG</a>
             </div>
-
             <div class="download-card">
                 <div class="platform-icon">📱</div>
-                <h3>Android</h3>
+                <h3>Android Package</h3>
                 <p>Direct APK installer for Android tablets and smartphones.</p>
                 <a href="#" class="btn-app-dl">Download .APK</a>
             </div>
@@ -96,6 +86,5 @@
         <p>© 2026 Interactive Studio. All rights reserved.</p>
     </footer>
 
-    <script src="../app.js"></script>
 </body>
 </html>
