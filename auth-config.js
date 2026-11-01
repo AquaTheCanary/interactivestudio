@@ -35,7 +35,7 @@ window.loginWithMicrosoft = async function () {
         });
         sessionStorage.setItem("is_user_email", loginResponse.account.username);
         sessionStorage.setItem("is_user_name", loginResponse.account.name || loginResponse.account.username);
-        window.location.href = window.getAppUrl('/dashboard/');
+        window.location.href = window.getAppUrl('interactivestudio/dashboard/');
     } catch (error) {
         console.error("Microsoft SSO Error:", error);
         alert("Microsoft SSO failed: " + error.message);
