@@ -1,1 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organisation Login — Interactive Studio</title>
+    <link rel="icon" type="image/png" href="../../../tabletop.png">
+    <link rel="stylesheet" href="../../../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-header">
+            <img src="../../../logo.png" alt="Logo" class="auth-logo">
+            <h1>Organisation Portal</h1>
+            <p>Sign in using enterprise SSO</p>
+        </div>
+        
+        <div class="auth-tabs">
+            <button class="auth-tab active">Login</button>
+            <button class="auth-tab" onclick="window.location.href='/contact/index.html'">Sign Up (Contact)</button>
+        </div>
 
+        <form class="auth-form" onsubmit="event.preventDefault(); window.location.href='../../../editor/index.html';">
+            <div class="input-group">
+                <label>Company Email / Domain</label>
+                <input type="text" placeholder="company.com" required>
+            </div>
+            <button type="submit" class="btn-submit">Continue with Enterprise SSO</button>
+        </form>
+
+        <div class="back-link-wrap" style="margin-top: 1.5rem;">
+            <a href="../../personal/login/index.html">← Switch to Personal Login</a>
+        </div>
+    </div>
+</body>
+</html>
