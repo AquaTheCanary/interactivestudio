@@ -49,11 +49,17 @@ header {
 }
 
 .brand-logo {
-  width: 40px;
-  height: 40px;
+  height: 44px;
+  width: auto;
   object-fit: contain;
-  border-radius: 6px;
-  filter: drop-shadow(0 0 8px rgba(136, 255, 0, 0.4));
+  image-rendering: -webkit-optimize-contrast;
+  filter: drop-shadow(0 0 10px rgba(136, 255, 0, 0.5));
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.brand-logo:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.8));
 }
 
 .brand-name {
