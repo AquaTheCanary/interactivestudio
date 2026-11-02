@@ -115,6 +115,11 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         throw new Error("Organisation login requires a corporate email domain. Gmail, Yahoo, Outlook.com and other personal providers are blocked.");
       }
       const credential = await auth.signInWithEmailAndPassword(email.trim(), password);
+      if (!credential.user.emailVerified) {
+        try { await credential.user.sendEmailVerification(); } catch (_) {}
+        await auth.signOut();
+        throw new Error("Your email address is not verified yet. We have sent you a fresh verification link. Open it, then sign in again.");
+      }
       await studioAuth.finishSignIn(credential.user, organisation);
     },
     async signInGoogle(organisation = false) {
@@ -150,7 +155,8 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       const credential = await auth.createUserWithEmailAndPassword(email.trim(), password);
       await credential.user.updateProfile({ displayName: name.trim() });
       await credential.user.sendEmailVerification();
-      await studioAuth.finishSignIn(credential.user, false);
+      await auth.signOut();
+      return true;
     },
     async signOut() {
       await auth.signOut();
