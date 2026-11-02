@@ -8,24 +8,29 @@
     <link rel="stylesheet" href="../style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="../router.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="../auth-config.js"></script>
 </head>
 <body class="page-body" style="height: 100vh; overflow: hidden; display: flex; flex-direction: column;">
+
     <header class="home-nav" style="flex-shrink: 0;">
         <div class="nav-brand">
-            <a data-route="/dashboard/"><img src="../headerlogo.png" alt="Interactive Studio" class="brand-logo"></a>
+            <a data-route="/home/"><img src="../headerlogo.png" alt="Interactive Studio" class="brand-logo"></a>
             <span class="brand-name">Studio AI Hub</span>
         </div>
         <nav class="nav-links">
             <a data-route="/dashboard/">Dashboard</a>
+            <a data-route="/editor/">Editor</a>
         </nav>
         <div class="nav-actions">
-            <select id="model-selector" onchange="handleModelSelect(this.value)" style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 0.85rem; font-weight: 600;">
-                <option value="gemini">Gemini: Flash - Free</option>
-                <option value="copilot">Microsoft: Copilot Mini - Free</option>
-                <option value="chatgpt">OpenAI ChatGPT: 4o - Pro</option>
-                <option value="claude">Anthropic Claude: 3.5 Sonnet - Pro</option>
+            <select id="model-selector" onchange="handleModelSelect(this.value)" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 0.85rem; font-weight: 600;">
+                <option value="gemini">Gemini Flash (Free)</option>
+                <option value="copilot">Microsoft Copilot Mini (Free)</option>
+                <option value="chatgpt">ChatGPT-4o (Pro / Paid)</option>
+                <option value="claude">Claude 3.5 Sonnet (Pro / Paid)</option>
             </select>
-            <a data-route="/dashboard/" class="btn-secondary-small">Dashboard</a>
+            <a data-route="/dashboard/" class="btn-secondary-small">Exit Hub</a>
         </div>
     </header>
 
@@ -35,26 +40,33 @@
                 <div style="display: flex; gap: 12px; align-items: flex-start;">
                     <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--brand-blue); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem;">AI</div>
                     <div style="background: var(--bg-subtle); border: 1px solid var(--border-color); padding: 1rem 1.25rem; border-radius: 12px; font-size: 0.95rem;">
-                        Welcome to the Multi-Agent AI Hub! Select a model above. Gemini and Copilot are completely free. ChatGPT-4o and Claude require a paid plan.
+                        Welcome! I am your AI assistant. Gemini Flash and Copilot Mini are included in your Free plan. Upgrade to Pro to unlock ChatGPT-4o and Claude 3.5 Sonnet.
                     </div>
                 </div>
             </div>
 
             <div style="padding: 1.5rem; background: var(--bg-main); border-top: 1px solid var(--border-color); display: flex; justify-content: center;">
                 <form id="chat-form" style="max-width: 800px; width: 100%; display: flex; gap: 10px;" onsubmit="sendMessage(event)">
-                    <input type="text" id="chat-input" placeholder="Ask your AI assistant..." style="flex: 1; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.95rem;" required autocomplete="off">
-                    <button type="submit" class="btn-primary-small" style="padding: 0 20px;">Send →</button
+                    <input type="text" id="chat-input" placeholder="Type instructions or paste slide outline..." style="flex: 1; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.95rem;" required autocomplete="off">
+                    <button type="submit" class="btn-primary-small" style="padding: 0 20px;">Send Prompt →</button>
                 </form>
             </div>
         </main>
     </div>
 
     <script>
+        const auth = firebase.auth();
+        auth.onAuthStateChanged((user) => {
+            if (!user && !sessionStorage.getItem("is_user_email")) {
+                window.location.href = window.getAppUrl('/auth/personal/login/');
+            }
+        });
+
         function handleModelSelect(val) {
             const userPlan = sessionStorage.getItem("is_user_plan") || "Free";
             const paidModels = ["chatgpt", "claude"];
-            if (paidModels.includes(val) && userPlan === "Free") {
-                alert("🔒 This AI model is locked on the Free plan. Please sign in with an account on a Pro or Team plan, or visit the Pricing page to upgrade.");
+            if (paidModels.includes(val) && (userPlan === "Free" || userPlan === "Basic")) {
+                alert("🔒 This model is locked on the Free tier. Please sign in to a Pro, Team, or Organisation account to unlock ChatGPT-4o and Claude 3.5 Sonnet.");
                 document.getElementById("model-selector").value = "gemini";
             }
         }
@@ -70,7 +82,7 @@
             input.value = "";
 
             setTimeout(() => {
-                container.innerHTML += `<div style="display:flex; gap:12px;"><div style="width:32px;height:32px;border-radius:50%;background:var(--brand-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;">AI</div><div style="background:var(--bg-subtle);border:1px solid var(--border-color);padding:10px 14px;border-radius:8px;">Response generated via ${currentModel.toUpperCase()}: I've processed your prompt successfully!</div></div>`;
+                container.innerHTML += `<div style="display:flex; gap:12px;"><div style="width:32px;height:32px;border-radius:50%;background:var(--brand-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;">AI</div><div style="background:var(--bg-subtle);border:1px solid var(--border-color);padding:10px 14px;border-radius:8px;">Generated using <strong>${currentModel.toUpperCase()}</strong>: Slide layout and copy recommendations ready for canvas export.</div></div>`;
                 container.scrollTop = container.scrollHeight;
             }, 600);
         }
