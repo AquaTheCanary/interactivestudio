@@ -84,7 +84,7 @@ Endpoints:
 - **Gemini Flash** uses the Gemini API and requires `GEMINI_API_KEY`.
 - **Copilot Mini** is wired to an Azure OpenAI deployment alias. Microsoft does not provide a general public API endpoint named “Copilot Mini”; configure the Azure deployment you want to use with the three Azure secrets above. Azure usage may incur charges.
 - **ChatGPT-4o** uses OpenAI's API and requires `OPENAI_API_KEY`.
-- **Claude 3.5 Sonnet** uses Anthropic's Messages API and requires `ANTHROPIC_API_KEY`.
+- **Claude Sonnet (current supported API model)** uses Anthropic's Messages API and requires `ANTHROPIC_API_KEY`.
 
 Provider API usage is subject to provider pricing, quotas, account eligibility and model availability. A free Interactive Studio plan does not guarantee a provider will supply unlimited free API usage.
 
