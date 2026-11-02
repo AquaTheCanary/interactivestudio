@@ -2,7 +2,7 @@
 // Configure Google and Microsoft providers in Firebase Authentication.
 // Microsoft uses Firebase's microsoft.com OAuth provider so all sign-ins share one Firebase session.
 const firebaseConfig = {
-  apiKey: "AIzaSyAHQDuRXq77XRZvnE-dDuoy8A1TLtfSy8",
+  apiKey: "AIzaSyAHQDuRXq77XRZvnE-dDuoy8A1TLLtfSy8",
   authDomain: "interactive-studio-convexllc.firebaseapp.com",
   projectId: "interactive-studio-convexllc",
   storageBucket: "interactive-studio-convexllc.firebasestorage.app",
