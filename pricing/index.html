@@ -1,134 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plans and Pricing | Interactive Studio</title>
-    <link rel="icon" type="image/png" href="../tablogo.png">
-    <link rel="stylesheet" href="../style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="../router.js"></script>
-</head>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pricing | Interactive Studio</title><link rel="icon" href="../tablogo.png"><link rel="stylesheet" href="../style.css"><script src="../router.js"></script></head>
 <body class="page-body">
-
-    <header class="home-nav">
-        <div class="nav-brand">
-            <a data-route="/home/"><img src="../headerlogo.png" alt="Interactive Studio" class="brand-logo"></a>
-            <span class="brand-name">Interactive Studio</span>
-        </div>
-        <nav class="nav-links">
-            <a data-route="/product/">Product</a>
-            <a data-route="/solutions/">Solutions</a>
-            <a data-route="/pricing/" class="active">Pricing</a>
-            <a data-route="/resources/">Resources</a>
-            <a data-route="/contact/">Contact</a>
-        </nav>
-        <div class="nav-actions">
-            <a data-route="/auth/personal/login/" class="btn-launch">Sign In</a>
-            <a data-route="/editor/" class="btn-primary-small">Launch App</a>
-        </div>
-    </header>
-
-    <main class="content-container">
-        <section class="page-hero">
-            <h1 class="hero-title">Flexible Plans for Teams of All Sizes</h1>
-            <p class="hero-subtitle">Start for free or upgrade to unlock premium AI models, native app builds, and complete watermark removal.</p>
-        </section>
-
-        <div class="pricing-grid">
-            <div class="pricing-card">
-                <h3>Basic (Free)</h3>
-                <div class="price">$0 <span>/ forever</span></div>
-                <p>Standard vector editor, Gemini Flash AI, watermarked presentation export.</p>
-                <a data-route="/auth/personal/register/" class="btn-secondary-large">Get Started Free</a>
-            </div>
-            <div class="pricing-card">
-                <h3>Pro</h3>
-                <div class="price">£4.99 <span>/ month</span></div>
-                <p>ChatGPT-4o & Claude 3.5 Sonnet access, zero watermarks, 4K canvas export.</p>
-                <a data-route="/auth/personal/login/" class="btn-primary-small">Upgrade to Pro</a>
-            </div>
-            <div class="pricing-card">
-                <h3>Team</h3>
-                <div class="price">£12.99 <span>/ month</span></div>
-                <p>Real-time multi-user editing, team asset libraries, custom permissions.</p>
-                <a data-route="/auth/personal/login/" class="btn-primary-small">Start Team Plan</a>
-            </div>
-            <div class="pricing-card">
-                <h3>Organisation</h3>
-                <div class="price">£17.99 <span>/ mo (billed annually)</span></div>
-                <p>Corporate domain SSO validation, admin dashboard, central governance.</p>
-                <a data-route="/contact/setup/organisation/" class="btn-primary-small">Setup Organisation</a>
-            </div>
-            <div class="pricing-card">
-                <h3>Enterprise</h3>
-                <div class="price">£25.99 <span>/ mo (billed annually)</span></div>
-                <p>Dedicated cloud infrastructure, custom security SLAs, 24/7 priority support.</p>
-                <a data-route="/contact/setup/enterprise/" class="btn-primary-small">Setup Enterprise</a>
-            </div>
-            <div class="pricing-card featured-pricing">
-                <span class="pricing-badge">Custom</span>
-                <h3>Company</h3>
-                <div class="price">Custom <span>quote</span></div>
-                <p>Tailored contract provisioned directly by our engineering team upon approval.</p>
-                <a data-route="/contact/enquiry/custompricing-plan?=company" class="btn-primary-large">Request Quote</a>
-            </div>
-        </div>
-
-        <section style="margin-top: 5rem;">
-            <h2 style="text-align: center; font-size: 2rem; font-weight: 800; margin-bottom: 2rem;">Feature Comparison Matrix</h2>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; font-size: 0.9rem;">
-                    <thead>
-                        <tr style="background: var(--bg-subtle); border-bottom: 1px solid var(--border-color); text-align: left;">
-                            <th style="padding: 14px 16px;">Feature</th>
-                            <th style="padding: 14px 16px;">Basic (Free)</th>
-                            <th style="padding: 14px 16px;">Pro (£4.99)</th>
-                            <th style="padding: 14px 16px;">Team (£12.99)</th>
-                            <th style="padding: 14px 16px;">Organisation / Enterprise</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr style="border-bottom: 1px solid var(--border-color);">
-                            <td style="padding: 14px 16px; font-weight: 600;">AI Assistant Models</td>
-                            <td style="padding: 14px 16px;">Gemini & Copilot Mini</td>
-                            <td style="padding: 14px 16px;">All Models (Inc. ChatGPT-4o & Claude)</td>
-                            <td style="padding: 14px 16px;">All Models + Shared Context</td>
-                            <td style="padding: 14px 16px;">Custom Fine-tuned LLMs</td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid var(--border-color);">
-                            <td style="padding: 14px 16px; font-weight: 600;">Presentation Watermark</td>
-                            <td style="padding: 14px 16px; color: #d93025;">Yes ("Made in Interactive Studio")</td>
-                            <td style="padding: 14px 16px; color: #188038;">None (Removed)</td>
-                            <td style="padding: 14px 16px; color: #188038;">None (Removed)</td>
-                            <td style="padding: 14px 16px; color: #188038;">Custom Brand Logo Watermark</td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid var(--border-color);">
-                            <td style="padding: 14px 16px; font-weight: 600;">Single Sign-On (SSO)</td>
-                            <td style="padding: 14px 16px;">Standard Auth</td>
-                            <td style="padding: 14px 16px;">Standard Auth</td>
-                            <td style="padding: 14px 16px;">Google Workspace & MSFT</td>
-                            <td style="padding: 14px 16px;">Azure AD Domain Enforcement</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 14px 16px; font-weight: 600;">Native Desktop Builds</td>
-                            <td style="padding: 14px 16px;">Web Only</td>
-                            <td style="padding: 14px 16px;">.EXE / .DMG Exports</td>
-                            <td style="padding: 14px 16px;">.EXE / .DMG / .APK Exports</td>
-                            <td style="padding: 14px 16px;">Managed Enterprise Deployment</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <p>© 2026 Interactive Studio. All rights reserved.</p>
-        <p style="margin-top: 6px;">
-            View this website on <a href="https://github.com/AquaTheCanary/interactivestudio/tree/main" target="_blank" rel="noopener" style="color: var(--brand-blue); text-decoration: underline; font-weight: 600;">GitHub</a>
-        </p>
-    </footer>
-
-</body>
-</html>
+<header class="home-nav"><div class="nav-brand"><a data-route="/home/"><img src="../headerlogo.png" class="brand-logo" alt="Interactive Studio"></a><span class="brand-name">Interactive Studio</span></div><nav class="nav-links"><a data-route="/home/">Home</a><a data-route="/ai/">AI Hub</a><a data-route="/pricing/" class="active">Pricing</a></nav><div class="nav-actions"><a data-route="/auth/personal/login/" class="btn-launch">Sign In</a></div></header>
+<main class="content-container"><section class="page-hero"><h1 class="hero-title">Simple, transparent pricing</h1><p class="hero-subtitle">Start free. Upgrade when your studio needs more power.</p></section>
+<div class="pricing-grid">
+<article class="pricing-card"><h3>Basic</h3><div class="price">£0 <span>/ forever</span></div><p>Core editor, Gemini Flash and Copilot Mini, watermarked presentations.</p><a data-route="/auth/personal/register/" class="btn-secondary-large">Get started free</a></article>
+<article class="pricing-card featured-pricing"><span class="pricing-badge">Popular</span><h3>Pro</h3><div class="price">£4.99 <span>/ month</span></div><p>All AI models, watermark removal and high-resolution canvas exports.</p><a data-route="/auth/personal/login/" class="btn-primary-large">Choose Pro</a></article>
+<article class="pricing-card"><h3>Team</h3><div class="price">£12.99 <span>/ month</span></div><p>All models, shared workflows and team collaboration features.</p><a data-route="/auth/personal/login/" class="btn-primary-large">Choose Team</a></article>
+<article class="pricing-card"><h3>Organisation</h3><div class="price">£17.99 <span>/ month</span></div><p>Billed annually. Corporate SSO and organisation administration.</p><a data-route="/contact/setup/organisation/" class="btn-primary-large">Set up organisation</a></article>
+<article class="pricing-card"><h3>Enterprise</h3><div class="price">£25.99 <span>/ month</span></div><p>Billed annually. Enterprise governance and deployment options.</p><a data-route="/contact/setup/organisation/" class="btn-primary-large">Contact sales</a></article>
+<article class="pricing-card"><span class="pricing-badge">Custom</span><h3>Company</h3><div class="price">Custom <span>/ quote</span></div><p>Tailored agreements and provisioning for larger deployments.</p><a href="../contact/enquiry/custompricing-plan?=company" class="btn-primary-large">Request a quote</a></article>
+</div>
+<section style="margin-top:4rem"><h2 style="text-align:center;margin-bottom:1.5rem">Feature comparison</h2><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:760px"><thead><tr><th>Feature</th><th>Basic</th><th>Pro</th><th>Team</th><th>Organisation</th><th>Enterprise</th><th>Company</th></tr></thead><tbody>
+<tr><td>Gemini Flash</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr><tr><td>Copilot Mini</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr><tr><td>ChatGPT-4o</td><td>—</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr><tr><td>Claude 3.5 Sonnet</td><td>—</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr><tr><td>Presentation watermark</td><td>Shown</td><td>Removed</td><td>Removed</td><td>Removed</td><td>Removed</td><td>Configurable</td></tr><tr><td>Google / Microsoft SSO</td><td>Personal</td><td>Personal</td><td>Team</td><td>Corporate</td><td>Corporate</td><td>Custom</td></tr><tr><td>Native app exports</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>Custom</td></tr><tr><td>Collaboration</td><td>Basic</td><td>Basic</td><td>Team</td><td>Organisation</td><td>Advanced</td><td>Custom</td></tr>
+</tbody></table></div><p style="color:var(--text-sub);margin-top:1rem;font-size:.85rem">Prices are displayed as supplied. Organisation and Enterprise prices are monthly equivalents billed annually.</p></section></main>
+<footer><p>© 2026 Interactive Studio. All rights reserved.</p><p><a href="https://github.com/AquaTheCanary/interactivestudio/tree/main" target="_blank" rel="noopener">View this website on GitHub (github.com/AquaTheCanary/interactivestudio/tree/main)</a></p></footer></body></html>
