@@ -1,4 +1,4 @@
-// auth-config.js — Complete SSO & Firebase Authentication Handlers
+// auth-config.js — Unified Auth & SSO Core
 const firebaseConfig = {
     apiKey: "AIzaSyAHQDuRXq77XRZvnE-dDuoy8A1TLtfSy8",
     authDomain: "interactive-studio-convexllc.firebaseapp.com",
@@ -18,15 +18,35 @@ const msalConfig = {
     cache: { cacheLocation: "sessionStorage", storeAuthStateInCookie: false }
 };
 
-// Initialize Firebase
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 
-const freeDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'aol.com', 'mail.com', 'protonmail.com'];
+const freeEmailDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'aol.com', 'mail.com', 'proton.me'];
 
-// Microsoft SSO Handler (Works for Personal & Org)
-window.loginWithMicrosoft = async function (enforceOrgDomain = false) {
+window.loginWithGoogle = async function (enforceOrg = false) {
+    try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        const res = await firebase.auth().signInWithPopup(provider);
+        const email = res.user.email.toLowerCase();
+        const domain = email.split('@')[1];
+
+        if (enforceOrg && freeEmailDomains.includes(domain)) {
+            await firebase.auth().signOut();
+            alert("Access Denied: Organisation login requires a corporate work domain. Consumer Google accounts are blocked.");
+            return;
+        }
+
+        sessionStorage.setItem("is_user_email", email);
+        sessionStorage.setItem("is_user_name", res.user.displayName || email);
+        sessionStorage.setItem("is_user_plan", enforceOrg ? "Organisation" : "Free");
+        window.location.href = window.getAppUrl('/dashboard/');
+    } catch (err) {
+        alert("Google Sign-In Failed: " + err.message);
+    }
+};
+
+window.loginWithMicrosoft = async function (enforceOrg = false) {
     try {
         const msalInstance = new msal.PublicClientApplication(msalConfig);
         await msalInstance.initialize();
@@ -34,41 +54,16 @@ window.loginWithMicrosoft = async function (enforceOrgDomain = false) {
         const email = res.account.username.toLowerCase();
         const domain = email.split('@')[1];
 
-        if (enforceOrgDomain && freeDomains.includes(domain)) {
-            alert("Access Denied: Organisation login requires a corporate email domain. Please use a work address or sign in via Personal Login.");
+        if (enforceOrg && freeEmailDomains.includes(domain)) {
+            alert("Access Denied: Organisation login requires a corporate work domain.");
             return;
         }
 
         sessionStorage.setItem("is_user_email", email);
         sessionStorage.setItem("is_user_name", res.account.name || email);
-        sessionStorage.setItem("is_user_plan", enforceOrgDomain ? "Organisation" : "Team");
+        sessionStorage.setItem("is_user_plan", enforceOrg ? "Organisation" : "Team");
         window.location.href = window.getAppUrl('/dashboard/');
     } catch (err) {
-        console.error("Microsoft SSO Error:", err);
-        alert("Microsoft Sign-In Error: " + err.message);
-    }
-};
-
-// Google SSO Handler (Works for Personal & Org)
-window.loginWithGoogle = async function (enforceOrgDomain = false) {
-    try {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        const res = await firebase.auth().signInWithPopup(provider);
-        const email = res.user.email.toLowerCase();
-        const domain = email.split('@')[1];
-
-        if (enforceOrgDomain && freeDomains.includes(domain)) {
-            await firebase.auth().signOut();
-            alert("Access Denied: Organisation login requires a valid work email domain (e.g., name@company.com). Generic consumer Google accounts are restricted.");
-            return;
-        }
-
-        sessionStorage.setItem("is_user_email", email);
-        sessionStorage.setItem("is_user_name", res.user.displayName || email);
-        sessionStorage.setItem("is_user_plan", enforceOrgDomain ? "Organisation" : "Free");
-        window.location.href = window.getAppUrl('/dashboard/');
-    } catch (err) {
-        console.error("Google SSO Error:", err);
-        alert("Google Sign-In Error: " + err.message);
+        alert("Microsoft Sign-In Failed: " + err.message);
     }
 };
