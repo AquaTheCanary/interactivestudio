@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Studio — Design & Present Without Limits</title>
+    <title>Home | Interactive Studio</title>
     <link rel="icon" type="image/png" href="../tablogo.png">
     <link rel="stylesheet" href="../style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="../router.js"></script>
 </head>
 <body class="page-body">
+
     <header class="home-nav">
         <div class="nav-brand">
             <a data-route="/home/"><img src="../headerlogo.png" alt="Interactive Studio" class="brand-logo"></a>
@@ -20,31 +21,86 @@
             <a data-route="/solutions/">Solutions</a>
             <a data-route="/pricing/">Pricing</a>
             <a data-route="/resources/">Resources</a>
-            <a data-route="/ai/">AI</a>
             <a data-route="/contact/">Contact</a>
         </nav>
         <div class="nav-actions">
             <a data-route="/auth/personal/login/" class="btn-launch">Sign In</a>
-            <a data-route="/home#apps/" class="btn-primary-small">Download the App</a>
+            <a data-route="/editor/" class="btn-primary-small">Launch App</a>
         </div>
     </header>
 
-    <section class="hero-section">
-        <div class="hero-badge">Now available! New AI hub to power your workflows. Try it here.<a href="https://aquathecanary.github.io/ai/"></div>
-        <h1 class="hero-title">Build presentations that will <br><span class="highlight-text">change the world.</span></h1>
-        <p class="hero-subtitle">Design, collaberate and create life-changing presentations with ease, powered by Artificial Intelligence.</p>
-        <p class="hero-subtitle">Get started today at no cost</p>
-        <div class="hero-cta-group">
-            <a data-route="/personal/register" class="btn-primary-large">Get Started<a>
-            <a data-route="/personal/register" class="btn-secondary-large">Sign in<a>
-            <a data-route="/pricing/" class="btn-secondary-large">View Pricing<a>
-        </div>
-    </section>
+    <main>
+        <section class="hero-section">
+            <div class="hero-badge">Now available! New AI hub to power your workflows. <a data-route="/ai/" style="color: inherit; font-weight: 700; text-decoration: underline;">Try it here.</a></div>
+            
+            <h1 class="hero-title" style="font-size: 3.8rem; font-weight: 800; letter-spacing: -1.5px; line-height: 1.1;">
+                <u>Build presentations</u> that will <br><span class="highlight-text" style="color: #0066ff;"><u>change the world.</u></span>
+            </h1>
+
+            <p class="hero-subtitle" style="font-size: 1.25rem; font-weight: 500; color: #555; max-width: 750px; margin: 1.5rem auto 1rem; line-height: 1.5;">
+                <u>Design, collaborate and create life-changing presentations with ease, powered by Artificial Intelligence.</u>
+            </p>
+
+            <p style="font-size: 1.05rem; font-weight: 600; color: #333; margin-bottom: 2rem;">
+                <u>Get started today at no cost</u>
+            </p>
+
+            <div class="hero-cta-group" style="display: flex; justify-content: center; gap: 1rem; margin-bottom: 4rem;">
+                <a data-route="/editor/" class="btn-primary-large" style="background: #111; color: #fff; padding: 14px 32px; border-radius: 8px; font-weight: 700; font-size: 1rem;">Get Started</a>
+                <a data-route="/auth/personal/login/" class="btn-secondary-large" style="background: #fff; color: #111; border: 1px solid var(--border-color); padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 1rem;">Sign in</a>
+                <a data-route="/pricing/" class="btn-secondary-large" style="background: #fff; color: #111; border: 1px solid var(--border-color); padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 1rem;">View Pricing</a>
+            </div>
+
+            <div class="app-preview-mockup">
+                <div class="mockup-header">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green"></span>
+                    <span class="mockup-title">Interactive Studio — Live Canvas Engine</span>
+                </div>
+                <div class="mockup-body">
+                    <img src="../headerlogo.png" alt="Studio Preview Logo" class="preview-hero-logo">
+                    <h3>Real-time Collaborative Vector Editor</h3>
+                    <p>Designed for teams who want to replace flat slides with interactive applications.</p>
+                    <a data-route="/editor/" class="btn-preview-launch">Launch Editor Canvas →</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="download-section">
+            <div class="section-header">
+                <h2>Native Desktop & Mobile Applications</h2>
+                <p>Run Interactive Studio offline with zero watermarks on Pro, Team, and Organisation plans.</p>
+            </div>
+            <div class="download-grid">
+                <div class="download-card">
+                    <div class="platform-icon">💻</div>
+                    <h3>Windows 10 & 11</h3>
+                    <p>Standalone desktop installer with full hardware acceleration.</p>
+                    <a href="#" class="btn-app-dl">Download .EXE</a>
+                </div>
+                <div class="download-card">
+                    <div class="platform-icon">🍏</div>
+                    <h3>macOS Native</h3>
+                    <p>Universal binary compiled for Apple Silicon M1/M2/M3 and Intel Macs.</p>
+                    <a href="#" class="btn-app-dl">Download .DMG</a>
+                </div>
+                <div class="download-card">
+                    <div class="platform-icon">📱</div>
+                    <h3>Android Package</h3>
+                    <p>Native APK installer optimized for Android tablets & mobile screens.</p>
+                    <a href="#" class="btn-app-dl">Download .APK</a>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <footer>
         <p>© 2026 Interactive Studio. All rights reserved.</p>
-        <p>View the website on Github<a href="aquathecanary.github.io/interactivestudio/tree/main"></p>
+        <p style="margin-top: 6px;">
+            View this website on <a href="https://github.com/AquaTheCanary/interactivestudio/tree/main" target="_blank" rel="noopener" style="color: var(--brand-blue); text-decoration: underline; font-weight: 600;">GitHub</a>
+        </p>
     </footer>
-    
+
 </body>
 </html>
