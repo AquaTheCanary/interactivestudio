@@ -87,3 +87,12 @@ exports.generateAI=onRequest({secrets:[GEMINI_API_KEY,OPENAI_API_KEY,ANTHROPIC_A
     return res.json({text,model,plan});
   }catch(e){console.error("AI request failed",e);return res.status(500).json({error:e.message||"AI request failed."});}
 });
+exports.getEntitlements=onRequest(async(req,res)=>{
+  if(cors(req,res)) return;
+  if(req.method!=="POST") return res.status(405).json({error:"Method not allowed."});
+  try{
+    const user=await authenticatedUser(req);
+    const plan=await planFor(user.uid);
+    return res.json({plan:plan.charAt(0).toUpperCase()+plan.slice(1)});
+  }catch(e){return res.status(401).json({error:e.message||"Could not load account entitlements."});}
+});
