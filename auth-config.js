@@ -1,164 +1,176 @@
-// Interactive Studio shared authentication configuration.
-// Firebase web config is public by design; never place service-account credentials here.
+// Interactive Studio authentication shared by every account page.
+// Configure Google and Microsoft providers in Firebase Authentication.
+// Microsoft uses Firebase's microsoft.com OAuth provider so all sign-ins share one Firebase session.
 const firebaseConfig = {
-    apiKey: "AIzaSyAHQDuRXq77XRZvnE-dDuoy8A1TLtfSy8",
-    authDomain: "interactive-studio-convexllc.firebaseapp.com",
-    projectId: "interactive-studio-convexllc",
-    storageBucket: "interactive-studio-convexllc.firebasestorage.app",
-    messagingSenderId: "405382386557",
-    appId: "1:405382386557:web:bd91219c8797218fb2b214",
-    measurementId: "G-9JSV264WHB"
+  apiKey: "AIzaSyAHQDuRXq77XRZvnE-dDuoy8A1TLtfSy8",
+  authDomain: "interactive-studio-convexllc.firebaseapp.com",
+  projectId: "interactive-studio-convexllc",
+  storageBucket: "interactive-studio-convexllc.firebasestorage.app",
+  messagingSenderId: "405382386557",
+  appId: "1:405382386557:web:bd91219c8797218fb2b214",
+  measurementId: "G-9JSV264WHB"
 };
-
-const msalConfig = {
-    auth: {
-        clientId: "9be15a5a-1acc-4365-bdbd-6f206627af88",
-        authority: "https://login.microsoftonline.com/common",
-        redirectUri: window.location.origin + (window.getAppUrl ? window.getAppUrl("/auth/personal/login/") : "/auth/personal/login/")
-    },
-    cache: { cacheLocation: "localStorage", storeAuthStateInCookie: true }
-};
-
-if (!window.firebase) throw new Error("Firebase SDK must load before auth-config.js.");
+if (!window.firebase) throw new Error("Load Firebase App and Auth compat SDK before auth-config.js.");
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
-window.studioAuth = window.studioAuth || {};
-const studioAuth = window.studioAuth;
-studioAuth.auth = firebase.auth();
-studioAuth.freeEmailDomains = new Set([
-    "gmail.com", "googlemail.com", "yahoo.com", "yahoo.co.uk", "ymail.com",
-    "hotmail.com", "hotmail.co.uk", "outlook.com", "outlook.co.uk", "live.com",
-    "live.co.uk", "msn.com", "icloud.com", "me.com", "mac.com", "aol.com",
-    "mail.com", "proton.me", "protonmail.com", "gmx.com", "gmx.co.uk",
-    "yandex.com", "hey.com", "fastmail.com"
-]);
-
-studioAuth.ready = studioAuth.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-    .catch(error => console.error("Could not enable persistent Firebase sessions:", error));
-
-studioAuth.isOrganisationEmail = function (email) {
-    const value = String(email || "").trim().toLowerCase();
-    const parts = value.split("@");
-    return parts.length === 2 && parts[0].length > 0 &&
-        parts[1].includes(".") && !studioAuth.freeEmailDomains.has(parts[1]);
-};
-
-studioAuth.saveSession = function ({ email, name, photoURL, plan = "Basic", provider = "password", uid = "" }) {
-    const profile = {
-        email: String(email || "").toLowerCase(),
-        name: name || email || "Creator",
-        photoURL: photoURL || "",
-        plan,
-        provider,
-        uid,
-        updatedAt: new Date().toISOString()
-    };
-    localStorage.setItem("is_user_email", profile.email);
-    localStorage.setItem("is_user_name", profile.name);
-    localStorage.setItem("is_user_photo", profile.photoURL);
-    localStorage.setItem("is_user_plan", profile.plan);
-    localStorage.setItem("is_user_provider", profile.provider);
-    localStorage.setItem("is_user_uid", profile.uid);
-    localStorage.setItem("interactive_studio_session", JSON.stringify(profile));
-    return profile;
-};
-
-studioAuth.getSession = function () {
-    const user = studioAuth.auth.currentUser;
-    if (user) {
-        return {
-            email: user.email || "",
-            name: user.displayName || user.email || "Creator",
-            photoURL: user.photoURL || "",
-            plan: localStorage.getItem("is_user_plan") || "Basic",
-            provider: user.providerData?.[0]?.providerId || "firebase",
-            uid: user.uid
-        };
-    }
-    try {
-        const saved = JSON.parse(localStorage.getItem("interactive_studio_session") || "null");
-        return saved && saved.email ? saved : null;
-    } catch (_) {
-        return null;
-    }
-};
-
-studioAuth.requireSession = function (redirectPath = "/auth/personal/login/") {
-    const session = studioAuth.getSession();
-    if (!session) {
-        window.location.replace(window.getAppUrl ? window.getAppUrl(redirectPath) : redirectPath);
-        return false;
-    }
-    return true;
-};
-
-studioAuth.completeLogin = function (profile, plan) {
-    studioAuth.saveSession({
-        email: profile.email,
-        name: profile.name || profile.displayName || profile.email,
-        photoURL: profile.photoURL || "",
-        plan,
-        provider: profile.provider || "unknown",
-        uid: profile.uid || profile.localAccountId || ""
+(function () {
+  const auth = firebase.auth();
+  const freeDomains = new Set([
+    "gmail.com","googlemail.com","yahoo.com","yahoo.co.uk","ymail.com",
+    "hotmail.com","hotmail.co.uk","outlook.com","outlook.co.uk","live.com",
+    "live.co.uk","msn.com","icloud.com","me.com","mac.com","aol.com",
+    "mail.com","proton.me","protonmail.com","gmx.com","gmx.co.uk",
+    "yandex.com","hey.com","fastmail.com","pm.me","zoho.com"
+  ]);
+  const paidPlans = new Set(["pro","team","organisation","enterprise","company"]);
+  const appUrl = path => window.getAppUrl ? window.getAppUrl(path) : path;
+  const authReady = new Promise(resolve => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      unsubscribe();
+      resolve(user || null);
     });
-    window.location.replace(window.getAppUrl ? window.getAppUrl("/dashboard/") : "/dashboard/");
-};
+  });
 
-window.loginWithGoogle = async function (enforceOrg = false) {
-    try {
-        await studioAuth.ready;
-        const provider = new firebase.auth.GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: "select_account" });
-        const credential = await studioAuth.auth.signInWithPopup(provider);
-        const user = credential.user;
-        if (enforceOrg && !studioAuth.isOrganisationEmail(user.email)) {
-            await studioAuth.auth.signOut();
-            throw new Error("Organisation access requires a verified corporate Google Workspace email. Free personal email providers are not accepted.");
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(error => {
+    console.error("Firebase persistence setup failed:", error);
+  });
+
+  const studioAuth = {
+    auth,
+    ready: authReady,
+    freeDomains,
+    paidPlans,
+    isOrganisationEmail(email) {
+      const value = String(email || "").trim().toLowerCase();
+      const at = value.lastIndexOf("@");
+      if (at < 1) return false;
+      const domain = value.slice(at + 1);
+      return domain.includes(".") && !freeDomains.has(domain) &&
+        !domain.startsWith(".") && !domain.endsWith(".");
+    },
+    async currentUser() {
+      await authReady;
+      return auth.currentUser;
+    },
+    async getProfile(user) {
+      const activeUser = user || await studioAuth.currentUser();
+      if (!activeUser) return null;
+      let claims = {};
+      try { claims = (await activeUser.getIdTokenResult()).claims || {}; } catch (_) {}
+      return {
+        uid: activeUser.uid,
+        email: activeUser.email || "",
+        name: activeUser.displayName || activeUser.email || "Creator",
+        photoURL: activeUser.photoURL || "",
+        emailVerified: !!activeUser.emailVerified,
+        provider: activeUser.providerData?.[0]?.providerId || "password",
+        plan: String(claims.plan || "Basic"),
+        organisationId: claims.organisationId || null
+      };
+    },
+    async requireUser(redirect = "/auth/personal/login/") {
+      const user = await studioAuth.currentUser();
+      if (!user) {
+        window.location.replace(appUrl(redirect));
+        return null;
+      }
+      return user;
+    },
+    async validateOrganisation(user) {
+      if (!user || !studioAuth.isOrganisationEmail(user.email)) {
+        throw new Error("Use a verified corporate email address. Consumer email providers are not accepted for organisation accounts.");
+      }
+      if (!user.emailVerified) {
+        throw new Error("Verify your corporate email address before accessing an organisation workspace.");
+      }
+      if (firebase.functions) {
+        try {
+          const check = firebase.functions().httpsCallable("assertOrganisationAccess");
+          await check({});
+        } catch (error) {
+          if (error.code === "functions/not-found" || error.code === "functions/unavailable") {
+            throw new Error("Organisation verification is not deployed yet. Please contact your workspace administrator.");
+          }
+          throw error;
         }
-        studioAuth.completeLogin({
-            email: user.email,
-            name: user.displayName,
-            photoURL: user.photoURL,
-            uid: user.uid,
-            provider: "google"
-        }, enforceOrg ? "Organisation" : "Basic");
-    } catch (error) {
-        console.error("Google sign-in:", error);
-        window.alert("Google sign-in failed: " + (error.message || "Please try again."));
+      } else {
+        throw new Error("Organisation verification service is unavailable.");
+      }
+      return true;
+    },
+    async finishSignIn(user, organisation = false) {
+      if (organisation) await studioAuth.validateOrganisation(user);
+      const profile = await studioAuth.getProfile(user);
+      localStorage.setItem("is_user_email", profile.email);
+      localStorage.setItem("is_user_name", profile.name);
+      localStorage.setItem("is_user_photo", profile.photoURL);
+      localStorage.setItem("is_user_plan", profile.plan);
+      localStorage.setItem("is_user_provider", profile.provider);
+      window.location.replace(appUrl("/dashboard/"));
+    },
+    async signInEmail(email, password, organisation = false) {
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      if (organisation && !studioAuth.isOrganisationEmail(email)) {
+        throw new Error("Organisation login requires a corporate email domain. Gmail, Yahoo, Outlook.com and other personal providers are blocked.");
+      }
+      const credential = await auth.signInWithEmailAndPassword(email.trim(), password);
+      await studioAuth.finishSignIn(credential.user, organisation);
+    },
+    async signInGoogle(organisation = false) {
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+      const credential = await auth.signInWithPopup(provider);
+      await studioAuth.finishSignIn(credential.user, organisation);
+    },
+    async signInMicrosoft(organisation = false) {
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      const provider = new firebase.auth.OAuthProvider("microsoft.com");
+      provider.setCustomParameters({ prompt: "select_account" });
+      provider.addScope("email");
+      const credential = await auth.signInWithPopup(provider);
+      await studioAuth.finishSignIn(credential.user, organisation);
+    },
+    async registerPersonal({ name, email, password }) {
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      const credential = await auth.createUserWithEmailAndPassword(email.trim(), password);
+      await credential.user.updateProfile({ displayName: name.trim() });
+      await credential.user.sendEmailVerification();
+      await studioAuth.finishSignIn(credential.user, false);
+    },
+    async signOut() {
+      await auth.signOut();
+      ["is_user_email","is_user_name","is_user_photo","is_user_plan","is_user_provider"].forEach(key => localStorage.removeItem(key));
+      localStorage.removeItem("interactive_studio_session");
+      window.location.replace(appUrl("/home/"));
+    },
+    async generateAI(model, prompt, context = {}) {
+      const user = await studioAuth.currentUser();
+      if (!user) throw new Error("Sign in to use Interactive Studio AI.");
+      const token = await user.getIdToken();
+      const response = await fetch(appUrl("/api/ai"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+        body: JSON.stringify({ model, prompt, context })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "AI service unavailable.");
+      return data.text || data.reply || "";
     }
-};
+  };
 
-window.loginWithMicrosoft = async function (enforceOrg = false) {
-    try {
-        if (!window.msal) throw new Error("Microsoft sign-in library did not load. Refresh and try again.");
-        const instance = new msal.PublicClientApplication(msalConfig);
-        await instance.initialize();
-        const result = await instance.loginPopup({
-            scopes: ["openid", "profile", "email", "User.Read"],
-            prompt: "select_account"
-        });
-        const account = result.account;
-        const email = account.username || account.idTokenClaims?.preferred_username || account.idTokenClaims?.email;
-        if (!email) throw new Error("Microsoft did not return an email address.");
-        if (enforceOrg && !studioAuth.isOrganisationEmail(email)) {
-            await instance.logoutPopup({ account });
-            throw new Error("Organisation access requires a corporate Microsoft Entra account. Free Outlook, Hotmail and other personal email providers are not accepted.");
-        }
-        studioAuth.completeLogin({
-            email,
-            name: account.name || email,
-            uid: account.localAccountId,
-            provider: "microsoft"
-        }, enforceOrg ? "Organisation" : "Basic");
-    } catch (error) {
-        console.error("Microsoft sign-in:", error);
-        window.alert("Microsoft sign-in failed: " + (error.message || "Please try again."));
+  window.studioAuth = studioAuth;
+  window.loginWithGoogle = organisation => studioAuth.signInGoogle(!!organisation).catch(showAuthError);
+  window.loginWithMicrosoft = organisation => studioAuth.signInMicrosoft(!!organisation).catch(showAuthError);
+  window.showAuthError = showAuthError;
+  function showAuthError(error) {
+    const message = document.querySelector("[data-auth-message]");
+    if (message) {
+      message.textContent = error.message || "Something went wrong. Please try again.";
+      message.className = "auth-message error";
+    } else {
+      console.error(error);
+      window.alert(error.message || "Something went wrong. Please try again.");
     }
-};
-
-studioAuth.signOut = async function () {
-    try { await studioAuth.auth.signOut(); } catch (error) { console.warn(error); }
-    localStorage.removeItem("interactive_studio_session");
-    ["is_user_email", "is_user_name", "is_user_photo", "is_user_plan", "is_user_provider", "is_user_uid"].forEach(key => localStorage.removeItem(key));
-    window.location.replace(window.getAppUrl ? window.getAppUrl("/home/") : "/home/");
-};
+  }
+})();
