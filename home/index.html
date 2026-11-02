@@ -3,91 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home | Interactive Studio: Design & Present Without Limits</title>
+    <title>Interactive Studio — Design & Present Without Limits</title>
     <link rel="icon" type="image/png" href="../tablogo.png">
     <link rel="stylesheet" href="../style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="../router.js"></script>
 </head>
 <body class="page-body">
-
     <header class="home-nav">
         <div class="nav-brand">
             <a data-route="/home/"><img src="../headerlogo.png" alt="Interactive Studio" class="brand-logo"></a>
             <span class="brand-name">Interactive Studio</span>
         </div>
         <nav class="nav-links">
-            <a data-route="/products/">Products</a>
+            <a data-route="/product/">Product</a>
             <a data-route="/solutions/">Solutions</a>
             <a data-route="/pricing/">Pricing</a>
             <a data-route="/resources/">Resources</a>
+            <a data-route="/ai/">AI Hub</a>
             <a data-route="/contact/">Contact</a>
         </nav>
         <div class="nav-actions">
             <a data-route="/auth/personal/login/" class="btn-launch">Sign In</a>
-            <a data-route="/auth/personal/login" class="btn-primary-small">Dashboard</a>
+            <a data-route="/editor/" class="btn-primary-small">Launch App</a>
         </div>
     </header>
 
     <section class="hero-section">
-        <div class="hero-badge">Coming soon: Imagine and generate presentations using high-power Artificial Intelligence. Coming on all plans with credits.</div>
-        <h1 class="hero-title">Build presentations that will <br><span class="highlight-text">change the world.</span></h1>
-        <p class="hero-subtitle">With Interactive Studio, anyone can build life-changing presentations with easy.
+        <div class="hero-badge">⚡ Next-Gen Presentation Engine</div>
+        <h1 class="hero-title">Interactive presentations.<br><span class="highlight-text">Designed like Figma.</span></h1>
+        <p class="hero-subtitle">Build professional, highly interactive decks on the web with multi-model AI agents and cross-platform native deployment.</p>
         <div class="hero-cta-group">
-        <a data-route="interactivestudio/auth/personal/register" class="btn-primary-large">Register today for free</a>
-        <a href="#apps" class="btn-secondary-large">Download the App</a>
-        <a href="interactivestudio/auth/personal/login" class="btn-secondary-large">Editor</a>
-        <a href="interactivestudio/pricing" class="btn-secondary-large">Plans and Pricing</a>
-        </div>
-
-        <div class="app-preview-mockup">
-            <div class="mockup-header">
-                <span class="dot red"></span>
-                <span class="dot yellow"></span>
-                <span class="dot green"></span>
-                <span class="mockup-title">Interactive Studio — Presentation Canvas</span>
-            </div>
-            <div class="mockup-body">
-                <img src="../headerlogo.png" alt="Studio Preview Logo" class="preview-hero-logo">
-                <h3>Collaborate and create properly.</h3>
-                <p>Click below to jump straight into the canvas.</p>
-                <a data-route="/editor/" class="btn-preview-launch">Start Creating now →</a>
-            </div>
+            <a data-route="/editor/" class="btn-primary-large">Open Studio in Browser</a>
+            <a data-route="/pricing/" class="btn-secondary-large">View Pricing Plans</a>
         </div>
     </section>
 
-    <section class="download-section" id="apps">
-        <div class="section-header">
-            <h2>Download Desktop & Mobile Apps</h2>
-            <p>The same experience as the web, just portable</p>
-        </div>
-        <div class="download-grid">
-            <div class="download-card">
-                <div class="platform-icon"></div>
-                <h3>Windows</h3>
-                <p>Standalone desktop installer for Windows 10 & 11.</p>
-                <a href="#" class="btn-app-dl">Windows Download</a>
-            </div>
-            <div class="download-card">
-                <div class="platform-icon"></div>
-                <h3>MacOS</h3>
-                <p>Optimized build for Apple Silicon & Intel Macs.</p>
-                <a href="#" class="btn-app-dl">MacOS Download</a>
-            </div>
-            <div class="download-card">
-                <div class="platform-icon"></div>
-                <h3>Android</h3>
-                <p>Direct APK installer for Android tablets and smartphones.</p>
-                <a href="#" class="btn-app-dl">Android Download</a>
-            </div>
-            <p3>IOS App Coming Soon...<p3>
-        </div>
-    </section>
-
-    <footer>
-        <p>© 2026 Interactive Studio. All rights reserved.</p>
-        <p>View this website on <a href="https://github.com/AquaTheCanary/interactivestudio/tree/main" target="_blank" rel="noopener">GitHub</a></p>
-    </footer>
-
+    <footer><p>© 2026 Interactive Studio. All rights reserved.</p></footer>
 </body>
 </html>
