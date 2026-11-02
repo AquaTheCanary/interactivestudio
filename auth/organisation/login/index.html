@@ -63,15 +63,14 @@
             const password = document.getElementById("org-password").value;
             const domain = email.split('@')[1];
 
-            if (freeEmailDomains.includes(domain)) {
+            if (!studioAuth.isOrganisationEmail(email)) {
                 alert("Access Denied: Organisation Login requires a valid corporate email domain. Generic consumer email addresses are blocked.");
                 return;
             }
 
-            auth.signInWithEmailAndPassword(email, password).then(() => {
-                sessionStorage.setItem("is_user_email", email);
-                sessionStorage.setItem("is_user_plan", "Organisation");
-                window.location.href = window.getAppUrl('/dashboard/');
+            auth.signInWithEmailAndPassword(email, password).then((cred) => {
+                studioAuth.saveSession({ email: cred.user.email, name: cred.user.displayName || email, photoURL: cred.user.photoURL, uid: cred.user.uid, provider: "password", plan: "Organisation" });
+                window.location.replace(window.getAppUrl("/dashboard/"));
             }).catch(err => alert("Organisation Sign-In Error: " + err.message));
         });
     </script>
