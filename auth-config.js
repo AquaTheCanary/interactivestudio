@@ -83,23 +83,18 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       if (!user.emailVerified) {
         throw new Error("Verify your corporate email address before accessing an organisation workspace.");
       }
-      if (firebase.functions) {
-        try {
-          const check = firebase.functions().httpsCallable("assertOrganisationAccess");
-          await check({});
-        } catch (error) {
-          if (error.code === "functions/not-found" || error.code === "functions/unavailable") {
-            throw new Error("Organisation verification is not deployed yet. Please contact your workspace administrator.");
-          }
-          throw error;
-        }
-      } else {
-        throw new Error("Organisation verification service is unavailable.");
-      }
+      const token = await user.getIdToken();
+      const response = await fetch("https://us-central1-interactive-studio-convexllc.cloudfunctions.net/assertOrganisationAccess", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" },
+        body: "{}"
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.ok) throw new Error(result.error || "Organisation verification failed.");
       return true;
     },
     async finishSignIn(user, organisation = false) {
-      if (organisation) await studioAuth.validateOrganisation(user);
+      if (organisation) { try { await studioAuth.validateOrganisation(user); } catch (error) { await auth.signOut(); throw error; } }
       const profile = await studioAuth.getProfile(user);
       localStorage.setItem("is_user_email", profile.email);
       localStorage.setItem("is_user_name", profile.name);
@@ -131,7 +126,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       const credential = await auth.signInWithPopup(provider);
       await studioAuth.finishSignIn(credential.user, organisation);
     },
-    async registerPersonal({ name, email, password }) {
+    async registerOrganisation({ name, email, password }) {\n      if (!studioAuth.isOrganisationEmail(email)) throw new Error("Use a corporate email address to register an organisation account.");\n      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);\n      const credential = await auth.createUserWithEmailAndPassword(email.trim(), password);\n      await credential.user.updateProfile({ displayName: name.trim() });\n      await credential.user.sendEmailVerification();\n      await auth.signOut();\n      return true;\n    },\n    async registerPersonal({ name, email, password }) {
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
       const credential = await auth.createUserWithEmailAndPassword(email.trim(), password);
       await credential.user.updateProfile({ displayName: name.trim() });
@@ -148,7 +143,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       const user = await studioAuth.currentUser();
       if (!user) throw new Error("Sign in to use Interactive Studio AI.");
       const token = await user.getIdToken();
-      const response = await fetch(appUrl("/api/ai"), {
+      const response = await fetch("https://us-central1-interactive-studio-convexllc.cloudfunctions.net/generateAI", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
         body: JSON.stringify({ model, prompt, context })
