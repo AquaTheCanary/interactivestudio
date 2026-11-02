@@ -2,8 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=/home/">
-    <script>window.location.href = "/interactivestudio/home/";</script>
-    <title>Loading...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="refresh" content="0; url=home/">
+    <title>Home | Interactive Studio</title>
+    <script>
+        (function () {
+            var base = location.hostname.endsWith(".github.io") ? "/interactivestudio" : "";
+            location.replace(base + "/home/");
+        })();
+    </script>
 </head>
+<body>
+    <p>Opening <a href="home/">Interactive Studio</a>…</p>
+</body>
 </html>
