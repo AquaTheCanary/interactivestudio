@@ -10,7 +10,6 @@
     <script src="../router.js"></script>
 </head>
 <body class="page-body">
-
     <header class="home-nav">
         <div class="nav-brand">
             <a data-route="/home/"><img src="../headerlogo.png" alt="Interactive Studio" class="brand-logo"></a>
@@ -21,6 +20,7 @@
             <a data-route="/solutions/">Solutions</a>
             <a data-route="/pricing/" class="active">Pricing</a>
             <a data-route="/resources/">Resources</a>
+            <a data-route="/ai/">AI Hub</a>
             <a data-route="/contact/">Contact</a>
         </nav>
         <div class="nav-actions">
@@ -32,30 +32,50 @@
     <main class="content-container">
         <section class="page-hero">
             <h1 class="hero-title">Simple, Transparent Pricing</h1>
-            <p class="hero-subtitle">Start designing for free, or upgrade for enterprise controls and native app packaging.</p>
+            <p class="hero-subtitle">Choose the plan that fits your creation needs. Unlock all AI agents and remove watermarks instantly.</p>
         </section>
 
         <div class="pricing-grid">
             <div class="pricing-card">
-                <h3>Personal</h3>
+                <h3>Basic (Free)</h3>
                 <div class="price">$0 <span>/ forever</span></div>
-                <p>Ideal for individual creators building web presentations.</p>
+                <p>Includes Gemini Flash & Copilot Mini AI, standard canvas, watermarked presentation export.</p>
                 <a data-route="/auth/personal/register/" class="btn-secondary-large">Get Started Free</a>
             </div>
-
-            <div class="pricing-card featured-pricing">
-                <span class="pricing-badge">Popular</span>
+            <div class="pricing-card">
+                <h3>Pro</h3>
+                <div class="price">£4.99 <span>/ month</span></div>
+                <p>Unlock ChatGPT-4o & Claude 3.5 Sonnet, watermark removal, and priority rendering.</p>
+                <a data-route="/auth/personal/login/" class="btn-primary-small">Upgrade to Pro</a>
+            </div>
+            <div class="pricing-card">
+                <h3>Team</h3>
+                <div class="price">£12.99 <span>/ month</span></div>
+                <p>Real-time team collaboration, shared workspace libraries, and full AI access.</p>
+                <a data-route="/auth/personal/login/" class="btn-primary-small">Start Team Plan</a>
+            </div>
+            <div class="pricing-card">
                 <h3>Organisation</h3>
-                <div class="price">Custom</div>
-                <p>SSO Authentication, team workspace management, and native builds.</p>
-                <a data-route="/contact/setup/organisation/" class="btn-primary-large">Request Workspace</a>
+                <div class="price">£17.99 <span>/ mo (billed annually)</span></div>
+                <p>Advanced SSO, domain verification login, custom branding controls.</p>
+                <a data-route="/contact/setup/organisation/" class="btn-primary-small">Setup Organisation</a>
+            </div>
+            <div class="pricing-card">
+                <h3>Enterprise</h3>
+                <div class="price">£25.99 <span>/ mo (billed annually)</span></div>
+                <p>Dedicated instances, custom SLAs, enterprise compliance protocols.</p>
+                <a data-route="/contact/setup/enterprise/" class="btn-primary-small">Setup Enterprise</a>
+            </div>
+            <div class="pricing-card featured-pricing">
+                <span class="pricing-badge">Custom</span>
+                <h3>Company</h3>
+                <div class="price">Custom <span>pricing</span></div>
+                <p>Tailored quote automatically generated and provisioned by us upon approval.</p>
+                <a data-route="/contact/enquiry/custompricing-plan?=company" class="btn-primary-large">Request Quote</a>
             </div>
         </div>
     </main>
 
-    <footer>
-        <p>© 2026 Interactive Studio. All rights reserved.</p>
-    </footer>
-
+    <footer><p>© 2026 Interactive Studio. All rights reserved.</p></footer>
 </body>
 </html>
