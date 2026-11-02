@@ -8,27 +8,76 @@
     <link rel="stylesheet" href="../style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="../router.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="../auth-config.js"></script>
 </head>
 <body class="page-body" style="overflow: hidden; height: 100vh; display: flex; flex-direction: column;">
-
     <header class="app-header" style="width: 100%;">
         <div class="nav-brand">
             <a data-route="/dashboard/"><img src="../headerlogo.png" alt="Interactive Studio" class="brand-logo"></a>
-            <span class="project-title" contenteditable="true" style="font-weight: 600; font-size: 0.9rem; padding: 4px 8px; border: 1px dashed transparent; border-radius: 4px;">Untitled Presentation</span>
+            <span class="project-title" contenteditable="true" style="font-weight: 600; font-size: 0.9rem; padding: 4px 8px;">Untitled Presentation</span>
         </div>
         <div class="nav-actions">
-            <span class="user-email-badge" style="background: #e6f4ea; color: #137333; border-color: #ceead6;">☁️ Saved to Cloud</span>
-            <a data-route="/dashboard/" class="btn-secondary-small">Back to Dashboard</a>
+            <button onclick="openShareModal()" class="btn-secondary-small">Share / Collab</button>
+            <button onclick="startPresenting()" class="btn-primary-small">Present Slides ⯈</button>
+            <a data-route="/dashboard/" class="btn-secondary-small">Dashboard</a>
         </div>
     </header>
 
     <div style="flex: 1; background: #f4f5f7; display: flex; align-items: center; justify-content: center; position: relative;">
-        <!-- Figma-like Minimalist Workspace Canvas Placeholder -->
         <div style="width: 720px; height: 405px; background: #ffffff; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;">
             <img src="../headerlogo.png" alt="Logo" style="height: 36px; opacity: 0.8;">
-            <p style="color: var(--text-sub); font-size: 0.9rem;">Interactive Canvas Area — Ready for components</p>
+            <p style="color: var(--text-sub); font-size: 0.9rem;">Interactive Vector Canvas — Ready for components</p>
         </div>
     </div>
 
+    <!-- Presentation Watermark Player Modal -->
+    <div id="presenter-modal" style="display: none; position: fixed; inset: 0; background: #000; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; color: #fff;">
+        <div id="slide-viewport" style="width: 80vw; height: 75vh; background: #fff; color: #111; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; position: relative;">
+            Slide 1: Interactive Presentation Content
+        </div>
+        
+        <!-- Watermark Footer (Visible on Free Plan) -->
+        <div id="watermark-bar" style="position: absolute; bottom: 20px; background: rgba(255,255,255,0.9); color: #111; padding: 10px 20px; border-radius: 8px; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="openWatermarkPopup()">
+            <span>Made in</span> <strong style="color: var(--brand-blue);">Interactive Studio</strong> <img src="../headerlogo.png" style="height: 16px;">
+        </div>
+        <button onclick="exitPresenting()" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Exit (ESC)</button>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="share-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: #fff; padding: 2rem; border-radius: 12px; width: 400px; display: flex; flex-direction: column; gap: 1rem;">
+            <h3>Collaboration & Sharing</h3>
+            <p style="font-size: 0.85rem; color: var(--text-sub);">Invite team members to collaborate live on this canvas.</p>
+            <input type="text" value="https://interactivestudio.abrdns.com/editor/share?token=xyz99" readonly style="padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.85rem;">
+            <button onclick="document.getElementById('share-modal').style.display='none'" class="btn-primary-small">Close</button>
+        </div>
+    </div>
+
+    <script>
+        firebase.initializeApp(firebaseConfig);
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user && !sessionStorage.getItem("is_user_email")) {
+                window.location.href = window.getAppUrl('/auth/personal/login/');
+            }
+        });
+
+        function openShareModal() { document.getElementById('share-modal').style.display = 'flex'; }
+        function startPresenting() {
+            document.getElementById('presenter-modal').style.display = 'flex';
+            const userPlan = sessionStorage.getItem("is_user_plan") || "Free";
+            if (userPlan !== "Free" && userPlan !== "Basic") {
+                document.getElementById('watermark-bar').style.display = 'none'; // Remove watermark for paid users
+            }
+        }
+        function exitPresenting() { document.getElementById('presenter-modal').style.display = 'none'; }
+        
+        function openWatermarkPopup() {
+            const userName = sessionStorage.getItem("is_user_name") || "Creator";
+            const lastSaved = new Date().toLocaleString();
+            alert(`Made on Interactive Studio by ${userName}\nLast saved time and date: ${lastSaved}\n\nWant to remove this watermark? Upgrade to a paid plan at /pricing to remove it.`);
+        }
+    </script>
 </body>
 </html>
