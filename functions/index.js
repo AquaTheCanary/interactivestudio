@@ -1,7 +1,6 @@
 const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
-const crypto = require("crypto");
 admin.initializeApp();
 const db = admin.firestore();
 
@@ -66,7 +65,7 @@ exports.generateAI=onRequest({secrets:[GEMINI_API_KEY,OPENAI_API_KEY,ANTHROPIC_A
     if(model==="gemini"){
       const key=GEMINI_API_KEY.value();
       if(!key) return res.status(503).json({error:"Gemini is not configured. Set the GEMINI_API_KEY Firebase secret."});
-      const response=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="+encodeURIComponent(key),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({systemInstruction:{parts:[{text:system}]},contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:0.7,maxOutputTokens:1800}})});
+      const response=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key="+encodeURIComponent(key),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({systemInstruction:{parts:[{text:system}]},contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:0.7,maxOutputTokens:1800}})});
       const data=await response.json();if(!response.ok)throw new Error(data.error?.message||"Gemini request failed.");text=replyText(data);
     }else if(model==="copilot"){
       const endpoint=AZURE_OPENAI_ENDPOINT.value(),key=AZURE_OPENAI_API_KEY.value(),deployment=AZURE_OPENAI_DEPLOYMENT.value();
@@ -80,7 +79,7 @@ exports.generateAI=onRequest({secrets:[GEMINI_API_KEY,OPENAI_API_KEY,ANTHROPIC_A
       const data=await response.json();if(!response.ok)throw new Error(data.error?.message||"OpenAI request failed.");text=data.choices?.[0]?.message?.content||"";
     }else{
       const key=ANTHROPIC_API_KEY.value();if(!key)return res.status(503).json({error:"Claude is not configured. Set the ANTHROPIC_API_KEY Firebase secret."});
-      const response=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01"},body:JSON.stringify({model:"claude-3-5-sonnet-20241022",system,max_tokens:1800,messages:[{role:"user",content:prompt}]})});
+      const response=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01"},body:JSON.stringify({model:"claude-sonnet-5-5",system,max_tokens:1800,messages:[{role:"user",content:prompt}]})});
       const data=await response.json();if(!response.ok)throw new Error(data.error?.message||"Anthropic request failed.");text=(data.content||[]).map(x=>x.text||"").join("\n");
     }
     if(!text) throw new Error("The AI provider returned an empty response.");
