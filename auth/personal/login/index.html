@@ -64,9 +64,8 @@
             const password = document.getElementById("login-password").value;
 
             auth.signInWithEmailAndPassword(email, password).then((cred) => {
-                sessionStorage.setItem("is_user_email", email);
-                sessionStorage.setItem("is_user_plan", "Free");
-                window.location.href = window.getAppUrl('/dashboard/');
+                studioAuth.saveSession({ email: cred.user.email, name: cred.user.displayName || email, photoURL: cred.user.photoURL, uid: cred.user.uid, provider: "password", plan: "Basic" });
+                window.location.replace(window.getAppUrl("/dashboard/"));
             }).catch(err => alert("Login Error: " + err.message));
         });
     </script>
