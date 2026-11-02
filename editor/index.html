@@ -1,83 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor | Interactive Studio</title>
-    <link rel="icon" type="image/png" href="../tablogo.png">
-    <link rel="stylesheet" href="../style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="../router.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="../auth-config.js"></script>
-</head>
-<body class="page-body" style="overflow: hidden; height: 100vh; display: flex; flex-direction: column;">
-    <header class="app-header" style="width: 100%;">
-        <div class="nav-brand">
-            <a data-route="/dashboard/"><img src="../headerlogo.png" alt="Interactive Studio" class="brand-logo"></a>
-            <span class="project-title" contenteditable="true" style="font-weight: 600; font-size: 0.9rem; padding: 4px 8px;">Untitled Presentation</span>
-        </div>
-        <div class="nav-actions">
-            <button onclick="openShareModal()" class="btn-secondary-small">Share / Collab</button>
-            <button onclick="startPresenting()" class="btn-primary-small">Present Slides ⯈</button>
-            <a data-route="/dashboard/" class="btn-secondary-small">Dashboard</a>
-        </div>
-    </header>
-
-    <div style="flex: 1; background: #f4f5f7; display: flex; align-items: center; justify-content: center; position: relative;">
-        <div style="width: 720px; height: 405px; background: #ffffff; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;">
-            <img src="../headerlogo.png" alt="Logo" style="height: 36px; opacity: 0.8;">
-            <p style="color: var(--text-sub); font-size: 0.9rem;">Interactive Vector Canvas — Ready for components</p>
-        </div>
-    </div>
-
-    <!-- Presentation Watermark Player Modal -->
-    <div id="presenter-modal" style="display: none; position: fixed; inset: 0; background: #000; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; color: #fff;">
-        <div id="slide-viewport" style="width: 80vw; height: 75vh; background: #fff; color: #111; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; position: relative;">
-            Slide 1: Interactive Presentation Content
-        </div>
-        
-        <!-- Watermark Footer (Visible on Free Plan) -->
-        <div id="watermark-bar" style="position: absolute; bottom: 20px; background: rgba(255,255,255,0.9); color: #111; padding: 10px 20px; border-radius: 8px; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="openWatermarkPopup()">
-            <span>Made in</span> <strong style="color: var(--brand-blue);">Interactive Studio</strong> <img src="../headerlogo.png" style="height: 16px;">
-        </div>
-        <button onclick="exitPresenting()" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Exit (ESC)</button>
-    </div>
-
-    <!-- Share Modal -->
-    <div id="share-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-        <div style="background: #fff; padding: 2rem; border-radius: 12px; width: 400px; display: flex; flex-direction: column; gap: 1rem;">
-            <h3>Collaboration & Sharing</h3>
-            <p style="font-size: 0.85rem; color: var(--text-sub);">Invite team members to collaborate live on this canvas.</p>
-            <input type="text" value="https://interactivestudio.abrdns.com/editor/share?token=xyz99" readonly style="padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.85rem;">
-            <button onclick="document.getElementById('share-modal').style.display='none'" class="btn-primary-small">Close</button>
-        </div>
-    </div>
-
-    <script>
-        firebase.initializeApp(firebaseConfig);
-        firebase.auth().onAuthStateChanged((user) => {
-            if (!user && !sessionStorage.getItem("is_user_email")) {
-                window.location.href = window.getAppUrl('/auth/personal/login/');
-            }
-        });
-
-        function openShareModal() { document.getElementById('share-modal').style.display = 'flex'; }
-        function startPresenting() {
-            document.getElementById('presenter-modal').style.display = 'flex';
-            const userPlan = sessionStorage.getItem("is_user_plan") || "Free";
-            if (userPlan !== "Free" && userPlan !== "Basic") {
-                document.getElementById('watermark-bar').style.display = 'none'; // Remove watermark for paid users
-            }
-        }
-        function exitPresenting() { document.getElementById('presenter-modal').style.display = 'none'; }
-        
-        function openWatermarkPopup() {
-            const userName = sessionStorage.getItem("is_user_name") || "Creator";
-            const lastSaved = new Date().toLocaleString();
-            alert(`Made on Interactive Studio by ${userName}\nLast saved time and date: ${lastSaved}\n\nWant to remove this watermark? Upgrade to a paid plan at /pricing to remove it.`);
-        }
-    </script>
-</body>
-</html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Editor | Interactive Studio</title><link rel="icon" href="../tablogo.png"><link rel="stylesheet" href="../style.css"><script src="../router.js"></script><script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script><script src="../auth-config.js"></script><style>
+.editor-stage{flex:1;background:#f1f3f5;display:flex;align-items:center;justify-content:center;padding:24px}.slide{width:min(900px,90vw);aspect-ratio:16/9;background:white;border:1px solid #ddd;border-radius:10px;box-shadow:0 8px 28px #0001;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:#222}.slide h1{font-size:clamp(24px,4vw,44px)}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.modal{display:none;position:fixed;inset:0;background:#0008;z-index:1000;align-items:center;justify-content:center;padding:16px}.modal-card{background:white;color:#111;padding:24px;border-radius:14px;width:min(440px,100%);display:grid;gap:14px}.presenter{display:none;position:fixed;inset:0;background:#08090c;z-index:900;align-items:center;justify-content:center;flex-direction:column;padding:24px}.presenter .slide{width:min(1100px,90vw)}.watermark{position:absolute;bottom:20px;background:#fff;color:#111;border-radius:9px;padding:9px 16px;display:flex;align-items:center;gap:8px;font-size:14px}.watermark a{display:inline-flex;align-items:center}.watermark img{height:18px}.watermark .details{border:0;background:none;cursor:pointer;font:inherit;color:inherit}
+</style></head><body class="page-body" style="min-height:100vh">
+<header class="app-header"><div class="nav-brand"><a data-route="/home/"><img src="../headerlogo.png" class="brand-logo" alt="Interactive Studio"></a><input aria-label="Presentation title" id="deck-title" value="Untitled Presentation" style="border:0;font-weight:600;padding:8px;width:190px"></div><div class="toolbar"><button class="btn-secondary-small" id="share">Share / Collaborate</button><button class="btn-secondary-small" id="png">Export PNG</button><button class="btn-secondary-small" id="jpg">Export JPEG</button><button class="btn-primary-small" id="present">Present</button><a data-route="/dashboard/" class="btn-secondary-small">Dashboard</a></div></header>
+<main class="editor-stage"><section class="slide" id="canvas"><img src="../headerlogo.png" alt="" style="height:40px"><h1 id="slide-title">Your next big idea.</h1><p contenteditable="true" style="outline:0;text-align:center">Click this text to edit your presentation.</p></section></main>
+<div class="presenter" id="presenter"><button id="exit" class="btn-secondary-small" style="position:absolute;right:20px;top:20px">Exit presentation</button><section class="slide"><img src="../headerlogo.png" alt="" style="height:42px"><h1 id="present-title">Your next big idea.</h1><p>Interactive Studio presentation</p></section><div class="watermark" id="watermark"><a data-route="/home/" aria-label="Interactive Studio home"><img src="../headerlogo.png" alt="Interactive Studio"></a><span>Made in Interactive Studio</span><button class="details" id="watermark-details" aria-label="Watermark details">ⓘ</button></div></div>
+<div class="modal" id="profile-modal"><div class="modal-card"><button id="close-profile" style="justify-self:end">✕</button><h2>Presentation creator</h2><div style="display:flex;gap:12px;align-items:center"><img id="avatar" src="" alt="Profile picture" style="width:52px;height:52px;border-radius:50%;object-fit:cover;background:#eee"><div><strong id="creator-name">Creator</strong><p id="creator-email" style="color:#666;font-size:13px"></p></div></div><p>Last saved: <strong id="saved-at"></strong></p><a data-route="/pricing/" class="btn-primary-large">Upgrade to remove watermark</a></div></div>
+<div class="modal" id="share-modal"><div class="modal-card"><button id="close-share" style="justify-self:end">✕</button><h2>Share presentation</h2><p>Copy this page address to share the editor link. Live multi-user collaboration requires a collaboration backend.</p><input id="share-url" readonly style="padding:10px;border:1px solid #ddd;border-radius:7px"><button id="copy-share" class="btn-primary-small">Copy link</button><p id="share-status" aria-live="polite"></p></div></div>
+<script>
+(function(){
+const $=id=>document.getElementById(id),session=window.studioAuth.getSession();
+if(!session){window.location.replace(window.getAppUrl("/auth/personal/login/"));return}
+const paid=["pro","team","organisation","enterprise","company"].includes((session.plan||"basic").toLowerCase());
+$("watermark").style.display=paid?"none":"flex";
+function save(){localStorage.setItem("studio_last_saved",new Date().toISOString());$("present-title").textContent=$("deck-title").value||"Untitled Presentation"}
+$("deck-title").addEventListener("input",save);$("present").onclick=()=>{$("presenter").style.display="flex";save()};$("exit").onclick=()=>{$("presenter").style.display="none"};
+$("watermark-details").onclick=()=>{const name=session.name||"Creator";$("creator-name").textContent=name;$("creator-email").textContent=session.email||"";$("avatar").src=session.photoURL||"../tablogo.png";$("saved-at").textContent=new Date(localStorage.getItem("studio_last_saved")||Date.now()).toLocaleString();$("profile-modal").style.display="flex"};
+$("close-profile").onclick=()=>$("profile-modal").style.display="none";
+$("share").onclick=()=>{$("share-url").value=location.href;$("share-modal").style.display="flex"};$("close-share").onclick=()=>$("share-modal").style.display="none";
+$("copy-share").onclick=async()=>{try{await navigator.clipboard.writeText($("share-url").value);$("share-status").textContent="Link copied."}catch(e){$("share-url").select();$("share-status").textContent="Select and copy the link."}};
+function exportCanvas(type){const slide=$("canvas"),rect=slide.getBoundingClientRect(),scale=2,c=document.createElement("canvas");c.width=rect.width*scale;c.height=rect.height*scale;const ctx=c.getContext("2d");ctx.scale(scale,scale);ctx.fillStyle="#fff";ctx.fillRect(0,0,rect.width,rect.height);ctx.fillStyle="#222";ctx.textAlign="center";ctx.font="bold 42px Arial";ctx.fillText($("deck-title").value||"Untitled Presentation",rect.width/2,rect.height/2);ctx.font="20px Arial";ctx.fillText("Created with Interactive Studio",rect.width/2,rect.height/2+45);const a=document.createElement("a");a.download="interactive-studio-presentation."+type;a.href=c.toDataURL(type==="jpg"?"image/jpeg":"image/png",.92);a.click()}
+$("png").onclick=()=>exportCanvas("png");$("jpg").onclick=()=>exportCanvas("jpg");
+})();
+</script></body></html>
