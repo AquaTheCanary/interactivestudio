@@ -1,20 +1,26 @@
-// router.js — Cross-environment path resolver (GitHub Pages vs Custom Domain)
+// Shared route resolver for GitHub Pages project subpaths and custom domains.
 (function () {
-    const isGitHubIo = window.location.hostname.endsWith('github.io');
-    const basePath = isGitHubIo ? '/interactivestudio' : '';
+    const isGitHubPages = window.location.hostname.toLowerCase().endsWith(".github.io");
+    const repositoryBase = isGitHubPages ? "/interactivestudio" : "";
 
+    window.APP_BASE_PATH = repositoryBase;
     window.getAppUrl = function (path) {
-        if (!path) return basePath || '/';
-        const cleanPath = path.startsWith('/') ? path : '/' + path;
-        return basePath + cleanPath;
+        const value = String(path || "/").trim();
+        const clean = "/" + value.replace(/^\/+/, "");
+        return repositoryBase + (clean === "/" ? "/" : clean);
     };
 
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('a[data-route]').forEach(anchor => {
-            const route = anchor.getAttribute('data-route');
-            if (route) {
-                anchor.href = window.getAppUrl(route);
-            }
+    function applyRoutes(root = document) {
+        root.querySelectorAll("a[data-route]").forEach(anchor => {
+            const route = anchor.getAttribute("data-route");
+            if (route) anchor.href = window.getAppUrl(route);
         });
-    });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => applyRoutes());
+    } else {
+        applyRoutes();
+    }
+    window.applyStudioRoutes = applyRoutes;
 })();
