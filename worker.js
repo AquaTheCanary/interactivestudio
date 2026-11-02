@@ -114,10 +114,12 @@ export default {
         return json({ ok: true, domain }, 200, origin);
       }
       if (url.pathname === "/getEntitlements") {
+        if (!user.emailVerified) return json({ error: "Verify your email address before accessing account services." }, 403, origin);
         const plan = await planFor(user, env, token);
         return json({ plan: plan.charAt(0).toUpperCase() + plan.slice(1) }, 200, origin);
       }
       if (url.pathname === "/generateAI") {
+        if (!user.emailVerified) return json({ error: "Verify your email address before using AI features." }, 403, origin);
         const body = await request.json();
         const model = String(body.model || "gemini").toLowerCase();
         const prompt = String(body.prompt || "").trim().slice(0, 16000);
