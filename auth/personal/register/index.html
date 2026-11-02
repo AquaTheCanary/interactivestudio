@@ -8,13 +8,11 @@
     <link rel="stylesheet" href="../../../style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="../../../router.js"></script>
-    
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="../../../auth-config.js"></script>
 </head>
 <body class="auth-page">
-
     <div class="auth-container">
         <div class="auth-header">
             <img src="../../../headerlogo.png" alt="Interactive Studio" class="auth-logo">
@@ -56,16 +54,13 @@
             const password = document.getElementById("reg-password").value;
             const name = document.getElementById("reg-name").value;
 
-            auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    user.updateProfile({ displayName: name });
-                    user.sendEmailVerification().then(() => {
-                        alert("Account created! A verification email has been sent to " + email);
-                        window.location.href = window.getAppUrl('/dashboard/');
-                    });
-                })
-                .catch(err => alert(err.message));
+            auth.createUserWithEmailAndPassword(email, password).then((cred) => {
+                cred.user.updateProfile({ displayName: name });
+                cred.user.sendEmailVerification().then(() => {
+                    sessionStorage.setItem("is_user_plan", "Free");
+                    window.location.href = window.getAppUrl('/dashboard/');
+                });
+            }).catch(err => alert(err.message));
         });
     </script>
 </body>
