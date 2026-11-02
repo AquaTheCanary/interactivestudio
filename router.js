@@ -1,4 +1,4 @@
-// router.js — Dynamic environment-aware path resolver
+// router.js — Cross-environment path resolver (GitHub Pages vs Custom Domain)
 (function () {
     const isGitHubIo = window.location.hostname.endsWith('github.io');
     const basePath = isGitHubIo ? '/interactivestudio' : '';
