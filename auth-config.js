@@ -57,14 +57,15 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       if (!activeUser) return null;
       let claims = {};
       try { claims = (await activeUser.getIdTokenResult()).claims || {}; } catch (_) {}
-      return {
+      let verifiedPlan = String(claims.plan || "Basic");
+      try {\n        const token = await activeUser.getIdToken();\n        const response = await fetch("https://us-central1-interactive-studio-convexllc.cloudfunctions.net/getEntitlements", { method: "POST", headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }, body: "{}" });\n        if (response.ok) { const data = await response.json(); verifiedPlan = data.plan || verifiedPlan; }\n      } catch (_) {}\n      return {
         uid: activeUser.uid,
         email: activeUser.email || "",
         name: activeUser.displayName || activeUser.email || "Creator",
         photoURL: activeUser.photoURL || "",
         emailVerified: !!activeUser.emailVerified,
         provider: activeUser.providerData?.[0]?.providerId || "password",
-        plan: String(claims.plan || "Basic"),
+        plan: verifiedPlan,
         organisationId: claims.organisationId || null
       };
     },
