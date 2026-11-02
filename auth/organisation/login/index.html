@@ -18,7 +18,7 @@
         <div class="auth-header">
             <a data-route="/home/"><img src="../../../headerlogo.png" alt="Interactive Studio" class="auth-logo"></a>
             <h1>Organisation Portal</h1>
-            <p>Sign in using your enterprise work domain</p>
+            <p>Sign in using your corporate work domain</p>
         </div>
 
         <div class="sso-buttons">
@@ -63,7 +63,7 @@
             const password = document.getElementById("org-password").value;
             const domain = email.split('@')[1];
 
-            if (freeDomains.includes(domain)) {
+            if (freeEmailDomains.includes(domain)) {
                 alert("Access Denied: Organisation Login requires a valid corporate email domain. Generic consumer email addresses are blocked.");
                 return;
             }
