@@ -58,7 +58,12 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       let claims = {};
       try { claims = (await activeUser.getIdTokenResult()).claims || {}; } catch (_) {}
       let verifiedPlan = String(claims.plan || "Basic");
-      try {\n        const token = await activeUser.getIdToken();\n        const response = await fetch("https://us-central1-interactive-studio-convexllc.cloudfunctions.net/getEntitlements", { method: "POST", headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }, body: "{}" });\n        if (response.ok) { const data = await response.json(); verifiedPlan = data.plan || verifiedPlan; }\n      } catch (_) {}\n      return {
+      try {
+        const token = await activeUser.getIdToken();
+        const response = await fetch("https://us-central1-interactive-studio-convexllc.cloudfunctions.net/getEntitlements", { method: "POST", headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }, body: "{}" });
+        if (response.ok) { const data = await response.json(); verifiedPlan = data.plan || verifiedPlan; }
+      } catch (_) {}
+      return {
         uid: activeUser.uid,
         email: activeUser.email || "",
         name: activeUser.displayName || activeUser.email || "Creator",
@@ -127,7 +132,20 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       const credential = await auth.signInWithPopup(provider);
       await studioAuth.finishSignIn(credential.user, organisation);
     },
-    async resetPassword(email) {\n      if (!email) throw new Error("Enter your email address first.");\n      await auth.sendPasswordResetEmail(email.trim());\n    },\n    async registerOrganisation({ name, email, password }) {\n      if (!studioAuth.isOrganisationEmail(email)) throw new Error("Use a corporate email address to register an organisation account.");\n      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);\n      const credential = await auth.createUserWithEmailAndPassword(email.trim(), password);\n      await credential.user.updateProfile({ displayName: name.trim() });\n      await credential.user.sendEmailVerification();\n      await auth.signOut();\n      return true;\n    },\n    async registerPersonal({ name, email, password }) {
+    async resetPassword(email) {
+      if (!email) throw new Error("Enter your email address first.");
+      await auth.sendPasswordResetEmail(email.trim());
+    },
+    async registerOrganisation({ name, email, password }) {
+      if (!studioAuth.isOrganisationEmail(email)) throw new Error("Use a corporate email address to register an organisation account.");
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      const credential = await auth.createUserWithEmailAndPassword(email.trim(), password);
+      await credential.user.updateProfile({ displayName: name.trim() });
+      await credential.user.sendEmailVerification();
+      await auth.signOut();
+      return true;
+    },
+    async registerPersonal({ name, email, password }) {
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
       const credential = await auth.createUserWithEmailAndPassword(email.trim(), password);
       await credential.user.updateProfile({ displayName: name.trim() });
