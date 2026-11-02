@@ -23,4 +23,4 @@ $("new-slide").onclick=()=>{alert("Multi-slide management is the next editor mil
 async function exportImage(type){if(!window.html2canvas){alert("Export library did not load. Check your connection.");return}const canvas=await html2canvas($("slide-canvas"),{scale:2,backgroundColor:null});const a=document.createElement("a");a.download=(project.title||"presentation").replace(/[^a-z0-9-_]+/gi,"-")+"."+type;a.href=canvas.toDataURL(type==="jpg"?"image/jpeg":"image/png",.95);a.click()}
 $("export-png").onclick=()=>exportImage("png");$("export-jpg").onclick=()=>exportImage("jpg");window.addEventListener("beforeunload",save);localStorage.setItem("studio_active_project",id);save();
 })();
-</script></body></html>
+</script><footer><div class="footer-inner"><div>© 2026 Interactive Studio. All rights reserved.</div><a href="https://github.com/AquaTheCanary/interactivestudio/tree/main" target="_blank" rel="noopener">View this website on GitHub (github.com/AquaTheCanary/interactivestudio/tree/main)</a></div></footer></body></html>
