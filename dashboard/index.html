@@ -15,7 +15,7 @@
 <body class="page-body">
     <header class="home-nav">
         <div class="nav-brand">
-            <a data-route="/dashboard/"><img src="../headerlogo.png" alt="Interactive Studio" class="brand-logo"></a>
+            <a data-route="/home/"><img src="../headerlogo.png" alt="Interactive Studio" class="brand-logo"></a>
             <span class="brand-name">Interactive Studio</span>
         </div>
         <nav class="nav-links">
@@ -59,44 +59,35 @@
         </div>
     </main>
 
-    <footer><p>© 2026 Interactive Studio. All rights reserved.</p></footer>
+    <footer><p>© 2026 Interactive Studio. All rights reserved.</p><p><a href="https://github.com/AquaTheCanary/interactivestudio/tree/main" target="_blank" rel="noopener">View this website on GitHub (github.com/AquaTheCanary/interactivestudio/tree/main)</a></p></footer>
 
     <script>
-        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-
-        auth.setPersistence(firebase.auth.Auth.Persistence.SESSION).then(() => {
-            auth.onAuthStateChanged((user) => {
-                const msftEmail = sessionStorage.getItem("is_user_email");
-                const emailLabel = document.getElementById("user-display-email");
-                const verifyBanner = document.getElementById("verification-banner");
-
-                if (user) {
-                    emailLabel.textContent = user.email + ` (${sessionStorage.getItem("is_user_plan") || 'Free'})`;
-                    sessionStorage.setItem("is_user_name", user.displayName || user.email);
-                    if (!user.emailVerified && user.providerData[0]?.providerId === 'password') {
-                        verifyBanner.style.display = 'flex';
-                    }
-                } else if (msftEmail) {
-                    emailLabel.textContent = msftEmail + ` (Team)`;
-                } else {
-                    setTimeout(() => {
-                        if (!auth.currentUser && !sessionStorage.getItem("is_user_email")) {
-                            window.location.href = window.getAppUrl('/auth/personal/login/');
-                        }
-                    }, 300);
+        const emailLabel = document.getElementById("user-display-email");
+        const verifyBanner = document.getElementById("verification-banner");
+        auth.onAuthStateChanged((user) => {
+            const session = studioAuth.getSession();
+            if (user || session) {
+                const profile = user ? {
+                    email: user.email,
+                    name: user.displayName || user.email,
+                    photoURL: user.photoURL,
+                    plan: localStorage.getItem("is_user_plan") || "Basic"
+                } : session;
+                emailLabel.textContent = (profile.email || "Signed in") + " (" + (profile.plan || "Basic") + ")";
+                if (user && !user.emailVerified && user.providerData[0]?.providerId === "password") {
+                    verifyBanner.style.display = "flex";
                 }
-            });
+            } else {
+                window.location.replace(window.getAppUrl("/auth/personal/login/"));
+            }
         });
-
-        document.getElementById("signout-btn").addEventListener("click", () => {
-            sessionStorage.clear();
-            auth.signOut().then(() => { window.location.href = window.getAppUrl('/home/'); });
-        });
-
+        document.getElementById("signout-btn").addEventListener("click", () => studioAuth.signOut());
         document.getElementById("resend-verify-btn")?.addEventListener("click", () => {
-            if (auth.currentUser) auth.currentUser.sendEmailVerification().then(() => alert("Verification email sent!"));
+            if (auth.currentUser) auth.currentUser.sendEmailVerification()
+                .then(() => alert("Verification email sent!"))
+                .catch(error => alert("Could not send verification email: " + error.message));
         });
-    </script>
+    </script>ipt>
 </body>
 </html>
