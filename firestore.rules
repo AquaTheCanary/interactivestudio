@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /userEntitlements/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      // Subscription entitlements are server-managed only.
+      allow write: if false;
+    }
+  }
+}
