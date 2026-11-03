@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function roomExists(code) {
+      return exists(/databases/$(database)/documents/rooms/$(code));
+    }
+    function owner(code) {
+      return signedIn() && roomExists(code)
+        && get(/databases/$(database)/documents/rooms/$(code)).data.ownerUid == request.auth.uid;
+    }
+
+    match /rooms/{code} {
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.status == 'live'
+        && request.resource.data.slides is list
+        && request.resource.data.slides.size() > 0
+        && request.resource.data.slides.size() <= 150;
+      allow read: if signedIn();
+      allow update: if owner(code)
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.slides is list
+        && request.resource.data.slides.size() > 0
+        && request.resource.data.slides.size() <= 150
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['title', 'slides', 'activeSlide', 'status', 'updatedAt']);
+      allow delete: if owner(code);
+
+      match /participants/{uid} {
+        allow read: if signedIn() && (request.auth.uid == uid || owner(code));
+        allow create: if signedIn() && request.auth.uid == uid;
+        allow update: if signedIn() && request.auth.uid == uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastSeenAt']);
+        allow delete: if owner(code);
+      }
+
+      match /votes/{voteId} {
+        allow read: if owner(code);
+        allow create: if signedIn()
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.choice is string
+          && request.resource.data.choice.size() > 0
+          && request.resource.data.choice.size() <= 120
+          && request.resource.data.slideIndex is int
+          && exists(/databases/$(database)/documents/rooms/$(code)/participants/$(request.auth.uid));
+        allow update, delete: if false;
+      }
+
+      match /private/{docId} {
+        allow read: if owner(code) && docId == 'notes';
+        allow create, update: if owner(code) && docId == 'notes'
+          && request.resource.data.ownerUid == request.auth.uid;
+        allow delete: if owner(code) && docId == 'notes';
+      }
+    }
+  }
+}
