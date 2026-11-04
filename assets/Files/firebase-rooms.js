@@ -186,6 +186,19 @@
     });
   }
 
+  async function resetVotes(code) {
+    const { db } = await ready();
+    const votesRef = db.collection("rooms").doc(String(code).toUpperCase()).collection("votes");
+    const snapshot = await votesRef.get();
+    const docs = snapshot.docs;
+    for (let start = 0; start < docs.length; start += 450) {
+      const batch = db.batch();
+      docs.slice(start, start + 450).forEach(doc => batch.delete(doc.ref));
+      await batch.commit();
+    }
+    return docs.length;
+  }
+
   function subscribeRoom(code, callback, onError) {
     let unsubscribe;
     ready().then(({ db }) => {
@@ -218,6 +231,6 @@
 
   window.studioRooms = {
     ready, createRoom, updateRoom, joinRoom, saveActiveSlide, saveNotes,
-    castVote, subscribeRoom, subscribeVotes, getNotes, publicDeck
+    castVote, resetVotes, subscribeRoom, subscribeVotes, getNotes, publicDeck
   };
 })();
