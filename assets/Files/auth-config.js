@@ -124,20 +124,47 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       }
       await studioAuth.finishSignIn(credential.user, organisation);
     },
+    async completeRedirectSignIn() {
+      await authReady;
+      try {
+        const credential = await auth.getRedirectResult();
+        if (!credential || !credential.user) return false;
+        const organisation = sessionStorage.getItem("studio_sso_organisation") === "true";
+        sessionStorage.removeItem("studio_sso_organisation");
+        await studioAuth.finishSignIn(credential.user, organisation);
+        return true;
+      } catch (error) {
+        sessionStorage.removeItem("studio_sso_organisation");
+        showAuthError(error);
+        return false;
+      }
+    },
     async signInGoogle(organisation = false) {
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
       const provider = new firebase.auth.GoogleAuthProvider();
       provider.setCustomParameters({ prompt: "select_account" });
-      const credential = await auth.signInWithPopup(provider);
-      await studioAuth.finishSignIn(credential.user, organisation);
+      return studioAuth.runSSO(provider, organisation);
     },
     async signInMicrosoft(organisation = false) {
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
       const provider = new firebase.auth.OAuthProvider("microsoft.com");
       provider.setCustomParameters({ prompt: "select_account" });
       provider.addScope("email");
-      const credential = await auth.signInWithPopup(provider);
-      await studioAuth.finishSignIn(credential.user, organisation);
+      return studioAuth.runSSO(provider, organisation);
+    },
+    async runSSO(provider, organisation) {
+      try {
+        const credential = await auth.signInWithPopup(provider);
+        await studioAuth.finishSignIn(credential.user, organisation);
+      } catch (error) {
+        const redirectCodes = ["auth/popup-blocked", "auth/operation-not-supported-in-this-environment", "auth/web-storage-unsupported"];
+        if (redirectCodes.includes(error.code)) {
+          sessionStorage.setItem("studio_sso_organisation", organisation ? "true" : "false");
+          await auth.signInWithRedirect(provider);
+          return;
+        }
+        throw error;
+      }
     },
     async resetPassword(email) {
       if (!email) throw new Error("Enter your email address first.");
@@ -185,6 +212,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   window.loginWithGoogle = organisation => studioAuth.signInGoogle(!!organisation).catch(showAuthError);
   window.loginWithMicrosoft = organisation => studioAuth.signInMicrosoft(!!organisation).catch(showAuthError);
   window.showAuthError = showAuthError;
+  studioAuth.completeRedirectSignIn();
   function showAuthError(error) {
     const message = document.querySelector("[data-auth-message]");
     if (message) {
