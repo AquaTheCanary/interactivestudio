@@ -24,16 +24,18 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   ]);
   const paidPlans = new Set(["pro","team","organisation","enterprise","company"]);
   const appUrl = path => window.getAppUrl ? window.getAppUrl(path) : path;
-  const authReady = new Promise(resolve => {
-    const unsubscribe = auth.onAuthStateChanged(user => {
-      unsubscribe();
-      resolve(user || null);
-    });
-  });
-
-  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(error => {
-    console.error("Firebase persistence setup failed:", error);
-  });
+  // Set durable browser persistence before resolving the initial auth state.
+  // This prevents page guards from briefly treating a returning user as signed out.
+  const authReady = auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .catch(error => {
+      console.error("Firebase persistence setup failed:", error);
+    })
+    .then(() => new Promise(resolve => {
+      const unsubscribe = auth.onAuthStateChanged(user => {
+        unsubscribe();
+        resolve(user || null);
+      });
+    }));
 
   const studioAuth = {
     auth,
