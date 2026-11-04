@@ -144,10 +144,18 @@
     const roomRef = db.collection("rooms").doc(roomCode);
     const snapshot = await roomRef.get();
     if (!snapshot.exists || snapshot.data().status !== "live") throw new Error("That presentation could not be found or is no longer live.");
-    await roomRef.collection("participants").doc(user.uid).set({
-      joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      lastSeenAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
+    const participantRef = roomRef.collection("participants").doc(user.uid);
+    const participantSnapshot = await participantRef.get();
+    if (participantSnapshot.exists) {
+      await participantRef.update({
+        lastSeenAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } else {
+      await participantRef.set({
+        joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        lastSeenAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
     return { code: roomCode, uid: user.uid, room: snapshot.data() };
   }
 
