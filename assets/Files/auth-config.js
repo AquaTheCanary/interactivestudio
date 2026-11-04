@@ -214,13 +214,22 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   window.showAuthError = showAuthError;
   studioAuth.completeRedirectSignIn();
   function showAuthError(error) {
+    const messages = {
+      "auth/unauthorized-domain": "This website domain is not authorised in Firebase. Add interactivestudio.abrdns.com and aquathecanary.github.io under Firebase Authentication → Settings → Authorised domains.",
+      "auth/operation-not-allowed": "This sign-in provider is not enabled yet. Enable Google or Microsoft in Firebase Authentication → Sign-in method.",
+      "auth/popup-closed-by-user": "The sign-in window was closed before sign-in finished. Please try again.",
+      "auth/popup-blocked": "Your browser blocked the sign-in window. Allow pop-ups for this site and try again.",
+      "auth/network-request-failed": "A network error interrupted sign-in. Check your connection and try again.",
+      "auth/account-exists-with-different-credential": "An account already exists with this email using another sign-in method. Sign in with that method first."
+    };
+    const detail = messages[error && error.code] || (error && error.message) || "Something went wrong. Please try again.";
     const message = document.querySelector("[data-auth-message]");
     if (message) {
-      message.textContent = error.message || "Something went wrong. Please try again.";
+      message.textContent = detail;
       message.className = "auth-message error";
     } else {
       console.error(error);
-      window.alert(error.message || "Something went wrong. Please try again.");
+      window.alert(detail);
     }
   }
 })();
