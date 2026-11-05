@@ -52,6 +52,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     },
     async currentUser() {
       await authReady;
+      if (studioAuth.redirectReady) await studioAuth.redirectReady;
       return auth.currentUser;
     },
     async getProfile(user) {
@@ -119,8 +120,9 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       const credential = await auth.signInWithEmailAndPassword(email.trim(), password);
       if (!credential.user.emailVerified) {
         try { await credential.user.sendEmailVerification(); } catch (_) {}
-        await auth.signOut();
-        throw new Error("Your email address is not verified yet. We have sent you a fresh verification link. Open it, then sign in again.");
+        if (organisation) {
+          throw new Error("Your work email is not verified yet. We sent a fresh verification link. Verify it, then sign in again.");
+        }
       }
       await studioAuth.finishSignIn(credential.user, organisation);
     },
@@ -176,7 +178,6 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       const credential = await auth.createUserWithEmailAndPassword(email.trim(), password);
       await credential.user.updateProfile({ displayName: name.trim() });
       await credential.user.sendEmailVerification();
-      await auth.signOut();
       return true;
     },
     async registerPersonal({ name, email, password }) {
@@ -184,7 +185,6 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       const credential = await auth.createUserWithEmailAndPassword(email.trim(), password);
       await credential.user.updateProfile({ displayName: name.trim() });
       await credential.user.sendEmailVerification();
-      await auth.signOut();
       return true;
     },
     async signOut() {
@@ -208,11 +208,14 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     }
   };
 
+  // Resolve redirect-based SSO before page guards inspect the signed-in user.
+  // Firebase LOCAL persistence survives navigation, reloads and browser restarts.
+  studioAuth.redirectReady = Promise.resolve().then(() => studioAuth.completeRedirectSignIn());
+
   window.studioAuth = studioAuth;
   window.loginWithGoogle = organisation => studioAuth.signInGoogle(!!organisation).catch(showAuthError);
   window.loginWithMicrosoft = organisation => studioAuth.signInMicrosoft(!!organisation).catch(showAuthError);
   window.showAuthError = showAuthError;
-  studioAuth.completeRedirectSignIn();
   function showAuthError(error) {
     const messages = {
       "auth/unauthorized-domain": "This website domain is not authorised in Firebase. Add interactivestudio.abrdns.com and aquathecanary.github.io under Firebase Authentication → Settings → Authorised domains.",
