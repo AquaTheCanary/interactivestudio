@@ -18,3 +18,24 @@ footer{margin-top:auto;border-top:1px solid var(--border-color);padding:36px 24p
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 
 .auth-page{display:flex;flex-direction:column;justify-content:center;align-items:center}.auth-page>.auth-layout{margin:auto}.auth-page>footer{width:100%;padding:22px 18px}
+
+/* Interactive Studio visual system refresh */
+:root{--brand-blue:#635bff;--brand-violet:#8b5cf6;--border-color:#e7e8f0;--bg-subtle:#f6f6fb;--radius:16px;--shadow-sm:0 5px 22px rgba(32,30,72,.045);--shadow-lg:0 22px 65px rgba(32,30,72,.11)}
+::selection{background:#dedbff;color:#29245c}
+:focus-visible{outline:3px solid #8b83ff!important;outline-offset:2px}
+.home-nav,.site-header{box-shadow:0 2px 14px rgba(32,30,72,.025)}
+.nav-links a{transition:color .16s ease}
+.btn-primary-small,.btn-primary-large,.btn-launch,.btn-submit{background:#635bff;border-color:#635bff}
+.btn-primary-small:hover,.btn-primary-large:hover,.btn-launch:hover,.btn-submit:hover{background:#5148e8;border-color:#5148e8}
+.feature-card,.pricing-card,.solution-card,.contact-card,.download-card{border-radius:16px;box-shadow:0 5px 22px rgba(32,30,72,.045)}
+.pricing-card{padding:28px}
+.auth-page{background:radial-gradient(ellipse at 15% 15%,#eeecff 0,transparent 42%),#f7f7fb}
+.auth-container{border:1px solid #e9e8f2;border-radius:20px;box-shadow:0 24px 80px rgba(35,31,80,.09)}
+.auth-logo{max-width:190px;max-height:58px;object-fit:contain}
+.sso-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-sso{min-height:48px;border:1px solid #e5e6ee;background:#fff;color:#292b3a;border-radius:10px;font-size:13px}
+.sso-logo{width:19px;height:19px;flex:0 0 19px}
+.btn-sso:hover{background:#fafaff;border-color:#c9c5ff;box-shadow:0 5px 16px rgba(60,55,130,.07)}
+.auth-message{border-radius:10px;padding:0}
+.auth-message.error,.auth-message.success{padding:12px 14px;margin:12px 0}
+@media(max-width:520px){.sso-buttons{grid-template-columns:1fr}.auth-container{border-radius:16px}}

@@ -24,16 +24,18 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   ]);
   const paidPlans = new Set(["pro","team","organisation","enterprise","company"]);
   const appUrl = path => window.getAppUrl ? window.getAppUrl(path) : path;
-  const authReady = new Promise(resolve => {
-    const unsubscribe = auth.onAuthStateChanged(user => {
-      unsubscribe();
-      resolve(user || null);
-    });
-  });
-
-  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(error => {
-    console.error("Firebase persistence setup failed:", error);
-  });
+  // Set durable browser persistence before resolving the initial auth state.
+  // This prevents page guards from briefly treating a returning user as signed out.
+  const authReady = auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .catch(error => {
+      console.error("Firebase persistence setup failed:", error);
+    })
+    .then(() => new Promise(resolve => {
+      const unsubscribe = auth.onAuthStateChanged(user => {
+        unsubscribe();
+        resolve(user || null);
+      });
+    }));
 
   const studioAuth = {
     auth,
@@ -50,6 +52,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     },
     async currentUser() {
       await authReady;
+      if (studioAuth.redirectReady) await studioAuth.redirectReady;
       return auth.currentUser;
     },
     async getProfile(user) {
@@ -117,25 +120,53 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       const credential = await auth.signInWithEmailAndPassword(email.trim(), password);
       if (!credential.user.emailVerified) {
         try { await credential.user.sendEmailVerification(); } catch (_) {}
-        await auth.signOut();
-        throw new Error("Your email address is not verified yet. We have sent you a fresh verification link. Open it, then sign in again.");
+        if (organisation) {
+          throw new Error("Your work email is not verified yet. We sent a fresh verification link. Verify it, then sign in again.");
+        }
       }
       await studioAuth.finishSignIn(credential.user, organisation);
+    },
+    async completeRedirectSignIn() {
+      await authReady;
+      try {
+        const credential = await auth.getRedirectResult();
+        if (!credential || !credential.user) return false;
+        const organisation = sessionStorage.getItem("studio_sso_organisation") === "true";
+        sessionStorage.removeItem("studio_sso_organisation");
+        await studioAuth.finishSignIn(credential.user, organisation);
+        return true;
+      } catch (error) {
+        sessionStorage.removeItem("studio_sso_organisation");
+        showAuthError(error);
+        return false;
+      }
     },
     async signInGoogle(organisation = false) {
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
       const provider = new firebase.auth.GoogleAuthProvider();
       provider.setCustomParameters({ prompt: "select_account" });
-      const credential = await auth.signInWithPopup(provider);
-      await studioAuth.finishSignIn(credential.user, organisation);
+      return studioAuth.runSSO(provider, organisation);
     },
     async signInMicrosoft(organisation = false) {
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
       const provider = new firebase.auth.OAuthProvider("microsoft.com");
       provider.setCustomParameters({ prompt: "select_account" });
       provider.addScope("email");
-      const credential = await auth.signInWithPopup(provider);
-      await studioAuth.finishSignIn(credential.user, organisation);
+      return studioAuth.runSSO(provider, organisation);
+    },
+    async runSSO(provider, organisation) {
+      try {
+        const credential = await auth.signInWithPopup(provider);
+        await studioAuth.finishSignIn(credential.user, organisation);
+      } catch (error) {
+        const redirectCodes = ["auth/popup-blocked", "auth/operation-not-supported-in-this-environment", "auth/web-storage-unsupported"];
+        if (redirectCodes.includes(error.code)) {
+          sessionStorage.setItem("studio_sso_organisation", organisation ? "true" : "false");
+          await auth.signInWithRedirect(provider);
+          return;
+        }
+        throw error;
+      }
     },
     async resetPassword(email) {
       if (!email) throw new Error("Enter your email address first.");
@@ -147,7 +178,6 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       const credential = await auth.createUserWithEmailAndPassword(email.trim(), password);
       await credential.user.updateProfile({ displayName: name.trim() });
       await credential.user.sendEmailVerification();
-      await auth.signOut();
       return true;
     },
     async registerPersonal({ name, email, password }) {
@@ -155,7 +185,6 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       const credential = await auth.createUserWithEmailAndPassword(email.trim(), password);
       await credential.user.updateProfile({ displayName: name.trim() });
       await credential.user.sendEmailVerification();
-      await auth.signOut();
       return true;
     },
     async signOut() {
@@ -179,18 +208,31 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     }
   };
 
+  // Resolve redirect-based SSO before page guards inspect the signed-in user.
+  // Firebase LOCAL persistence survives navigation, reloads and browser restarts.
+  studioAuth.redirectReady = Promise.resolve().then(() => studioAuth.completeRedirectSignIn());
+
   window.studioAuth = studioAuth;
   window.loginWithGoogle = organisation => studioAuth.signInGoogle(!!organisation).catch(showAuthError);
   window.loginWithMicrosoft = organisation => studioAuth.signInMicrosoft(!!organisation).catch(showAuthError);
   window.showAuthError = showAuthError;
   function showAuthError(error) {
+    const messages = {
+      "auth/unauthorized-domain": "This website domain is not authorised in Firebase. Add interactivestudio.abrdns.com and aquathecanary.github.io under Firebase Authentication → Settings → Authorised domains.",
+      "auth/operation-not-allowed": "This sign-in provider is not enabled yet. Enable Google or Microsoft in Firebase Authentication → Sign-in method.",
+      "auth/popup-closed-by-user": "The sign-in window was closed before sign-in finished. Please try again.",
+      "auth/popup-blocked": "Your browser blocked the sign-in window. Allow pop-ups for this site and try again.",
+      "auth/network-request-failed": "A network error interrupted sign-in. Check your connection and try again.",
+      "auth/account-exists-with-different-credential": "An account already exists with this email using another sign-in method. Sign in with that method first."
+    };
+    const detail = messages[error && error.code] || (error && error.message) || "Something went wrong. Please try again.";
     const message = document.querySelector("[data-auth-message]");
     if (message) {
-      message.textContent = error.message || "Something went wrong. Please try again.";
+      message.textContent = detail;
       message.className = "auth-message error";
     } else {
       console.error(error);
-      window.alert(error.message || "Something went wrong. Please try again.");
+      window.alert(detail);
     }
   }
 })();
