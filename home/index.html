@@ -1,15 +1,154 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="refresh" content="0; url=../">
-  <title>Loading...</title>
-  <script>
-    window.location.replace("../");
-  </script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8fc">
+  <meta name="description" content="Turn ideas into beautiful, interactive presentations with Interactive Studio. Create, refine and present from one connected workspace.">
+  <title>Interactive Studio — Build presentations that change the world</title>
+  <link rel="icon" href="../assets/images/tablogo.png">
+  <link rel="stylesheet" href="../assets/Files/style.css">
+  <script src="../assets/Files/router.js" defer></script>
+  <script src="../assets/Files/app.js" defer></script>
+  <style>
+    :root{--bg-main:#f7f8fc;--brand-blue:#635bff;--brand-violet:#8b5cf6}
+    body.page-body{background:#f7f8fc;color:#20212b}
+    .home-nav{position:sticky;background:rgba(255,255,255,.86);backdrop-filter:blur(22px);border-bottom:1px solid #e8e9f1;padding-top:17px;padding-bottom:17px}
+    .nav-brand>a{display:flex;align-items:center}.brand-logo{height:32px}.nav-links a{font-size:13px;color:#686b7b}.nav-links a:hover{color:#635bff}
+    .hero-section{max-width:1320px;padding:100px 28px 92px}
+    .hero-badge{background:#fff;border-color:#e6e5ff;color:#5e5b86;box-shadow:0 4px 18px #35307808}
+    .hero-title{max-width:1080px;font-size:clamp(44px,7vw,84px);letter-spacing:-.082em;line-height:1.02;margin:30px auto 22px}
+    .hero-section>p:not(.hero-note){max-width:690px;margin:0 auto;color:#707487;font-size:18px;line-height:1.75}
+    .highlight-text{background:linear-gradient(110deg,#625bff,#9b5de5 72%,#bd6be8);background-clip:text;-webkit-background-clip:text;color:transparent}
+    .hero-cta-group{margin:30px 0 22px}.btn-primary-large{background:#635bff;border-color:#635bff;border-radius:11px;box-shadow:0 8px 22px #635bff28}.btn-primary-large:hover{background:#5148eb}.btn-secondary-large{border-radius:11px;background:#fff}
+    .hero-note{margin:0 0 44px!important;color:#9699a8!important}
+    .app-preview-mockup{max-width:1100px;border-radius:18px;border-color:#e4e5ee;box-shadow:0 36px 100px #27264a17}
+    .mockup-header{height:48px;background:#fbfbfd}.mockup-body{min-height:360px;padding:42px 34px;background:radial-gradient(ellipse at 50% 0%,#e9e8ff 0,transparent 55%),linear-gradient(135deg,#fbfbff,#f2f2fa)}
+    .section{padding-top:100px;padding-bottom:100px}.section-muted{background:#f0f1f8;border-color:#e8e9f1}.section-header{margin-bottom:48px}.section-kicker{color:#635bff}
+    .feature-card,.solution-card{border-radius:16px;border-color:#e7e8f0;padding:30px;box-shadow:0 8px 28px #29284a08}.feature-icon{background:#efedff;color:#635bff;border-radius:12px}
+    .split-visual{background:radial-gradient(circle at 30% 25%,#e4e1ff,transparent 44%),linear-gradient(145deg,#fbfaff,#efeffa);border-color:#e7e5f4;border-radius:22px}
+    .visual-panel{border-radius:15px;box-shadow:0 18px 50px #24204412}
+    .section-dark{background:#171725}.section-dark .section-kicker{color:#aaa5ff}
+    footer{background:#fff;border-color:#e9eaf0}
+    @media(max-width:700px){.hero-section{padding:68px 18px 64px}.hero-title{font-size:clamp(42px,12vw,62px)}.hero-section>p:not(.hero-note){font-size:15px}.app-preview-mockup{margin-top:15px}.mockup-body{padding:25px 15px;min-height:280px}.section{padding:65px 18px}}
+    </style>
 </head>
-<body>
-  <p>Redirecting to <a href="../">homepage</a>...</p>
+<body class="page-body">
+<header class="home-nav">
+  <div class="nav-brand">
+    <a data-route="/" aria-label="Interactive Studio home"><img src="../assets/images/headerlogo.png" class="brand-logo" alt="Interactive Studio"></a>
+    <span class="brand-name">Interactive Studio</span>
+  </div>
+  <button class="mobile-menu-button" aria-label="Toggle navigation" aria-expanded="false">Menu</button>
+  <nav class="nav-links">
+    <a data-route="/products/">Product</a>
+    <a data-route="/solutions/">Solutions</a>
+    <a data-route="/pricing/">Pricing</a>
+    <a data-route="/resources/">Resources</a>
+    <a data-route="/ai/">AI Studio</a>
+    <a data-route="/contact/">Contact</a>
+  </nav>
+  <div class="nav-actions">
+    <a data-route="/auth/personal/login/" class="btn-secondary-small">Sign in</a>
+    <a data-route="/auth/personal/register/" class="btn-launch">Get started</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero-section">
+    <span class="hero-badge"><span class="eyebrow-dot"></span> YOUR IDEAS, WITH ROOM TO MOVE</span>
+    <h1 class="hero-title">Build presentations<br>that will <span class="highlight-text">help</span><br>change the world.</h1>
+    <p>Turn your ideas into clear, compelling stories. Design beautiful presentations, bring in AI when you need a creative spark, and make every slide worth remembering — all in one connected workspace.</p>
+    <div class="hero-cta-group">
+      <a data-route="/auth/personal/register/" class="btn-primary-large">Start creating for free →</a>
+      <a data-route="/products/" class="btn-secondary-large">Explore the studio</a>
+    </div>
+    <p class="hero-note">Start free · Create at your own pace · Bring your ideas to life</p>
+
+    <div class="app-preview-mockup" aria-label="Interactive Studio presentation editor preview">
+      <div class="mockup-header">
+        <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+        <span class="mockup-title">Interactive Studio · Presentation workspace</span>
+      </div>
+      <div class="mockup-body">
+        <div style="display:flex;gap:10px;align-items:center;color:#596174;font-size:11px;flex-wrap:wrap">
+          <span class="status-pill">All changes saved</span><span>Untitled project</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 2fr 1fr;gap:14px;width:100%;max-width:800px;margin-top:20px;text-align:left">
+          <div style="background:#fff;border:1px solid #e4e8f0;border-radius:12px;padding:14px;font-size:11px;color:#70788a">LAYERS
+            <div class="visual-row">▣ Intro</div><div class="visual-row">▤ Product</div><div class="visual-row">◉ Call to action</div>
+          </div>
+          <div style="background:linear-gradient(135deg,#dce5ff,#f4e7ff);border:1px solid #e0e5f0;border-radius:12px;min-height:180px;display:grid;place-items:center;text-align:center;padding:20px">
+            <div><span style="font-size:10px;color:#4e60b5;font-weight:800;letter-spacing:.12em">YOUR NEXT BIG IDEA</span><h3 style="font-size:clamp(20px,3vw,34px);letter-spacing:-1.5px;margin:10px 0">Make every moment<br>mean something.</h3><span style="font-size:10px;color:#626b83">An interactive story, made with Studio</span></div>
+          </div>
+          <div style="background:#fff;border:1px solid #e4e8f0;border-radius:12px;padding:14px;font-size:11px;color:#70788a">DESIGN
+            <div class="visual-row">Colour · Indigo</div><div class="visual-row">Type · Inter</div><div class="visual-row">Spacing · 24</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-muted">
+    <div class="section-inner">
+      <div class="section-header">
+        <div class="section-kicker">One connected workspace</div>
+        <h2>Everything you need to make the idea real.</h2>
+        <p>Bring your content, design decisions and creative tools together. Spend less time switching between apps and more time shaping the work.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card"><div class="feature-icon">✳</div><h3>A flexible creative canvas</h3><p>Build presentations from structured slides, visual elements and interactive components. Keep the layout clear while giving every idea room to breathe.</p></article>
+        <article class="feature-card"><div class="feature-icon">⌘</div><h3>An AI partner, built into the work</h3><p>Brainstorm, structure slides, rewrite content and explore creative directions in the same workspace where your presentation takes shape.</p></article>
+        <article class="feature-card"><div class="feature-icon">◉</div><h3>Made to work together</h3><p>Share your work, collect feedback and keep teams aligned around the same story and the same source of truth.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-inner split-layout">
+      <div class="split-copy"><div class="section-kicker">01 · Create</div><h2>From blank canvas to a story worth sharing.</h2><p>Start with a blank presentation or a clear brief. Arrange content, refine typography and build visual rhythm with a canvas designed to keep the creative process simple and focused.</p><p style="margin-top:18px"><a data-route="/editor/" class="link-action">Explore the editor →</a></p></div>
+      <div class="split-visual"><div class="visual-panel"><div style="display:flex;justify-content:space-between;font-size:11px;color:#788091"><b>Presentation overview</b><span>4 slides</span></div><div class="visual-row"><span class="visual-dot"></span><span><b>01 · The opportunity</b><br><small>Opening statement</small></span></div><div class="visual-row"><span class="visual-dot" style="background:#f4eaff"></span><span><b>02 · The big idea</b><br><small>Visual narrative</small></span></div><div class="visual-row"><span class="visual-dot" style="background:#e5f7f1"></span><span><b>03 · How it works</b><br><small>Interactive detail</small></span></div><div class="visual-row"><span class="visual-dot" style="background:#fff0e5"></span><span><b>04 · What's next</b><br><small>Clear call to action</small></span></div></div></div>
+    </div>
+  </section>
+
+  <section class="section section-muted">
+    <div class="section-inner split-layout">
+      <div class="split-visual"><div class="visual-panel"><div style="font-size:11px;color:#737b8a;font-weight:700">STUDIO AI</div><div style="padding:16px;background:#f6f7fb;border-radius:12px;margin:12px 0;font-size:12px">Help me turn this product brief into a compelling 6-slide launch story.</div><div style="background:#eef1ff;border-radius:12px;padding:16px;font-size:12px"><b>Suggested structure</b><ol style="padding-left:18px;margin-top:8px;line-height:2"><li>Set the scene</li><li>Show the customer problem</li><li>Introduce the product</li><li>Demonstrate the difference</li><li>Build confidence</li><li>Invite the next step</li></ol></div></div></div>
+      <div class="split-copy"><div class="section-kicker">02 · Accelerate with AI</div><h2>A creative partner built into your process.</h2><p>Move from rough notes to a strong first draft. Explore ideas, organise information, sharpen messaging and adapt your presentation for the people you're speaking to.</p><p style="margin-top:18px"><a data-route="/ai/" class="link-action">Discover AI Studio →</a></p></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-header"><div class="section-kicker">03 · Work together</div><h2>Make collaboration part of the canvas.</h2><p>Keep the conversation close to the work. Share a project, invite a teammate and create a clearer path from feedback to final delivery.</p></div>
+      <div class="feature-grid">
+        <article class="feature-card"><div class="feature-icon">↗</div><h3>Share with confidence</h3><p>Give collaborators a clear way to access and review your work. Sharing permissions can grow with your workspace.</p></article>
+        <article class="feature-card"><div class="feature-icon">◎</div><h3>Consistent brand systems</h3><p>Build reusable visual patterns that help every presentation feel considered, consistent and unmistakably yours.</p></article>
+        <article class="feature-card"><div class="feature-icon">⇧</div><h3>Ready for the next step</h3><p>Prepare presentation visuals and keep your work ready for review, delivery and future iteration.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-dark">
+    <div class="section-inner" style="text-align:center;padding:28px 0">
+      <div class="section-kicker">Your next project starts here</div>
+      <h2 class="section-title" style="max-width:750px;margin:12px auto 18px">Give your best ideas a better place to grow.</h2>
+      <p style="max-width:600px;margin:0 auto 28px">Create a free account and explore a more connected way to design and present.</p>
+      <a data-route="/auth/personal/register/" class="btn-primary-large" style="background:#fff;color:#17191f;border-color:#fff">Create your free workspace →</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div>© <span data-year>2026</span> Interactive Studio. All rights reserved.</div>
+    <div class="footer-links">
+      <a data-route="/products/">Product</a><a data-route="/pricing/">Pricing</a><a data-route="/contact/">Contact</a>
+      <a data-route="/legal/privacy-policy/">Privacy Policy</a><a data-route="/legal/terms-of-service/">Terms of Service</a>
+      <a data-route="/github/">View on GitHub</a>
+    </div>
+  </div>
+</footer>
+
 </body>
 </html>
