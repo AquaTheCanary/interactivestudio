@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Presentation | Interactive Studio</title>
+<meta name="description" content="View a presentation published with Interactive Studio.">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f5fa;color:#252638;font-family:Inter,system-ui,Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+header{height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,48px);background:#fff;border-bottom:1px solid #e8e9f0}
+.brand{font-weight:800;letter-spacing:-.4px}.brand span{color:#635bff}
+main{width:min(1440px,100%);margin:auto;padding:clamp(14px,3vw,38px);flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#85889a;font-size:12px}
+.slide{width:100%;aspect-ratio:16/9;max-height:calc(100vh - 190px);min-height:300px;background:#fff;border:1px solid #e6e7ef;border-radius:14px;box-shadow:0 24px 70px #24243d16;padding:clamp(28px,7vw,110px);display:flex;flex-direction:column;justify-content:center;overflow:auto}
+.kicker{font-size:clamp(10px,1vw,15px);font-weight:800;letter-spacing:.15em;color:#635bff}.slide h1{font-size:clamp(28px,5vw,76px);line-height:1.04;letter-spacing:-.055em;margin:18px 0;color:#202431}.slide p{font-size:clamp(15px,2vw,27px);line-height:1.5;color:#626b7b;max-width:85%;white-space:pre-wrap}
+.controls{display:flex;justify-content:center;align-items:center;gap:12px}.controls button{border:1px solid #e2e3ed;border-radius:10px;padding:11px 18px;background:#fff;color:#36384b;font-weight:700;cursor:pointer}.controls button.primary{background:#635bff;color:#fff;border-color:#635bff}.controls button:disabled{opacity:.4;cursor:not-allowed}
+#status{text-align:center;color:#85889a;font-size:12px;min-height:18px}.error{margin:auto;text-align:center;background:#fff;border:1px solid #e8e9f0;border-radius:16px;padding:38px;max-width:560px}.error h1{font-size:24px;margin-bottom:8px}.error p{color:#777d90;font-size:13px}
+footer{text-align:center;padding:16px;color:#999bab;font-size:11px}
+@media(max-width:600px){.slide{aspect-ratio:auto;min-height:62vh;max-height:none;border-radius:10px}.meta{font-size:10px}.controls button{padding:10px 13px}}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<header><div class="brand">Interactive <span>Studio</span></div><div id="presentation-id" style="font-size:12px;color:#85889a">Presentation</div></header>
+<main>
+<div class="meta"><strong id="deck-title">Loading presentation…</strong><span id="slide-counter"></span></div>
+<article class="slide" id="slide" aria-live="polite"><div class="kicker">INTERACTIVE STUDIO</div><h1>Loading…</h1><p>Please wait while we load this presentation.</p></article>
+<div class="controls"><button id="previous" type="button" disabled>← Previous</button><button id="next" class="primary" type="button" disabled>Next →</button></div>
+<div id="status" role="status">Connecting…</div>
+</main>
+<footer>Made with Interactive Studio</footer>
+<script>
+(()=> {
+ const $=id=>document.getElementById(id);
+ const config={apiKey:"AIzaSyAHQDuRXq77XRZvnE-dDuoy8A1TLLtfSy8",authDomain:"interactive-studio-convexllc.firebaseapp.com",projectId:"interactive-studio-convexllc",storageBucket:"interactive-studio-convexllc.firebasestorage.app",messagingSenderId:"405382386557",appId:"1:405382386557:web:bd91219c8797218fb2b214",measurementId:"G-9JSV264WHB"};
+ const match=location.pathname.match(/(?:^|\/)view\/(\d{6})\/?$/);
+ const id=match&&match[1];let deck=null,index=0;
+ function showError(message){$("slide").innerHTML='<div class="error"><h1>Presentation unavailable</h1><p></p></div>';$("slide").querySelector("p").textContent=message;$("deck-title").textContent="Not found";$("status").textContent="Check the six-digit ID and try again.";$("previous").disabled=$("next").disabled=true;}
+ function draw(){
+  if(!deck||!Array.isArray(deck.slides)||!deck.slides.length){showError("This presentation has no slides.");return}
+  index=Math.max(0,Math.min(index,deck.slides.length-1));const item=deck.slides[index]||{};
+  $("deck-title").textContent=deck.title||"Untitled presentation";$("presentation-id").textContent="ID "+id;$("slide-counter").textContent="Slide "+(index+1)+" of "+deck.slides.length;
+  const root=$("slide");root.replaceChildren();root.style.background=/^#[0-9a-f]{6}$/i.test(item.bg||"")?item.bg:"#fff";
+  const kicker=document.createElement("div");kicker.className="kicker";kicker.textContent=item.kicker||"";
+  const heading=document.createElement("h1");heading.textContent=item.heading||"";heading.style.color=/^#[0-9a-f]{6}$/i.test(item.ink||"")?item.ink:"#202431";
+  const copy=document.createElement("p");copy.textContent=item.copy||"";
+  root.append(kicker,heading,copy);
+  $("previous").disabled=index===0;$("next").disabled=index===deck.slides.length-1;
+  $("status").textContent="Published presentation · ID "+id;
+ }
+ $("previous").onclick=()=>{index--;draw()};$("next").onclick=()=>{index++;draw()};
+ document.addEventListener("keydown",e=>{if(e.key==="ArrowLeft"&&!$("previous").disabled)$("previous").click();if(e.key==="ArrowRight"&&!$("next").disabled)$("next").click()});
+ if(!id){showError("The URL must end with a six-digit presentation ID, for example /view/123456.");return}
+ $("presentation-id").textContent="ID "+id;
+ try{if(!firebase.apps.length)firebase.initializeApp(config);firebase.firestore().collection("rooms").doc(id).get().then(snapshot=>{if(!snapshot.exists){showError("We couldn't find a presentation with that ID.");return}const data=snapshot.data();if(data.status!=="live"){showError("This presentation is not currently published.");return}deck={title:data.title,slides:data.slides};index=0;draw()}).catch(error=>{console.error("Presentation load failed:",error);showError(error.message||"We couldn't load this presentation. Please try again.")})}
+ catch(error){console.error(error);showError("The presentation viewer could not initialise. Please refresh and try again.")}
+})();
+</script>
+</body></html>
