@@ -104,6 +104,10 @@ export default {
         if (!domain || !domain.includes(".") || FREE_DOMAINS.has(domain)) return json({ error: "A corporate email domain is required for organisation access." }, 403, origin);
         return json({ ok: true, domain }, 200, origin);
       }
+      if (url.pathname === "/aiStatus") {
+        if (!user.emailVerified) return json({ error: "Verify your email address before using AI features." }, 403, origin);
+        return json({ providers: { gemini: !!env.GEMINI_API_KEY, chatgpt: !!env.OPENAI_API_KEY, claude: !!env.ANTHROPIC_API_KEY, copilot: !!(env.AZURE_OPENAI_ENDPOINT && env.AZURE_OPENAI_API_KEY && env.AZURE_OPENAI_DEPLOYMENT) } }, 200, origin);
+      }
       if (url.pathname === "/getEntitlements") {
         if (!user.emailVerified) return json({ error: "Verify your email address before accessing account services." }, 403, origin);
         const plan = await planFor(user, env, token);
@@ -124,7 +128,7 @@ export default {
       return json({ error: "Endpoint not found." }, 404, origin);
     } catch (error) {
       const message = error?.message || "Request failed.";
-      const status = /sign in|session is invalid|expired/i.test(message) ? 401 : 500;
+      const status = /sign in|session is invalid|expired/i.test(message) ? 401 : (/not configured|needs AZURE_OPENAI/i.test(message) ? 503 : 502);
       return json({ error: message }, status, origin);
     }
   }
