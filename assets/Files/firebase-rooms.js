@@ -87,10 +87,9 @@
   }
 
   function makeCode() {
-    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    const bytes = new Uint8Array(6);
+    const bytes = new Uint32Array(1);
     crypto.getRandomValues(bytes);
-    return [...bytes].map(byte => alphabet[byte % alphabet.length]).join("");
+    return String(100000 + (bytes[0] % 900000));
   }
 
   async function createRoom(deck) {
@@ -140,7 +139,7 @@
   async function joinRoom(code) {
     const { db, user } = await ready();
     const roomCode = String(code || "").trim().toUpperCase();
-    if (!/^[A-HJ-NP-Z2-9]{6}$/.test(roomCode)) throw new Error("Enter a valid 6-character room code.");
+    if (!/^\d{6}$/.test(roomCode)) throw new Error("Enter a valid 6-digit presentation ID.");
     const roomRef = db.collection("rooms").doc(roomCode);
     const snapshot = await roomRef.get();
     if (!snapshot.exists || snapshot.data().status !== "live") throw new Error("That presentation could not be found or is no longer live.");
