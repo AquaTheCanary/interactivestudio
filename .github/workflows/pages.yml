@@ -26,7 +26,25 @@ jobs:
         run: |
           mkdir -p _site
           rsync -a --exclude='.git' --exclude='.github' --exclude='_site' ./ _site/
-          sed 's#../assets/#assets/#g' homepage/index.html > _site/index.html
+          # The canonical homepage source lives in /home/index.html.
+          # Rewrite its relative asset paths for the site root.
+          sed 's#../assets/#assets/#g' home/index.html > _site/index.html
+          # /home remains a compatibility URL and redirects to the root homepage.
+          mkdir -p _site/home
+          cat > _site/home/index.html <<'EOF'
+          <!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta http-equiv="refresh" content="0;url=../">
+            <link rel="canonical" href="../">
+            <title>Redirecting to Interactive Studio</title>
+            <script>window.location.replace("../");</script>
+          </head>
+          <body><p>Redirecting to <a href="../">Interactive Studio</a>…</p></body>
+          </html>
+          EOF
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
