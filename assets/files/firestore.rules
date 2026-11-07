@@ -24,7 +24,7 @@ service cloud.firestore {
         && request.resource.data.slides.size() > 0
         && request.resource.data.slides.size() <= 150;
       // Published six-digit presentation IDs are intentionally public to view.
-      allow get: if signedIn() || (resource.data.status == 'live' && code.matches('^[0-9]{6}'+'
+      allow get: if signedIn() || (resource.data.status == 'live' && code.size() == 6 && code.matches('^[0-9]+'));
       allow update: if owner(code)
         && request.resource.data.ownerUid == resource.data.ownerUid
         && request.resource.data.slides is list
