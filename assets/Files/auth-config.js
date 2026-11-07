@@ -22,7 +22,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     "mail.com","proton.me","protonmail.com","gmx.com","gmx.co.uk",
     "yandex.com","hey.com","fastmail.com","pm.me","zoho.com"
   ]);
-  const paidPlans = new Set(["pro","team","organisation","enterprise","company"]);
+  const paidPlans = new Set(); // No paid tiers: every feature is included in the free plan.
   const appUrl = path => window.getAppUrl ? window.getAppUrl(path) : path;
   // Set durable browser persistence before resolving the initial auth state.
   // This prevents page guards from briefly treating a returning user as signed out.
@@ -60,11 +60,11 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       if (!activeUser) return null;
       let claims = {};
       try { claims = (await activeUser.getIdTokenResult()).claims || {}; } catch (_) {}
-      let verifiedPlan = String(claims.plan || "Basic");
+      let verifiedPlan = "Free";
       try {
         const token = await activeUser.getIdToken();
         const response = await fetch("https://interactive-studio-api.convexllc.workers.dev/getEntitlements", { method: "POST", headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }, body: "{}" });
-        if (response.ok) { const data = await response.json(); verifiedPlan = data.plan || verifiedPlan; }
+        if (response.ok) { const data = await response.json(); verifiedPlan = "Free"; }
       } catch (_) {}
       return {
         uid: activeUser.uid,
