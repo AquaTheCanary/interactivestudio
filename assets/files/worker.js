@@ -4,7 +4,6 @@ const ALLOWED_ORIGINS = new Set([
 ]);
 const SYSTEM_PROMPT = "You are Interactive Studio's creative presentation assistant. Help users plan, write and improve clear, accurate, engaging presentations. Be concise and practical.";
 const FREE_DOMAINS = new Set(["gmail.com","googlemail.com","yahoo.com","yahoo.co.uk","ymail.com","hotmail.com","hotmail.co.uk","outlook.com","outlook.co.uk","live.com","live.co.uk","msn.com","icloud.com","me.com","mac.com","aol.com","mail.com","proton.me","protonmail.com","gmx.com","gmx.co.uk","yandex.com","hey.com","fastmail.com","pm.me","zoho.com"]);
-const PAID_PLANS = new Set(["pro","team","organisation","enterprise","company"]);
 
 function corsHeaders(origin) {
   const headers = {
@@ -35,17 +34,9 @@ async function authenticatedUser(request, env) {
   const user = data.users[0];
   return { uid: user.localId, email: user.email || "", emailVerified: !!user.emailVerified };
 }
-async function planFor(user, env, token) {
-  // Firestore rules allow each signed-in user to read only their own entitlement document.
-  const url = "https://firestore.googleapis.com/v1/projects/" + encodeURIComponent(env.FIREBASE_PROJECT_ID || "interactive-studio-convexllc") +
-    "/databases/(default)/documents/userEntitlements/" + encodeURIComponent(user.uid) +
-    "?key=" + encodeURIComponent(env.FIREBASE_API_KEY);
-  try {
-    const response = await fetch(url, { headers: { Authorization: "Bearer " + token } });
-    if (!response.ok) return "basic";
-    const doc = await response.json();
-    return String(doc.fields?.plan?.stringValue || "Basic").toLowerCase();
-  } catch (_) { return "basic"; }
+async function planFor() {
+  // Interactive Studio is free for every account. Entitlements no longer gate features.
+  return "free";
 }
 function extractGemini(data) {
   return data?.candidates?.[0]?.content?.parts?.map(part => part.text || "").join("") || "";
@@ -126,7 +117,6 @@ export default {
         if (!prompt) return json({ error: "Enter a prompt." }, 400, origin);
         if (!["gemini", "copilot", "chatgpt", "claude"].includes(model)) return json({ error: "Unknown AI model." }, 400, origin);
         const plan = await planFor(user, env, token);
-        if (["chatgpt", "claude"].includes(model) && !PAID_PLANS.has(plan)) return json({ error: "Upgrade to Pro or above to use this model." }, 403, origin);
         const text = await generate(model, prompt, env);
         if (!text) throw new Error("The AI provider returned an empty response.");
         return json({ text, model, plan }, 200, origin);
