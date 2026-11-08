@@ -10,9 +10,8 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/rooms/$(code)).data.ownerUid == request.auth.uid;
     }
 
-    // Server-managed subscription entitlements.
     match /userEntitlements/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
+      allow read: if signedIn() && request.auth.uid == userId;
       allow write: if false;
     }
 
@@ -21,51 +20,11 @@ service cloud.firestore {
         && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.status == 'live'
         && code.size() == 6
-        && code.matches('^[0-9]+')
+        && code.matches('^[0-9]+$')
         && request.resource.data.slides is list
         && request.resource.data.slides.size() > 0
         && request.resource.data.slides.size() <= 150;
-      // Published six-digit presentation IDs are intentionally public to view.
-      allow get: if signedIn() || (resource.data.status == 'live' && code.size() == 6 && code.matches('^[0-9]+'));
-      allow update: if owner(code)
-        && request.resource.data.ownerUid == resource.data.ownerUid
-        && request.resource.data.slides is list
-        && request.resource.data.slides.size() > 0
-        && request.resource.data.slides.size() <= 150
-        && request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['title', 'slides', 'activeSlide', 'status', 'updatedAt']);
-      allow delete: if owner(code);
-
-      match /participants/{uid} {
-        allow read: if signedIn() && (request.auth.uid == uid || owner(code));
-        allow create: if signedIn() && request.auth.uid == uid;
-        allow update: if signedIn() && request.auth.uid == uid
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastSeenAt']);
-        allow delete: if owner(code);
-      }
-
-      match /votes/{voteId} {
-        allow read: if owner(code);
-        allow create: if signedIn()
-          && request.resource.data.uid == request.auth.uid
-          && request.resource.data.choice is string
-          && request.resource.data.choice.size() > 0
-          && request.resource.data.choice.size() <= 120
-          && request.resource.data.slideIndex is int
-          && exists(/databases/$(database)/documents/rooms/$(code)/participants/$(request.auth.uid));
-        allow update: if false;
-        allow delete: if owner(code);
-      }
-
-      match /private/{docId} {
-        allow read: if owner(code) && docId == 'notes';
-        allow create, update: if owner(code) && docId == 'notes'
-          && request.resource.data.ownerUid == request.auth.uid;
-        allow delete: if owner(code) && docId == 'notes';
-      }
-    }
-  }
-});
+      allow get: if signedIn() || (resource.data.status == 'live' && code.size() == 6 && code.matches('^[0-9]+$'));
       allow list: if signedIn();
       allow update: if owner(code)
         && request.resource.data.ownerUid == resource.data.ownerUid
@@ -104,84 +63,41 @@ service cloud.firestore {
         allow delete: if owner(code) && docId == 'notes';
       }
     }
-  }
-}));
-      allow update: if owner(code)
+
+    match /websites/{slug} {
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.slug == slug
+        && slug.matches('^[a-z0-9]+(-[a-z0-9]+)*$')
+        && request.resource.data.status in ['draft', 'published']
+        && request.resource.data.siteName is string
+        && request.resource.data.headline is string;
+      allow get: if (signedIn() && resource.data.ownerUid == request.auth.uid)
+        || resource.data.status == 'published';
+      allow list: if signedIn() && resource.data.ownerUid == request.auth.uid;
+      allow update: if signedIn()
+        && resource.data.ownerUid == request.auth.uid
         && request.resource.data.ownerUid == resource.data.ownerUid
-        && request.resource.data.slides is list
-        && request.resource.data.slides.size() > 0
-        && request.resource.data.slides.size() <= 150
-        && request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['title', 'slides', 'activeSlide', 'status', 'updatedAt']);
-      allow delete: if owner(code);
-
-      match /participants/{uid} {
-        allow read: if signedIn() && (request.auth.uid == uid || owner(code));
-        allow create: if signedIn() && request.auth.uid == uid;
-        allow update: if signedIn() && request.auth.uid == uid
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastSeenAt']);
-        allow delete: if owner(code);
-      }
-
-      match /votes/{voteId} {
-        allow read: if owner(code);
-        allow create: if signedIn()
-          && request.resource.data.uid == request.auth.uid
-          && request.resource.data.choice is string
-          && request.resource.data.choice.size() > 0
-          && request.resource.data.choice.size() <= 120
-          && request.resource.data.slideIndex is int
-          && exists(/databases/$(database)/documents/rooms/$(code)/participants/$(request.auth.uid));
-        allow update: if false;
-        allow delete: if owner(code);
-      }
-
-      match /private/{docId} {
-        allow read: if owner(code) && docId == 'notes';
-        allow create, update: if owner(code) && docId == 'notes'
-          && request.resource.data.ownerUid == request.auth.uid;
-        allow delete: if owner(code) && docId == 'notes';
-      }
+        && request.resource.data.slug == resource.data.slug
+        && request.resource.data.status in ['draft', 'published'];
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
     }
-  }
-});
-      allow list: if signedIn();
-      allow update: if owner(code)
+
+    match /websiteDomains/{hostname} {
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.hostname == hostname
+        && request.resource.data.status == 'pending';
+      allow get: if (signedIn() && resource.data.ownerUid == request.auth.uid)
+        || resource.data.status == 'active';
+      allow list: if signedIn() && resource.data.ownerUid == request.auth.uid;
+      allow update: if signedIn()
+        && resource.data.ownerUid == request.auth.uid
         && request.resource.data.ownerUid == resource.data.ownerUid
-        && request.resource.data.slides is list
-        && request.resource.data.slides.size() > 0
-        && request.resource.data.slides.size() <= 150
+        && request.resource.data.hostname == resource.data.hostname
         && request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['title', 'slides', 'activeSlide', 'status', 'updatedAt']);
-      allow delete: if owner(code);
-
-      match /participants/{uid} {
-        allow read: if signedIn() && (request.auth.uid == uid || owner(code));
-        allow create: if signedIn() && request.auth.uid == uid;
-        allow update: if signedIn() && request.auth.uid == uid
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastSeenAt']);
-        allow delete: if owner(code);
-      }
-
-      match /votes/{voteId} {
-        allow read: if owner(code);
-        allow create: if signedIn()
-          && request.resource.data.uid == request.auth.uid
-          && request.resource.data.choice is string
-          && request.resource.data.choice.size() > 0
-          && request.resource.data.choice.size() <= 120
-          && request.resource.data.slideIndex is int
-          && exists(/databases/$(database)/documents/rooms/$(code)/participants/$(request.auth.uid));
-        allow update: if false;
-        allow delete: if owner(code);
-      }
-
-      match /private/{docId} {
-        allow read: if owner(code) && docId == 'notes';
-        allow create, update: if owner(code) && docId == 'notes'
-          && request.resource.data.ownerUid == request.auth.uid;
-        allow delete: if owner(code) && docId == 'notes';
-      }
+          .hasOnly(['status', 'checkedAt', 'updatedAt']);
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
     }
   }
 }
