@@ -1,11 +1,11 @@
 const ALLOWED_ORIGINS = new Set([
   "https://aquathecanary.github.io",
-  "https://interactivestudio.abrdns.com"
+  "https://is-sites.abrdns.com"
 ]);
 const SYSTEM_PROMPT = "You are Interactive Studio's creative presentation assistant. Help users plan, write and improve clear, accurate, engaging presentations. Be concise and practical.";
 const FREE_DOMAINS = new Set(["gmail.com","googlemail.com","yahoo.com","yahoo.co.uk","ymail.com","hotmail.com","hotmail.co.uk","outlook.com","outlook.co.uk","live.com","live.co.uk","msn.com","icloud.com","me.com","mac.com","aol.com","mail.com","proton.me","protonmail.com","gmx.com","gmx.co.uk","yandex.com","hey.com","fastmail.com","pm.me","zoho.com"]);
 
-const PLATFORM_HOST = "interactivestudio.abrdns.com";
+const PLATFORM_HOST = "is-sites.abrdns.com";
 const API_HOST = "interactive-studio-api.convexllc.workers.dev";
 const FIREBASE_PROJECT_ID = "interactive-studio-convexllc";
 
@@ -54,33 +54,23 @@ function safeLink(value) {
   } catch (_) { return ""; }
 }
 function renderPublishedSite(site, hostname) {
-  const title = escapeHTML(site.siteName || site.title || "Website");
-  const description = escapeHTML(site.description || "");
-  const eyebrow = escapeHTML(site.eyebrow || "");
-  const heading = escapeHTML(site.headline || title);
-  const subheading = escapeHTML(site.subheadline || "");
-  const body = escapeHTML(site.body || "");
-  const buttonLabel = escapeHTML(site.buttonLabel || "");
-  const buttonUrl = safeLink(site.buttonUrl);
-  const accent = safeColour(site.accent, "#635bff");
-  const background = safeColour(site.background, "#f7f8fc");
-  const textColour = safeColour(site.textColour, "#252638");
-  const button = buttonLabel && buttonUrl ? '<a class="cta" href="' + escapeHTML(buttonUrl) + '">' + buttonLabel + '</a>' : "";
-  const html = '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
-    '<meta name="description" content="' + description + '"><meta name="theme-color" content="' + background + '">' +
-    '<title>' + title + '</title><style>*{box-sizing:border-box}body{margin:0;background:' + background + ';color:' + textColour + ';font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}header{width:min(1120px,100% - 40px);margin:auto;padding:28px 0;font-size:17px;font-weight:800;letter-spacing:-.04em}.hero{min-height:72vh;display:grid;place-items:center;padding:70px 24px;text-align:center;background:radial-gradient(ellipse at 50% 0%,' + accent + '18,transparent 62%)}.inner{width:min(850px,100%)}.eyebrow{color:' + accent + ';font-size:12px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}.hero h1{font-size:clamp(42px,8vw,88px);line-height:1.02;letter-spacing:-.075em;margin:22px 0}.sub{font-size:clamp(17px,2.2vw,24px);line-height:1.55;color:color-mix(in srgb,' + textColour + ' 72%,transparent);max-width:720px;margin:0 auto}.body{font-size:16px;line-height:1.8;white-space:pre-wrap;max-width:700px;margin:26px auto 0}.cta{display:inline-flex;margin-top:32px;padding:14px 22px;border-radius:12px;background:' + accent + ';color:white;text-decoration:none;font-weight:750;box-shadow:0 10px 28px ' + accent + '35}.cta:hover{filter:brightness(.95)}footer{text-align:center;padding:25px;color:#9295a5;font-size:11px}footer a{color:inherit;text-decoration:none}@media(max-width:600px){header{padding:20px 0}.hero{min-height:65vh;padding:50px 20px}}</style></head><body><header>' + title + '</header><main class="hero"><div class="inner">' +
-    (eyebrow ? '<div class="eyebrow">' + eyebrow + '</div>' : "") +
-    '<h1>' + heading + '</h1>' + (subheading ? '<p class="sub">' + subheading + '</p>' : "") +
-    (body ? '<p class="body">' + body + '</p>' : "") + button +
-    '</div></main><footer>Published with <a href="https://interactivestudio.abrdns.com/">Interactive Studio</a></footer></body></html>';
-  return new Response(html, { status: 200, headers: {
-    "Content-Type":"text/html; charset=utf-8", "Cache-Control":"public, max-age=60, s-maxage=60",
-    "X-Content-Type-Options":"nosniff", "Referrer-Policy":"strict-origin-when-cross-origin",
-    "Content-Security-Policy":"default-src 'none'; style-src 'unsafe-inline'; img-src https: data:; font-src https:; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"
-  }});
+  const title=escapeHTML(site.siteName||site.title||"Website"),description=escapeHTML(site.description||"");
+  const accent=safeColour(site.accent,"#635bff"),background=safeColour(site.background,"#f7f8fc"),textColour=safeColour(site.textColour,"#252638");
+  const sections=Array.isArray(site.sections)&&site.sections.length?site.sections:[{type:"hero",eyebrow:site.eyebrow||"",title:site.headline||title,text:site.subheadline||"",background,accent,align:"center"},...(site.body?[{type:"text",title:"About",text:site.body}]:[]),...(site.buttonLabel?[{type:"button",title:"",buttonLabel:site.buttonLabel,buttonUrl:site.buttonUrl}]:[])];
+  const render=s=>{
+    const bg=safeColour(s.background,"#fff"),c=safeColour(s.accent,accent),a=["left","center","right"].includes(s.align)?s.align:"center";
+    if(s.type==="hero")return '<section style="padding:76px 7%;background:'+bg+';color:'+textColour+';text-align:'+a+'"><div style="color:'+c+';font-size:11px;font-weight:850;letter-spacing:.16em">'+escapeHTML(s.eyebrow||"")+'</div><h1 style="font-size:clamp(38px,7vw,82px);line-height:1.03;letter-spacing:-.07em;margin:18px 0">'+escapeHTML(s.title||title)+'</h1><p style="font-size:clamp(17px,2.2vw,23px);line-height:1.65;max-width:760px;margin:0 auto">'+escapeHTML(s.text||"")+'</p></section>';
+    if(s.type==="text")return '<section style="padding:54px 8%;background:'+bg+';color:'+textColour+';text-align:'+a+'"><h2>'+escapeHTML(s.title||"")+'</h2><p style="font-size:16px;line-height:1.8;white-space:pre-wrap">'+escapeHTML(s.text||"")+'</p></section>';
+    if(s.type==="image"){let src="";try{const u=new URL(s.imageUrl||"");if(u.protocol==="https:")src=u.href}catch(_){}return '<section style="padding:46px 8%;background:'+bg+';color:'+textColour+';text-align:'+a+'"><h2>'+escapeHTML(s.title||"")+'</h2>'+(src?'<img src="'+escapeHTML(src)+'" alt="" style="display:block;max-width:100%;max-height:440px;object-fit:cover;border-radius:14px;margin:18px auto">':"")+'<p>'+escapeHTML(s.text||"")+'</p></section>'}
+    if(s.type==="button"){const href=safeLink(s.buttonUrl);return '<section style="padding:48px 8%;background:'+bg+';color:'+textColour+';text-align:'+a+'"><h2>'+escapeHTML(s.title||"")+'</h2>'+(href?'<a href="'+escapeHTML(href)+'" style="display:inline-block;margin-top:14px;padding:13px 20px;background:'+c+';color:white;text-decoration:none;border-radius:10px;font-weight:750">'+escapeHTML(s.buttonLabel||"Learn more")+'</a>':"")+'</section>'}
+    if(s.type==="features")return '<section style="padding:50px 7%;background:'+bg+';color:'+textColour+';text-align:'+a+'"><h2>'+escapeHTML(s.title||"Features")+'</h2><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px">'+(Array.isArray(s.features)?s.features.slice(0,6):[]).map(x=>'<div style="padding:20px;border:1px solid #e7e8f0;border-radius:12px;font-weight:700">'+escapeHTML(x)+'</div>').join("")+'</div></section>';
+    return "";
+  };
+  const html='<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="'+description+'"><title>'+title+'</title><style>*{box-sizing:border-box}body{margin:0;background:'+background+';color:'+textColour+';font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}img{height:auto}footer{text-align:center;padding:25px;color:#9295a5;font-size:11px}@media(max-width:600px){section{padding-left:22px!important;padding-right:22px!important}}</style></head><body>'+sections.map(render).join("")+'<footer>Published with <a href="https://is-sites.abrdns.com/">Interactive Studio</a></footer></body></html>';
+  return new Response(html,{status:200,headers:{"Content-Type":"text/html; charset=utf-8","Cache-Control":"public, max-age=60, s-maxage=60","X-Content-Type-Options":"nosniff","Referrer-Policy":"strict-origin-when-cross-origin","Content-Security-Policy":"default-src 'none'; style-src 'unsafe-inline'; img-src https: data:; font-src https:; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"}});
 }
 function notPublished(hostname) {
-  const html = "<!doctype html><html><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>Website not found</title><body style='font:16px system-ui;background:#f7f8fc;color:#252638;display:grid;place-items:center;min-height:100vh;margin:0'><main style='max-width:520px;padding:32px;text-align:center;background:white;border:1px solid #e7e8f0;border-radius:18px'><h1 style='letter-spacing:-.05em'>This website isn't published yet.</h1><p style='color:#73788a'>The address <b>" + escapeHTML(hostname) + "</b> is not connected to a published Interactive Studio website.</p><a href='https://interactivestudio.abrdns.com/websites/' style='color:#635bff;font-weight:700'>Create a website with Interactive Studio</a></main></body></html>";
+  const html = "<!doctype html><html><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>Website not found</title><body style='font:16px system-ui;background:#f7f8fc;color:#252638;display:grid;place-items:center;min-height:100vh;margin:0'><main style='max-width:520px;padding:32px;text-align:center;background:white;border:1px solid #e7e8f0;border-radius:18px'><h1 style='letter-spacing:-.05em'>This website isn't published yet.</h1><p style='color:#73788a'>The address <b>" + escapeHTML(hostname) + "</b> is not connected to a published Interactive Studio website.</p><a href='https://is-sites.abrdns.com/websites/' style='color:#635bff;font-weight:700'>Create a website with Interactive Studio</a></main></body></html>";
   return new Response(html, {status:404,headers:{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store","X-Content-Type-Options":"nosniff"}});
 }
 async function serveWebsite(request, env) {
