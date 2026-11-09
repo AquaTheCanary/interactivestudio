@@ -1,5 +1,6 @@
 const PROJECT = "interactive-studio-convexllc";
 const PLATFORM = "is-sites.abrdns.com";
+const SERVICE_HOST = "interactivestudio.vercel.app";
 
 function escapeHTML(value) {
   return String(value == null ? "" : value).replace(/[&<>"']/g, c => ({
@@ -85,6 +86,17 @@ module.exports = async function handler(req, res) {
   try {
     const hostHeader = req.headers["x-forwarded-host"] || req.headers.host || "";
     const host = String(hostHeader).split(",")[0].trim().toLowerCase().split(":")[0];
+
+    // The Vercel project hostname is a service health-check address, not a published site.
+    if (host === SERVICE_HOST) {
+      const page = '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Interactive Studio Publishing</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f7f8fc;color:#252638;font-family:Inter,system-ui,sans-serif}.card{max-width:560px;margin:24px;padding:42px;border:1px solid #e7e8f0;border-radius:22px;background:white;box-shadow:0 18px 60px #25263812}h1{margin:0 0 12px;font-size:clamp(30px,6vw,44px);letter-spacing:-.05em}.status{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:99px;background:#e9f9ef;color:#18733a;font-size:13px;font-weight:750}.dot{width:8px;height:8px;border-radius:50%;background:#20a45a}p{line-height:1.7;color:#656879}a{color:#635bff;font-weight:700}</style></head><body><main class="card"><div class="status"><span class="dot"></span> Publishing service online</div><h1>Interactive Studio</h1><p>This address is the publishing service health check. Published websites use their own address, such as <strong>your-site.is-sites.abrdns.com</strong>.</p><p>To test a published website, publish it in the Interactive Studio website builder and open its assigned website address.</p><p><a href="https://is-sites.abrdns.com/">Return to Interactive Studio</a></p></main></body></html>';
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      res.setHeader("Cache-Control", "no-store");
+      res.setHeader("X-Content-Type-Options", "nosniff");
+      if (req.method === "HEAD") return res.status(200).end();
+      return res.status(200).send(page);
+    }
+
     let slug = "";
     if (host.endsWith("." + PLATFORM)) {
       slug = host.slice(0, -("." + PLATFORM).length);
