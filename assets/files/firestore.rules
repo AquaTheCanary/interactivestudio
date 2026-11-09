@@ -72,7 +72,8 @@ service cloud.firestore {
         && request.resource.data.status in ['draft', 'published']
         && request.resource.data.siteName is string
         && request.resource.data.headline is string;
-      allow get: if (signedIn() && resource.data.ownerUid == request.auth.uid)
+      allow get: if resource == null
+        || (signedIn() && resource.data.ownerUid == request.auth.uid)
         || resource.data.status == 'published';
       allow list: if signedIn() && resource.data.ownerUid == request.auth.uid;
       allow update: if signedIn()
@@ -88,7 +89,8 @@ service cloud.firestore {
         && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.hostname == hostname
         && request.resource.data.status == 'pending';
-      allow get: if (signedIn() && resource.data.ownerUid == request.auth.uid)
+      allow get: if resource == null
+        || (signedIn() && resource.data.ownerUid == request.auth.uid)
         || resource.data.status == 'active';
       allow list: if signedIn() && resource.data.ownerUid == request.auth.uid;
       allow update: if signedIn()
