@@ -57,12 +57,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       if (!activeUser) return null;
       let claims = {};
       try { claims = (await activeUser.getIdTokenResult()).claims || {}; } catch (_) {}
-      let verifiedPlan = String(claims.plan || "Basic");
-      try {
-        const token = await activeUser.getIdToken();
-        const response = await fetch("https://interactive-studio-api.convexllc.workers.dev/getEntitlements", { method: "POST", headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }, body: "{}" });
-        if (response.ok) { const data = await response.json(); verifiedPlan = data.plan || verifiedPlan; }
-      } catch (_) {}
+      const verifiedPlan = "Free";
       return {
         uid: activeUser.uid,
         email: activeUser.email || "",
@@ -163,19 +158,6 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       ["is_user_email","is_user_name","is_user_photo","is_user_plan","is_user_provider"].forEach(key => localStorage.removeItem(key));
       localStorage.removeItem("interactive_studio_session");
       window.location.replace(appUrl("/home/"));
-    },
-    async generateAI(model, prompt, context = {}) {
-      const user = await studioAuth.currentUser();
-      if (!user) throw new Error("Sign in to use Interactive Studio AI.");
-      const token = await user.getIdToken();
-      const response = await fetch("https://interactive-studio-api.convexllc.workers.dev/generateAI", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-        body: JSON.stringify({ model, prompt, context })
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || "AI service unavailable.");
-      return data.text || data.reply || "";
     }
   };
 
