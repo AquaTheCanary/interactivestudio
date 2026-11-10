@@ -212,7 +212,12 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     },
     async finishSignIn(user, organisation = false) {
       if (organisation) { try { await studioAuth.validateOrganisation(user); } catch (error) { await auth.signOut(); throw error; } }
-      const session = readSession();\n      session.lastActivity = Date.now();\n      session.lastSeen = Date.now();\n      session.closedAt = 0;\n      session.tabs = sessionTabs(session, Date.now());\n      writeSession(session);\n      const profile = await studioAuth.getProfile(user);
+      const session = readSession();
+      session.lastActivity = Date.now();
+      session.lastSeen = Date.now();
+      session.closedAt = 0;
+      session.tabs = sessionTabs(session, Date.now());
+      writeSession(session);\n      const profile = await studioAuth.getProfile(user);
       localStorage.setItem("is_user_email", profile.email);
       localStorage.setItem("is_user_name", profile.name);
       localStorage.setItem("is_user_photo", profile.photoURL);
