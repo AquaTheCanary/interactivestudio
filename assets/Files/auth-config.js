@@ -177,7 +177,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       let verifiedPlan = "Free";
       try {
         const token = await activeUser.getIdToken();
-        const response = await fetch("https://interactive-studio-api.convexllc.workers.dev/getEntitlements", { method: "POST", headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }, body: "{}" });
+        const response = await fetch("https://interactive-studio.convexllc.workers.dev/getEntitlements", { method: "POST", headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }, body: "{}" });
         if (response.ok) { const data = await response.json(); verifiedPlan = "Free"; }
       } catch (_) {}
       return {
@@ -207,7 +207,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         throw new Error("Verify your corporate email address before accessing an organisation workspace.");
       }
       const token = await user.getIdToken();
-      const response = await fetch("https://interactive-studio-api.convexllc.workers.dev/assertOrganisationAccess", {
+      const response = await fetch("https://interactive-studio.convexllc.workers.dev/assertOrganisationAccess", {
         method: "POST",
         headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" },
         body: "{}"
@@ -326,7 +326,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       const user = await studioAuth.currentUser();
       if (!user) throw new Error("Sign in to check AI provider status.");
       const token = await user.getIdToken();
-      const response = await fetch("https://interactive-studio-api.convexllc.workers.dev/aiStatus", { method: "POST", headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }, body: "{}" });
+      const response = await fetch("https://interactive-studio.convexllc.workers.dev/aiStatus", { method: "POST", headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }, body: "{}" });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "Could not check AI provider configuration.");
       return data.providers || {};
@@ -335,7 +335,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       const user = await studioAuth.currentUser();
       if (!user) throw new Error("Sign in to use Interactive Studio AI.");
       const token = await user.getIdToken();
-      const response = await fetch("https://interactive-studio-api.convexllc.workers.dev/generateAI", {
+      const response = await fetch("https://interactive-studio.convexllc.workers.dev/generateAI", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
         body: JSON.stringify({ model, prompt, context })
