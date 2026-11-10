@@ -217,7 +217,8 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       session.lastSeen = Date.now();
       session.closedAt = 0;
       session.tabs = sessionTabs(session, Date.now());
-      writeSession(session);\n      const profile = await studioAuth.getProfile(user);
+      writeSession(session);
+      const profile = await studioAuth.getProfile(user);
       localStorage.setItem("is_user_email", profile.email);
       localStorage.setItem("is_user_name", profile.name);
       localStorage.setItem("is_user_photo", profile.photoURL);
@@ -334,7 +335,9 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   // Firebase LOCAL persistence survives navigation, reloads and browser restarts.
   studioAuth.redirectReady = Promise.resolve().then(() => studioAuth.completeRedirectSignIn());
 
-  auth.onAuthStateChanged(user => { if (user) startSessionLifecycle(user); else { if (sessionTimer) clearInterval(sessionTimer); sessionTimer = null; } });\n\n  window.studioAuth = studioAuth;
+  auth.onAuthStateChanged(user => { if (user) startSessionLifecycle(user); else { if (sessionTimer) clearInterval(sessionTimer); sessionTimer = null; } });
+
+  window.studioAuth = studioAuth;
   window.loginWithGoogle = organisation => studioAuth.signInGoogle(!!organisation).catch(showAuthError);
   window.loginWithMicrosoft = organisation => studioAuth.signInMicrosoft(!!organisation).catch(showAuthError);
   window.showAuthError = showAuthError;
