@@ -45,7 +45,7 @@ Organisation login applies a corporate-domain check and calls the server-side `a
 
 ## Cloudflare Worker and website publishing
 
-The `assets/files/worker.js` file contains the all-in-one Cloudflare Worker for the platform API and published website routing. It uses Firebase Authentication and Firestore to verify ownership and read published website records.
+The `assets/files/worker.js` file contains the all-in-one Cloudflare Worker for the platform API and published website routing. It uses Firebase Authentication and Firestore to verify ownership and read published website records. On publish, it creates four exact CNAME records through the ClouDNS API, registers those hostnames with Cloudflare for SaaS, and routes traffic through the Worker.
 
 Worker configuration may include:
 
@@ -53,8 +53,10 @@ Worker configuration may include:
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ZONE_ID`
 - `CLOUDFLARE_SAAS_TARGET`
+- `CLOUDNS_AUTH_ID`
+- `CLOUDNS_AUTH_PASSWORD`
 
-Only configure the Cloudflare values needed by the enabled publishing and custom-domain routes. Keep all secrets in Cloudflare Worker secrets, never in frontend files or Git.
+The Cloudflare zone ID and SaaS target must belong to the `convexllc.org` Cloudflare provider zone. Keep all secrets in Cloudflare Worker secrets, never in frontend files or Git. ClouDNS API credentials are used to create each exact CNAME record inside the delegated `is-sites.abrdns.com` DNS zone; they are never exposed to the browser.
 
 The Worker deployment workflow is in `.github/workflows/worker.yml`. It requires GitHub Actions secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
 
