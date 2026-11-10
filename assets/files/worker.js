@@ -79,8 +79,14 @@ async function serveWebsite(request, env) {
   const host = new URL(request.url).hostname.toLowerCase();
   let slug = "";
   if (host.endsWith("." + PLATFORM_HOST)) {
-    slug = host.slice(0, -("." + PLATFORM_HOST).length);
-    if (!slug || slug.includes(".")) return notPublished(host);
+    const hostMapping = await readPublicDocument("websiteHosts", host, env);
+    if (hostMapping && hostMapping.status === "published" && hostMapping.websiteSlug) {
+      slug = String(hostMapping.websiteSlug);
+    } else {
+      // Backwards compatibility for older one-label site addresses.
+      slug = host.slice(0, -("." + PLATFORM_HOST).length);
+      if (!slug || slug.includes(".")) return notPublished(host);
+    }
   } else {
     const mapping = await readPublicDocument("websiteDomains", host, env);
     if (!mapping || mapping.status !== "active" || !mapping.websiteSlug) return notPublished(host);
