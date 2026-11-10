@@ -11,4 +11,4 @@ FIREBASE_PROJECT_ID = "interactive-studio-convexllc"
 # This includes one-label and nested two-label customer website hostnames.
 [[routes]]
 pattern = "*/*"
-zone_name = "is-sites.abrdns.com"
+zone_name = "convexllc.org"
