@@ -48,6 +48,38 @@
 .builder-stage{background:radial-gradient(#d9dbe5 .8px,transparent .8px);background-size:16px 16px;padding:16px;min-height:620px;overflow:auto}.stage-top{display:flex;justify-content:space-between;color:#73788c;margin:0 auto 12px;max-width:1440px}.builder-canvas{width:100%;max-width:1440px;min-height:620px;margin:0 auto;background:#fff;box-shadow:0 12px 42px #25263818;border-radius:8px;overflow:hidden;transition:width .25s ease,transform .25s ease;transform-origin:top center}.builder-canvas.device-tablet{max-width:768px}.builder-canvas.device-mobile{max-width:390px}.builder-block{transition:outline-color .18s,box-shadow .18s}.builder-block.selected{border-color:#635bff;box-shadow:inset 0 0 0 1px #635bff}.builder-block:hover:not(.selected){border-color:#b9b4ff}
 @media(max-width:950px){.builder{grid-template-columns:175px minmax(0,1fr)}.builder-properties{grid-column:1/-1;border-left:0;border-top:1px solid #e8e9f1}.builder-properties .actions{display:flex}.builder-stage{min-height:520px}}
 @media(max-width:620px){.design-toolbar{border-radius:12px 12px 0 0}.toolbar-label{display:none}.builder{grid-template-columns:1fr}.builder-tools{border-right:0;border-bottom:1px solid #e8e9f1}.layer-list{grid-template-columns:repeat(2,minmax(0,1fr));max-height:150px}.builder-stage{padding:9px;min-height:450px}.builder-canvas{min-height:500px}.builder-properties{grid-column:auto}.builder-tools .toolbtn{display:inline-flex;width:calc(50% - 5px)}}
+
+/* Aura pass: luminous workspace chrome, sharper hierarchy and tactile controls. */
+:root{--studio-ink:#20213a;--studio-violet:#655bff;--studio-lilac:#a99fff;--studio-line:#e8e7f2}
+body{background:radial-gradient(ellipse at 12% 0%,#eeebff 0,transparent 34%),radial-gradient(ellipse at 92% 12%,#e5f5ff 0,transparent 30%),#f7f8fc}
+.shell{max-width:1560px;padding-top:42px}
+.head{position:relative;padding:25px 28px;border:1px solid #ffffffc9;border-radius:22px;background:linear-gradient(115deg,#fffefaed,#f7f5ffed 55%,#f0f8ffed);box-shadow:0 18px 60px #4437a012;overflow:hidden}
+.head:after{content:"";position:absolute;width:260px;height:260px;right:-90px;top:-150px;border-radius:50%;background:radial-gradient(circle,#b9adff66,transparent 70%);pointer-events:none}
+.head h1{font-size:clamp(34px,5.5vw,54px);background:linear-gradient(100deg,#24243c 5%,#6657e8 58%,#2699c9);-webkit-background-clip:text;background-clip:text;color:transparent}
+.head p{font-size:14px;max-width:560px;line-height:1.7}
+.panel{border-color:#e6e5f0;box-shadow:0 14px 45px #302b6410}
+.list{background:#ffffffd9;backdrop-filter:blur(14px)}
+.main{background:#ffffffed;backdrop-filter:blur(16px)}
+.design-toolbar{background:linear-gradient(105deg,#1e2038,#302a59 60%,#263f5d);border-color:#49436e;box-shadow:0 12px 30px #342c6b24}
+.toolbtn.compact{transition:transform .18s,background .18s,box-shadow .18s}
+.toolbtn.compact:hover{transform:translateY(-2px);background:#48416e;box-shadow:0 5px 15px #09091d55}
+.builder{border-color:#dcdbea;box-shadow:0 22px 65px #29244b15}
+.builder-tools,.builder-properties{background:linear-gradient(180deg,#fff,#fbfaff)}
+.builder-stage{background-color:#f2f1f9;background-image:radial-gradient(#c7c5d8 .8px,transparent .8px);background-size:17px 17px}
+.builder-canvas{box-shadow:0 18px 55px #27234220,0 2px 8px #2723420b}
+.layer-item{transition:background .16s,border-color .16s,transform .16s}
+.layer-item:hover{background:#f7f5ff;transform:translateX(2px)}
+.builder-tools .toolbtn{box-shadow:0 2px 5px #29244b08}
+.builder-tools .toolbtn:active,.btn:active{transform:translateY(1px)}
+.btn{transition:transform .16s,box-shadow .16s,border-color .16s}
+.btn:hover{box-shadow:0 7px 18px #332c6816;transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(110deg,#665bff,#8a63ed 60%,#4b9bd8);border-color:transparent;box-shadow:0 7px 20px #685bff35}
+.btn.primary:hover{box-shadow:0 10px 26px #685bff50}
+.prop-field input:focus,.prop-field textarea:focus,.prop-field select:focus{outline:3px solid #7568ff20;border-color:#8b80ff;box-shadow:0 0 0 1px #8b80ff22}
+.status{letter-spacing:.04em}
+.callout{background:linear-gradient(110deg,#f4f1ff,#eff8ff);border-color:#e2defe}
+@media(max-width:620px){.head{padding:20px 18px;border-radius:17px}.shell{padding-top:24px}.builder{border-radius:0 0 12px 12px}}
+
 </style></head>
 <body class="page-body">
 <header class="home-nav"><div class="nav-brand"><a data-route="/home/"><img src="../assets/images/headerlogo.png" class="brand-logo" alt="Interactive Studio"></a><span class="brand-name">Websites</span></div><nav class="nav-links"><a data-route="/dashboard/">Workspace</a><a data-route="/editor/">Presentations</a><a data-route="/websites/" class="active">Websites</a></nav><div class="nav-actions"><span class="user-email-badge" id="account">Loading account…</span></div></header>
