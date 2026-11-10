@@ -27,12 +27,12 @@ function decodeFirestoreFields(fields) {
   for (const [key, value] of Object.entries(fields || {})) result[key] = decodeFirestoreValue(value);
   return result;
 }
-async function readPublicDocument(collection, id, env) {
+async function readPublicDocument(collection, id, env, authToken) {
   if (!env.FIREBASE_API_KEY) throw new Error("Website publishing is not configured: FIREBASE_API_KEY is missing.");
   const endpoint = "https://firestore.googleapis.com/v1/projects/" + FIREBASE_PROJECT_ID +
     "/databases/(default)/documents/" + collection + "/" + encodeURIComponent(id) +
     "?key=" + encodeURIComponent(env.FIREBASE_API_KEY);
-  const response = await fetch(endpoint, { headers: { "Accept": "application/json" } });
+  const response = await fetch(endpoint, { headers: { "Accept": "application/json", ...(authToken ? { "Authorization": "Bearer " + authToken } : {}) } });
   if (response.status === 404) return null;
   if (!response.ok) throw new Error("Could not load the published website.");
   const document = await response.json();
@@ -136,6 +136,32 @@ async function connectCustomDomain(hostnameInput, env) {
     try { details = await cloudflareRequest("/custom_hostnames/" + result.id, {method:"GET"}, env); } catch (_) {}
   }
   return {hostname,id:details.id||result.id,status:details.status||result.status||"pending",sslStatus:details.ssl?.status||result.ssl?.status||"pending",validationRecords:details.ssl?.validation_records||result.ssl?.validation_records||[],cnameTarget:env.CLOUDFLARE_SAAS_TARGET};
+}
+async function connectBuiltInHost(hostnameInput, env) {
+  const hostname = String(hostnameInput || "").trim().toLowerCase();
+  const suffix = "." + PLATFORM_HOST;
+  if (!hostname.endsWith(suffix)) throw new Error("A built-in hostname must end in ." + PLATFORM_HOST + ".");
+  const labels = hostname.slice(0, -suffix.length).split(".");
+  if (labels.length < 1 || labels.length > 2 || labels.some(label => !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label))) {
+    throw new Error("The built-in hostname format is invalid.");
+  }
+  if (!env.CLOUDFLARE_SAAS_TARGET) throw new Error("Set CLOUDFLARE_SAAS_TARGET before automatic HTTPS can be provisioned for built-in addresses.");
+  let existing = null;
+  try {
+    const matches = await cloudflareRequest("/custom_hostnames?hostname=" + encodeURIComponent(hostname), {method:"GET"}, env);
+    existing = Array.isArray(matches) ? matches.find(item => String(item.hostname || "").toLowerCase() === hostname) : null;
+  } catch (_) {}
+  let result;
+  if (existing && existing.id) {
+    result = await cloudflareRequest("/custom_hostnames/" + existing.id, {method:"GET"}, env);
+  } else {
+    result = await cloudflareRequest("/custom_hostnames", {method:"POST",body:JSON.stringify({hostname,ssl:{method:"http",type:"dv",min_tls_version:"1.2"}})}, env);
+  }
+  if (result && result.id) {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    try { result = await cloudflareRequest("/custom_hostnames/" + result.id, {method:"GET"}, env); } catch (_) {}
+  }
+  return {hostname,id:result.id,status:result.status||"pending",sslStatus:result.ssl?.status||"pending",validationRecords:result.ssl?.validation_records||[],cnameTarget:env.CLOUDFLARE_SAAS_TARGET};
 }
 async function checkCustomDomain(hostnameInput, hostnameId, env) {
   const hostname = normaliseHostname(hostnameInput);
@@ -245,6 +271,30 @@ export default {
     try {
       const token = (request.headers.get("Authorization") || "").slice(7);
       const user = await authenticatedUser(request, env);
+      if (url.pathname === "/registerBuiltInHosts") {
+        if (!user.emailVerified) return json({ error: "Verify your email before publishing built-in addresses." }, 403, origin);
+        const body = await request.json();
+        const slug = String(body.websiteSlug || "").toLowerCase();
+        const username = String(body.username || "").toLowerCase();
+        const hosts = Array.isArray(body.hostnames) ? body.hostnames.map(value => String(value).toLowerCase()) : [];
+        if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(username) || username.length > 32 || slug.length > 63 || username.length + slug.length + 1 > 63) {
+          return json({ error: "The website slug or username is not valid for DNS hostnames." }, 400, origin);
+        }
+        const expected = [
+          username + "." + slug + "." + PLATFORM_HOST,
+          slug + "." + username + "." + PLATFORM_HOST,
+          username + "-" + slug + "." + PLATFORM_HOST,
+          slug + "-" + username + "." + PLATFORM_HOST
+        ];
+        if (hosts.length !== 4 || expected.some(host => !hosts.includes(host))) return json({ error: "The four built-in hostnames do not match this website and username." }, 400, origin);
+        const site = await readPublicDocument("websites", slug, env, token);
+        if (!site || site.ownerUid !== user.uid || site.username !== username || site.status !== "published") {
+          return json({ error: "You can only provision addresses for your own published website." }, 403, origin);
+        }
+        const results = [];
+        for (const hostname of expected) results.push(await connectBuiltInHost(hostname, env));
+        return json({ hosts: results }, 200, origin);
+      }
       if (url.pathname === "/connectCustomDomain") {
         if (!user.emailVerified) return json({ error: "Verify your email before connecting a custom domain." }, 403, origin);
         const body = await request.json();
