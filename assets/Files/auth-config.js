@@ -307,6 +307,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     },
     async registerPersonal({ name, email, password }) {
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      beginFreshSession();
       const credential = await auth.createUserWithEmailAndPassword(email.trim(), password);
       await credential.user.updateProfile({ displayName: name.trim() });
       await credential.user.sendEmailVerification();
