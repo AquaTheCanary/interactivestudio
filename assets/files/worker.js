@@ -168,7 +168,7 @@ function cloudnsRecordList(data) {
   return Object.values(source).filter(item => item && typeof item === "object" && ("type" in item || "record" in item || "id" in item));
 }
 async function ensureBuiltInDnsRecord(hostname, env) {
-  const target = String(env.CLOUDFLARE_SAAS_TARGET || "").trim().toLowerCase().replace(/\\.$/, "");
+  const target = String(env.CLOUDFLARE_SAAS_TARGET || "").trim().toLowerCase().replace(/\.$/, "");
   if (!target || target.includes("/") || target.includes(":")) {
     throw new Error("Set CLOUDFLARE_SAAS_TARGET to the Cloudflare for SaaS CNAME target hostname, without https://.");
   }
@@ -188,7 +188,7 @@ async function ensureBuiltInDnsRecord(hostname, env) {
   if (matches.length > 1) throw new Error("Multiple DNS records already exist for " + hostname + ". Remove duplicates in ClouDNS first.");
   if (matches.length === 1) {
     const current = matches[0];
-    const currentTarget = String(current.record || current.content || current.points_to || "").toLowerCase().replace(/\\.$/, "");
+    const currentTarget = String(current.record || current.content || current.points_to || "").toLowerCase().replace(/\.$/, "");
     if (currentTarget !== target) {
       const recordId = current.id || current.record_id || current["record-id"];
       if (!recordId) throw new Error("ClouDNS returned an existing CNAME without a record ID, so it cannot be updated safely.");
