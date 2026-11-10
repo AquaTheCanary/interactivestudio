@@ -78,3 +78,16 @@ input::placeholder,textarea::placeholder{color:#737d8d}
 table th{background:#171e29;color:#dce2eb}table td{border-color:#29313e}
 hr{border-color:#29313e}
 @media(max-width:760px){.site-header,.home-nav,.app-header{padding-left:18px;padding-right:18px}.nav-links{background:#111720;border:1px solid #29313e}}
+
+
+/* Platform-wide motion layer: subtle ambient lighting and crisp workspace interactions. */
+body{position:relative;isolation:isolate}
+body:before{content:"";position:fixed;inset:-18%;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 18% 12%,#635bff18,transparent 34%),radial-gradient(ellipse at 82% 24%,#32b8d414,transparent 30%),radial-gradient(ellipse at 55% 100%,#8b5cf60d,transparent 38%);filter:blur(18px);animation:studioAmbient 24s ease-in-out infinite alternate}
+@keyframes studioAmbient{0%{transform:translate3d(-1.5%,0,0) scale(1)}100%{transform:translate3d(1.5%,1.2%,0) scale(1.04)}}
+@keyframes studioEnter{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
+main{animation:studioEnter .55s cubic-bezier(.2,.7,.2,1) both}
+.feature-card,.pricing-card,.solution-card,.contact-card,.download-card,.project-card,.dashboard-card,.panel,.card,.modal-content{transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+.feature-card:hover,.pricing-card:hover,.solution-card:hover,.contact-card:hover,.download-card:hover,.project-card:hover,.dashboard-card:hover{transform:translateY(-4px);border-color:#46536b;box-shadow:0 18px 48px #0006}
+button,.btn,.btn-primary-small,.btn-primary-large,.btn-launch,.btn-submit,.btn-secondary-small,.btn-secondary-large,.btn-sso{transition:transform .16s ease,background .16s ease,border-color .16s ease,box-shadow .16s ease}
+button:active,.btn:active{transform:translateY(1px)}
+@media(prefers-reduced-motion:reduce){body:before,main{animation:none!important}.feature-card,.pricing-card,.solution-card,.contact-card,.download-card,.project-card,.dashboard-card,button,.btn{transition:none!important}}
