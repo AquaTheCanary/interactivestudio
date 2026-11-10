@@ -14,7 +14,7 @@
 <script>
 const PROJECT="interactive-studio-convexllc";
 const API_KEY="AIzaSyAHQDuRXq77XRZvnE-dDuoy8A1TLLtfSy8";
-const SUFFIX=".sites.is-sites.abrdns.com";
+const SUFFIX=".websites.is-sites.abrdns.com";
 function decode(v){if(!v||typeof v!=="object")return null;if("stringValue"in v)return v.stringValue;if("booleanValue"in v)return v.booleanValue;if("integerValue"in v)return Number(v.integerValue);if("doubleValue"in v)return Number(v.doubleValue);if("timestampValue"in v)return v.timestampValue;if("nullValue"in v)return null;if(v.arrayValue)return(v.arrayValue.values||[]).map(decode);if(v.mapValue)return fields(v.mapValue.fields||{});return null}
 function fields(obj){const out={};for(const [k,v] of Object.entries(obj||{}))out[k]=decode(v);return out}
 function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
