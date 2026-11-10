@@ -39,3 +39,42 @@ footer{margin-top:auto;border-top:1px solid var(--border-color);padding:36px 24p
 .auth-message{border-radius:10px;padding:0}
 .auth-message.error,.auth-message.success{padding:12px 14px;margin:12px 0}
 @media(max-width:520px){.sso-buttons{grid-template-columns:1fr}.auth-container{border-radius:16px}}
+
+
+/* Interactive Studio platform-wide Render-inspired refresh */
+:root{
+ --bg-main:#0b0d12;--bg-subtle:#11151d;--bg-ink:#080a0e;
+ --text-main:#f1f3f6;--text-sub:#a1a8b5;--text-soft:#737d8d;
+ --border-color:#252b36;--surface:#121720;
+ --shadow-sm:0 8px 28px #0005;--shadow-lg:0 28px 90px #0008;
+ --radius:13px;--content:1240px;
+}
+html{color-scheme:dark}
+body{background:#0b0d12;color:#f1f3f6}
+.site-header,.home-nav,.app-header{background:#0b0d12ed;border-bottom:1px solid #252b36;box-shadow:0 8px 28px #0003}
+.nav-links a{color:#a1a8b5}.nav-links a:hover,.nav-links a.active{color:#fff}
+.mobile-menu-button,.btn-secondary-small,.btn-secondary-large,.btn-sso{background:#151a23;color:#e8ebf0;border-color:#303846}
+.btn-primary-small,.btn-primary-large,.btn-submit,.btn-launch{background:#3b82f6;border-color:#3b82f6;color:#fff}
+.btn-primary-small:hover,.btn-primary-large:hover,.btn-submit:hover,.btn-launch:hover{background:#2563eb;border-color:#2563eb}
+.hero-badge,.eyebrow{background:#141a24;border-color:#303846;color:#c5ccd7}
+.hero-title{color:#f5f7fa}.hero-subtitle,.hero-note{color:#a1a8b5}
+.app-preview-mockup,.mockup-body{background:#121720;border-color:#2a3240}
+.mockup-header{background:#0e1219;border-color:#252d39}
+.mockup-title{color:#9aa4b3}.mockup-body{background:radial-gradient(ellipse at 50% 0%,#1b2b46 0,transparent 58%),linear-gradient(135deg,#121720,#0e131b)}
+.content-container{color:#eef1f5}
+.feature-card,.pricing-card,.solution-card,.contact-card,.download-card,.auth-container,
+.dashboard-card,.panel,.card,.modal-content,.editor-panel,.ai-sidebar,.ai-chat{
+ background:#121720;color:#eef1f5;border-color:#29313e;box-shadow:0 10px 34px #0004
+}
+.feature-card p,.pricing-card p,.solution-card p,.contact-card p,.download-card p,
+.dashboard-card p,.panel p,.card p{color:#a1a8b5}
+.auth-page{background:radial-gradient(ellipse at 15% 15%,#17243a 0,transparent 42%),#0b0d12}
+.auth-container{background:#121720;border:1px solid #29313e;box-shadow:0 24px 80px #0008}
+.auth-container input,.auth-container select,.auth-container textarea,
+input,select,textarea{background:#0d121a;color:#f1f3f6;border-color:#303846}
+input::placeholder,textarea::placeholder{color:#737d8d}
+.btn-sso:hover,.btn-secondary-small:hover,.btn-secondary-large:hover{background:#1b2330;border-color:#52627a}
+.site-footer,footer{border-color:#252b36;color:#8993a2}
+table th{background:#171e29;color:#dce2eb}table td{border-color:#29313e}
+hr{border-color:#29313e}
+@media(max-width:760px){.site-header,.home-nav,.app-header{padding-left:18px;padding-right:18px}.nav-links{background:#111720;border:1px solid #29313e}}
