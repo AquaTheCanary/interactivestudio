@@ -1,5 +1,5 @@
 # Interactive Studio Cloudflare Worker configuration
-name = "interactive-studio-api"
+name = "interactive-studio"
 main = "worker.js"
 compatibility_date = "2026-11-02"
 
