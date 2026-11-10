@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: interactive-studio-published-sites
+    runtime: static
+    branch: main
+    buildCommand: echo "Static publishing site - no build required"
+    staticPublishPath: ./published-sites-static
+    domains:
+      - "*.websites.is-sites.abrdns.com"
+    autoDeployTrigger: commit
