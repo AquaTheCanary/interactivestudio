@@ -217,6 +217,9 @@ async function generate(model, prompt, env) {
     if (parsedEndpoint.protocol !== "https:" || parsedEndpoint.hostname === "-" || !parsedEndpoint.hostname.includes(".")) {
       throw new Error("Copilot's AZURE_OPENAI_ENDPOINT is invalid. Replace the placeholder value with your full HTTPS Azure AI endpoint.");
     }
+    if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{1,127}$/.test(String(env.AZURE_OPENAI_DEPLOYMENT)) || env.AZURE_OPENAI_DEPLOYMENT === "-") {
+      throw new Error("Copilot's AZURE_OPENAI_DEPLOYMENT is still a placeholder or invalid. Enter the exact deployment name from your Azure AI resource.");
+    }
     const endpoint = parsedEndpoint.origin.replace(/\/$/, "");
     const url = endpoint + "/openai/deployments/" + encodeURIComponent(env.AZURE_OPENAI_DEPLOYMENT) + "/chat/completions?api-version=2024-10-21";
     const response = await fetch(url, {
