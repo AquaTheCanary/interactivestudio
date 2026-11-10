@@ -1,0 +1,33 @@
+name: Deploy Interactive Studio Worker
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "assets/files/worker.js"
+      - "assets/files/wrangler.toml"
+      - "assets/files/package.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: interactive-studio-worker
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: assets/files
+          command: deploy
