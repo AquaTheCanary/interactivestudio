@@ -80,7 +80,8 @@ async function serveWebsite(request, env) {
   let slug = "";
   if (host.endsWith("." + PLATFORM_HOST)) {
     const hostMapping = await readPublicDocument("websiteHosts", host, env);
-    if (hostMapping && hostMapping.status === "published" && hostMapping.websiteSlug) {
+    if (hostMapping) {
+      if (hostMapping.status !== "published" || !hostMapping.websiteSlug) return notPublished(host);
       slug = String(hostMapping.websiteSlug);
     } else {
       // Backwards compatibility for older one-label site addresses.
