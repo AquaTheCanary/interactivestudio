@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: interactive-studio-published-sites
+    runtime: static
+    branch: main
+    buildCommand: ""
+    staticPublishPath: ./published-sites-static
+    domains:
+      - "*.sites.is-sites.abrdns.com"
+    autoDeployTrigger: commit
