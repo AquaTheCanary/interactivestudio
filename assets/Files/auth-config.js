@@ -116,7 +116,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       lastActivityWrite = Date.now();
       markActivity();
     };
-    ["pointerdown","keydown","touchstart","scroll","click"].forEach(type => addEventListener(type, onActivity, { passive: true }));
+    ["pointerdown","pointermove","mousemove","keydown","touchstart","scroll","wheel","input","click"].forEach(type => addEventListener(type, onActivity, { passive: true }));
     addEventListener("storage", event => {
       if (event.key !== SESSION_KEY || !event.newValue) return;
       const latest = readSession();
@@ -305,6 +305,8 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       await auth.signOut();
       ["is_user_email","is_user_name","is_user_photo","is_user_plan","is_user_provider"].forEach(key => localStorage.removeItem(key));
       localStorage.removeItem("interactive_studio_session");
+      localStorage.removeItem(SESSION_KEY);
+      sessionStorage.removeItem(TAB_KEY);
       window.location.replace(appUrl("/home/"));
     },
     async getAIStatus() {
