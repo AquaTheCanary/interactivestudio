@@ -186,16 +186,6 @@ async function generate(model, prompt, env) {
     if (!response.ok) throw new Error(data.error?.message || "Gemini request failed.");
     return extractGemini(data);
   }
-  if (model === "chatgpt") {
-    if (!env.OPENAI_API_KEY) throw new Error("ChatGPT isn't configured yet. Add OPENAI_API_KEY in Cloudflare Worker secrets.");
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + env.OPENAI_API_KEY },
-      body: JSON.stringify({ model: "gpt-4o", messages: [{ role: "system", content: SYSTEM_PROMPT }, { role: "user", content: prompt }], temperature: 0.7, max_tokens: 1800 })
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error?.message || "OpenAI request failed.");
-    return data.choices?.[0]?.message?.content || "";
-  }
   if (model === "claude") {
     if (!env.ANTHROPIC_API_KEY) throw new Error("Claude isn't configured yet. Add ANTHROPIC_API_KEY in Cloudflare Worker secrets.");
     const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -203,14 +193,24 @@ async function generate(model, prompt, env) {
       body: JSON.stringify({ model: "claude-sonnet-4-5", system: SYSTEM_PROMPT, max_tokens: 1800, messages: [{ role: "user", content: prompt }] })
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error?.message || "Anthropic request failed.");
+    if (!response.ok) {
+      if (response.status === 401) throw new Error("Claude rejected ANTHROPIC_API_KEY (401). The Worker has a key saved, but Anthropic says it is invalid or revoked. Replace it with a fresh Anthropic Console API key; never paste it into chat.");
+      throw new Error(data.error?.message || "Anthropic request failed.");
+    }
     return (data.content || []).map(item => item.text || "").join("\n");
   }
   if (model === "copilot") {
     if (!env.AZURE_OPENAI_ENDPOINT || !env.AZURE_OPENAI_API_KEY || !env.AZURE_OPENAI_DEPLOYMENT) {
-      throw new Error("Copilot Mini needs AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY and AZURE_OPENAI_DEPLOYMENT in Cloudflare.");
+      throw new Error("Copilot needs AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY and AZURE_OPENAI_DEPLOYMENT configured on the Worker.");
     }
-    const endpoint = env.AZURE_OPENAI_ENDPOINT.replace(/\/$/, "");
+    let parsedEndpoint;
+    try { parsedEndpoint = new URL(env.AZURE_OPENAI_ENDPOINT); } catch (_) {
+      throw new Error("Copilot's AZURE_OPENAI_ENDPOINT is not a valid URL. Use your full Azure AI resource endpoint, for example https://your-resource.openai.azure.com.");
+    }
+    if (parsedEndpoint.protocol !== "https:" || parsedEndpoint.hostname === "-" || !parsedEndpoint.hostname.includes(".")) {
+      throw new Error("Copilot's AZURE_OPENAI_ENDPOINT is invalid. Replace the placeholder value with your full HTTPS Azure AI endpoint.");
+    }
+    const endpoint = parsedEndpoint.origin.replace(/\/$/, "");
     const url = endpoint + "/openai/deployments/" + encodeURIComponent(env.AZURE_OPENAI_DEPLOYMENT) + "/chat/completions?api-version=2024-10-21";
     const response = await fetch(url, {
       method: "POST", headers: { "Content-Type": "application/json", "api-key": env.AZURE_OPENAI_API_KEY },
@@ -253,7 +253,7 @@ export default {
       }
       if (url.pathname === "/aiStatus") {
         if (!user.emailVerified) return json({ error: "Verify your email address before using AI features." }, 403, origin);
-        return json({ providers: { gemini: !!env.GEMINI_API_KEY, chatgpt: !!env.OPENAI_API_KEY, claude: !!env.ANTHROPIC_API_KEY, copilot: !!(env.AZURE_OPENAI_ENDPOINT && env.AZURE_OPENAI_API_KEY && env.AZURE_OPENAI_DEPLOYMENT) } }, 200, origin);
+        return json({ providers: { gemini: !!env.GEMINI_API_KEY, claude: !!env.ANTHROPIC_API_KEY, copilot: !!(env.AZURE_OPENAI_ENDPOINT && env.AZURE_OPENAI_API_KEY && env.AZURE_OPENAI_DEPLOYMENT) } }, 200, origin);
       }
       if (url.pathname === "/getEntitlements") {
         if (!user.emailVerified) return json({ error: "Verify your email address before accessing account services." }, 403, origin);
@@ -266,7 +266,7 @@ export default {
         const model = String(body.model || "gemini").toLowerCase();
         const prompt = String(body.prompt || "").trim().slice(0, 16000);
         if (!prompt) return json({ error: "Enter a prompt." }, 400, origin);
-        if (!["gemini", "copilot", "chatgpt", "claude"].includes(model)) return json({ error: "Unknown AI model." }, 400, origin);
+        if (!["gemini", "copilot", "claude"].includes(model)) return json({ error: "Unknown AI model." }, 400, origin);
         const plan = await planFor(user, env, token);
         const text = await generate(model, prompt, env);
         if (!text) throw new Error("The AI provider returned an empty response.");
