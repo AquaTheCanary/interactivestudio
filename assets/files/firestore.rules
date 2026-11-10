@@ -84,6 +84,26 @@ service cloud.firestore {
       allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
     }
 
+
+    match /websiteHosts/{hostname} {
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.hostname == hostname
+        && request.resource.data.websiteSlug is string
+        && request.resource.data.status in ['draft', 'published'];
+      allow get: if resource == null
+        || resource.data.status == 'published'
+        || (signedIn() && resource.data.ownerUid == request.auth.uid);
+      allow list: if signedIn() && resource.data.ownerUid == request.auth.uid;
+      allow update: if signedIn()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.hostname == hostname
+        && request.resource.data.websiteSlug == resource.data.websiteSlug
+        && request.resource.data.status in ['draft', 'published'];
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+    }
+
     match /websiteDomains/{hostname} {
       allow create: if signedIn()
         && request.resource.data.ownerUid == request.auth.uid
