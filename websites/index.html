@@ -61,7 +61,7 @@
 <div class="create-overlay" id="create-overlay" role="dialog" aria-modal="true"><div class="create-modal"><h2 style="margin:0 0 8px">Create a website</h2><p class="muted">Choose a name. You can design the page in the visual builder next.</p><input id="create-name" maxlength="70" placeholder="My website"><div class="actions" style="justify-content:flex-end"><button class="btn" id="cancel-create">Cancel</button><button class="btn primary" id="confirm-create">Create</button></div></div></div>
 <script>
 (function(){
-const $=id=>document.getElementById(id),API="https://interactive-studio-api.convexllc.workers.dev",PLATFORM="sites.is-sites.abrdns.com";
+const $=id=>document.getElementById(id),API="https://interactive-studio-api.convexllc.workers.dev",PLATFORM="websites.is-sites.abrdns.com";
 let user=null,db=null,active=null,domains={},sections=[],selectedSection=0,dragSection=-1;
 const ids=["site-name","description","eyebrow","headline","subheadline","body-copy","button-label","button-url","accent","background"];
 function msg(id,text,type){$(id).textContent=text;$(id).className="message"+(type?" "+type:"")}
