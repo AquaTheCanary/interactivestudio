@@ -1,5 +1,6 @@
 const ALLOWED_ORIGINS = new Set([
   "https://aquathecanary.github.io",
+  "https://interactivestudio.abrdns.com",
   "https://is-sites.abrdns.com"
 ]);
 const SYSTEM_PROMPT = "You are Interactive Studio's creative presentation assistant. Help users plan, write and improve clear, accurate, engaging presentations. Be concise and practical.";
