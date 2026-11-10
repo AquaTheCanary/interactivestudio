@@ -54,6 +54,10 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   function writeSession(value) {
     try { localStorage.setItem(SESSION_KEY, JSON.stringify(value)); } catch (_) {}
   }
+  function beginFreshSession() {
+    const now = Date.now();
+    writeSession({ lastActivity: now, lastSeen: now, closedAt: 0, tabs: {} });
+  }
   function sessionTabs(state, now) {
     const tabs = state.tabs && typeof state.tabs === "object" ? state.tabs : {};
     Object.keys(tabs).forEach(id => { if (!tabs[id] || now - tabs[id] > 60000) delete tabs[id]; });
@@ -234,6 +238,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       if (organisation && !studioAuth.isOrganisationEmail(email)) {
         throw new Error("Organisation login requires a corporate email domain. Gmail, Yahoo, Outlook.com and other personal providers are blocked.");
       }
+      beginFreshSession();
       const credential = await auth.signInWithEmailAndPassword(email.trim(), password);
       if (!credential.user.emailVerified) {
         try { await credential.user.sendEmailVerification(); } catch (_) {}
@@ -260,12 +265,14 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     },
     async signInGoogle(organisation = false) {
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      beginFreshSession();
       const provider = new firebase.auth.GoogleAuthProvider();
       provider.setCustomParameters({ prompt: "select_account" });
       return studioAuth.runSSO(provider, organisation);
     },
     async signInMicrosoft(organisation = false) {
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      beginFreshSession();
       const provider = new firebase.auth.OAuthProvider("microsoft.com");
       provider.setCustomParameters({ prompt: "select_account" });
       provider.addScope("email");
@@ -292,6 +299,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     async registerOrganisation({ name, email, password }) {
       if (!studioAuth.isOrganisationEmail(email)) throw new Error("Use a corporate email address to register an organisation account.");
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      beginFreshSession();
       const credential = await auth.createUserWithEmailAndPassword(email.trim(), password);
       await credential.user.updateProfile({ displayName: name.trim() });
       await credential.user.sendEmailVerification();
