@@ -10,11 +10,6 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/rooms/$(code)).data.ownerUid == request.auth.uid;
     }
 
-    match /userEntitlements/{userId} {
-      allow read: if signedIn() && request.auth.uid == userId;
-      allow write: if false;
-    }
-
     match /rooms/{code} {
       allow create: if signedIn()
         && request.resource.data.ownerUid == request.auth.uid
