@@ -139,7 +139,7 @@ async function connectCustomDomain(hostnameInput, env) {
   return {hostname,id:details.id||result.id,status:details.status||result.status||"pending",sslStatus:details.ssl?.status||result.ssl?.status||"pending",validationRecords:details.ssl?.validation_records||result.ssl?.validation_records||[],cnameTarget:env.CLOUDFLARE_SAAS_TARGET};
 }
 async function ensureBuiltInDnsRecord(hostname, env) {
-  const target = String(env.CLOUDFLARE_SAAS_TARGET || "").trim().toLowerCase().replace(/\\.$/, "");
+  const target = String(env.CLOUDFLARE_SAAS_TARGET || "").trim().toLowerCase().replace(/\.$/, "");
   if (!target) throw new Error("Set CLOUDFLARE_SAAS_TARGET to your Cloudflare for SaaS CNAME target first.");
   const records = await cloudflareRequest("/dns_records?name=" + encodeURIComponent(hostname), {method:"GET"}, env);
   const exact = Array.isArray(records) ? records.filter(record => String(record.name || "").toLowerCase() === hostname) : [];
@@ -150,7 +150,7 @@ async function ensureBuiltInDnsRecord(hostname, env) {
   const body = {type:"CNAME",name:hostname,content:target,ttl:1,proxied:false};
   if (exact.length === 1) {
     const current = exact[0];
-    if (String(current.content || "").toLowerCase().replace(/\\.$/, "") !== target || current.proxied !== false) {
+    if (String(current.content || "").toLowerCase().replace(/\.$/, "") !== target || current.proxied !== false) {
       await cloudflareRequest("/dns_records/" + current.id, {method:"PUT",body:JSON.stringify(body)}, env);
     }
   } else {
