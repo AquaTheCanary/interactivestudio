@@ -63,6 +63,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   async function expireSession(reason) {
     if (sessionEnding) return;
     sessionEnding = true;
+    const accountType = localStorage.getItem("is_user_account_type") === "organisation" ? "organisation" : "personal";
     if (sessionTimer) clearInterval(sessionTimer);
     const state = readSession();
     state.tabs = {};
@@ -72,7 +73,6 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     ["is_user_email","is_user_name","is_user_photo","is_user_plan","is_user_provider","is_user_account_type"].forEach(key => localStorage.removeItem(key));
     sessionEnding = false;
     if (location.pathname.indexOf("/auth/") !== 0) {
-      const accountType = localStorage.getItem("is_user_account_type") === "organisation" ? "organisation" : "personal";
       const target = appUrl("/auth/" + accountType + "/login/") + "?reason=" + encodeURIComponent(reason || "session-ended");
       location.replace(target);
     }
@@ -307,7 +307,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     async signOut() {
       sessionEnding = true;
       await auth.signOut();
-      ["is_user_email","is_user_name","is_user_photo","is_user_plan","is_user_provider"].forEach(key => localStorage.removeItem(key));
+      ["is_user_email","is_user_name","is_user_photo","is_user_plan","is_user_provider","is_user_account_type"].forEach(key => localStorage.removeItem(key));
       localStorage.removeItem("interactive_studio_session");
       localStorage.removeItem(SESSION_KEY);
       sessionStorage.removeItem(TAB_KEY);
