@@ -3,7 +3,7 @@ services:
     name: interactive-studio-published-sites
     runtime: static
     branch: main
-    buildCommand: ""
+    buildCommand: echo "Static publishing site - no build required"
     staticPublishPath: ./published-sites-static
     domains:
       - "*.sites.is-sites.abrdns.com"
