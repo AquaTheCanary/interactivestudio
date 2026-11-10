@@ -80,6 +80,70 @@ body{background:radial-gradient(ellipse at 12% 0%,#eeebff 0,transparent 34%),rad
 .callout{background:linear-gradient(110deg,#f4f1ff,#eff8ff);border-color:#e2defe}
 @media(max-width:620px){.head{padding:20px 18px;border-radius:17px}.shell{padding-top:24px}.builder{border-radius:0 0 12px 12px}}
 
+
+/* NIGHTSHIFT — dark, cinematic editor skin */
+:root{color-scheme:dark;--night:#08090f;--panel:#10121c;--panel2:#151827;--line:#252a3b;--muted:#9299ad;--electric:#8b7cff;--cyan:#69d9f2}
+html{background:#08090f}
+body.page-body{color:#eef0fa;background:radial-gradient(ellipse at 8% -10%,#4535a333,transparent 34%),radial-gradient(ellipse at 95% 8%,#087e9d22,transparent 30%),linear-gradient(145deg,#08090f,#0b0d15 55%,#090b12);background-attachment:fixed}
+.home-nav{background:#090b12e8!important;border-bottom:1px solid #252a3b!important;backdrop-filter:blur(22px);box-shadow:0 10px 40px #0005}
+.home-nav .brand-name,.home-nav .nav-links a,.home-nav .user-email-badge{color:#e8eaf6!important}
+.home-nav .nav-links a.active{color:#a99fff!important}
+.home-nav .nav-links a:hover{color:#8de6fa!important}
+.shell{animation:nightEnter .7s cubic-bezier(.2,.75,.2,1) both}
+@keyframes nightEnter{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.head{background:linear-gradient(115deg,#121522f2,#151326f2 55%,#0d1b26f2)!important;border:1px solid #35334f!important;box-shadow:0 22px 80px #0006,inset 0 1px #ffffff0b!important}
+.head:before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 25%,#a69aff0b 48%,transparent 72%);transform:translateX(-100%);animation:headSheen 8s ease-in-out infinite;pointer-events:none}
+@keyframes headSheen{0%,65%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.head h1{background:linear-gradient(100deg,#fff 5%,#b7aaff 55%,#78dff4);-webkit-background-clip:text;background-clip:text;color:transparent}
+.head p{color:#a7aec2!important}
+.section-kicker,.panel-title,.toolbar-label,.stage-top{color:#9d94ff!important}
+.panel,.list,.main{background:linear-gradient(160deg,#111420f5,#0d1019f5)!important;border-color:#282d40!important;color:#edf0fb;box-shadow:0 20px 65px #0005!important}
+.list{backdrop-filter:blur(18px)}
+.item{background:#171b29!important;color:#edf0fb!important;border-color:#242a3d!important;transition:transform .2s,border-color .2s,background .2s,box-shadow .2s}
+.item:hover{transform:translateY(-2px);border-color:#655bff!important;box-shadow:0 8px 22px #0005}
+.item.active{background:linear-gradient(110deg,#292344,#172b39)!important;border-color:#8c7cff!important;box-shadow:0 0 0 1px #8c7cff22,0 8px 24px #0005}
+.item small,.muted,.head p{color:#9299ad!important}
+.empty h2,.main h2,.sectionhead h3{color:#f4f5ff}
+.empty p{color:#a1a8bb}
+.field span,.prop-field span{color:#b6bdd0!important}
+.field input,.field textarea,.site-name-edit,.prop-field input,.prop-field textarea,.prop-field select,.create-modal input{background:#0b0e17!important;color:#f1f3ff!important;border:1px solid #30364b!important}
+.field input:focus,.field textarea:focus,.prop-field input:focus,.prop-field textarea:focus,.prop-field select:focus{border-color:#8b7cff!important;outline:3px solid #8b7cff2b!important;box-shadow:0 0 22px #8b7cff1c!important}
+.btn{background:#171b29!important;color:#e9ecf8!important;border-color:#30364b!important}
+.btn:hover{border-color:#8275ff!important;box-shadow:0 8px 26px #0008!important}
+.btn.primary{background:linear-gradient(110deg,#7668ff,#986dff 58%,#36b9d5)!important;color:#fff!important;border:0!important;box-shadow:0 8px 28px #7668ff42!important}
+.btn.primary:hover{box-shadow:0 10px 34px #7668ff65!important}
+.status{background:#282344!important;color:#c1b8ff!important}
+.status.live{background:#12382f!important;color:#7de5ba!important}
+.callout{background:linear-gradient(110deg,#1d1934,#10232d)!important;border-color:#373052!important;color:#c5c4e8!important}
+.domainbox{background:#101521!important;border-color:#2b3042!important;color:#edf0fb}
+.design-toolbar{background:linear-gradient(105deg,#080a11,#17152b 58%,#10212b)!important;border:1px solid #34334e!important;box-shadow:0 15px 42px #0008!important}
+.toolbtn.compact{background:#1b2030!important;border-color:#343b52!important;color:#eef0ff!important}
+.toolbtn.compact:hover,.toolbtn.compact.active{background:linear-gradient(110deg,#6356d9,#286b80)!important;border-color:#9d91ff!important}
+.builder{background:#0d1019!important;border-color:#30354a!important;box-shadow:0 24px 80px #0009!important}
+.builder-tools,.builder-properties{background:linear-gradient(180deg,#111521,#0c1019)!important;color:#eef0fb!important}
+.builder-tools{border-right:1px solid #292f43!important}.builder-properties{border-left:1px solid #292f43!important}
+.builder-tools h3,.builder-properties h3{color:#a39aff!important}
+.builder-tools .toolbtn{background:#191e2c!important;color:#e8ebf8!important;border-color:#282f43!important}
+.builder-tools .toolbtn:hover{background:#24213d!important;border-color:#7165df!important;box-shadow:0 8px 22px #0006!important}
+.panel-rule{background:#292f43!important}
+.layer-item{color:#c8cde0!important}.layer-item:hover{background:#1b2030!important}
+.layer-item.active{background:linear-gradient(110deg,#292344,#152a36)!important;border-color:#7568ef!important;color:#fff!important}
+.layer-icon{background:#282344!important;color:#bcb1ff!important}
+.builder-stage{background-color:#0b0e16!important;background-image:radial-gradient(#35394d .8px,transparent .8px)!important}
+.builder-canvas{background:#fff!important;box-shadow:0 24px 80px #0009,0 0 0 1px #ffffff1c!important}
+.builder-block.selected{border-color:#897cff!important;box-shadow:inset 0 0 0 1px #897cff,0 0 0 2px #897cff2b!important}
+.prop-field input,.prop-field textarea,.prop-field select{border-radius:9px!important}
+.create-overlay{background:#02030bd9!important;backdrop-filter:blur(12px)}
+.create-modal{background:linear-gradient(145deg,#171b2a,#0e111b)!important;border:1px solid #353b51!important;color:#f4f5ff;box-shadow:0 28px 100px #000b}
+.message{color:#a1a8bc}.message.success{color:#75e1b5}.message.error{color:#ff8298}
+#editor-title{color:#f3f4ff!important}
+#builder-site-name{min-height:40px}
+#save,#publish,#unpublish,#preview-button{border-radius:10px}
+#publish{box-shadow:0 0 26px #6e61ff2b}
+@media(max-width:950px){.builder-properties{border-top:1px solid #292f43!important}.builder-tools{border-bottom:1px solid #292f43!important}}
+@media(max-width:620px){.head{border-radius:18px!important}.builder{border-radius:0 0 14px 14px!important}.main{border-radius:14px!important}.design-toolbar{border-radius:14px 14px 0 0!important}.builder-tools,.builder-properties{border-radius:0!important}}
+@media(prefers-reduced-motion:reduce){.shell,.head:before{animation:none!important}.btn,.item,.toolbtn,.layer-item{transition:none!important}}
+
 </style></head>
 <body class="page-body">
 <header class="home-nav"><div class="nav-brand"><a data-route="/home/"><img src="../assets/images/headerlogo.png" class="brand-logo" alt="Interactive Studio"></a><span class="brand-name">Websites</span></div><nav class="nav-links"><a data-route="/dashboard/">Workspace</a><a data-route="/editor/">Presentations</a><a data-route="/websites/" class="active">Websites</a></nav><div class="nav-actions"><span class="user-email-badge" id="account">Loading account…</span></div></header>
