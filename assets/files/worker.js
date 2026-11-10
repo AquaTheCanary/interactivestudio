@@ -33,7 +33,7 @@ async function readPublicDocument(collection, id, env, authToken) {
     "/databases/(default)/documents/" + collection + "/" + encodeURIComponent(id) +
     "?key=" + encodeURIComponent(env.FIREBASE_API_KEY);
   const response = await fetch(endpoint, { headers: { "Accept": "application/json", ...(authToken ? { "Authorization": "Bearer " + authToken } : {}) } });
-  if (response.status === 404) return null;
+  if (response.status === 404 || response.status === 403) return null;
   if (!response.ok) throw new Error("Could not load the published website.");
   const document = await response.json();
   return decodeFirestoreFields(document.fields || {});
