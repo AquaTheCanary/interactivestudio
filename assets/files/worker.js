@@ -138,6 +138,26 @@ async function connectCustomDomain(hostnameInput, env) {
   }
   return {hostname,id:details.id||result.id,status:details.status||result.status||"pending",sslStatus:details.ssl?.status||result.ssl?.status||"pending",validationRecords:details.ssl?.validation_records||result.ssl?.validation_records||[],cnameTarget:env.CLOUDFLARE_SAAS_TARGET};
 }
+async function ensureBuiltInDnsRecord(hostname, env) {
+  const target = String(env.CLOUDFLARE_SAAS_TARGET || "").trim().toLowerCase().replace(/\\.$/, "");
+  if (!target) throw new Error("Set CLOUDFLARE_SAAS_TARGET to your Cloudflare for SaaS CNAME target first.");
+  const records = await cloudflareRequest("/dns_records?name=" + encodeURIComponent(hostname), {method:"GET"}, env);
+  const exact = Array.isArray(records) ? records.filter(record => String(record.name || "").toLowerCase() === hostname) : [];
+  if (exact.some(record => record.type !== "CNAME")) {
+    throw new Error("The DNS name " + hostname + " already has a non-CNAME record. Remove that conflicting record before publishing.");
+  }
+  if (exact.length > 1) throw new Error("Multiple DNS records already exist for " + hostname + ". Remove duplicates before publishing.");
+  const body = {type:"CNAME",name:hostname,content:target,ttl:1,proxied:false};
+  if (exact.length === 1) {
+    const current = exact[0];
+    if (String(current.content || "").toLowerCase().replace(/\\.$/, "") !== target || current.proxied !== false) {
+      await cloudflareRequest("/dns_records/" + current.id, {method:"PUT",body:JSON.stringify(body)}, env);
+    }
+  } else {
+    await cloudflareRequest("/dns_records", {method:"POST",body:JSON.stringify(body)}, env);
+  }
+  return {hostname,type:"CNAME",target,proxied:false};
+}
 async function connectBuiltInHost(hostnameInput, env) {
   const hostname = String(hostnameInput || "").trim().toLowerCase();
   const suffix = "." + PLATFORM_HOST;
@@ -237,7 +257,11 @@ export default {
           return json({ error: "You can only provision addresses for your own published website." }, 403, origin);
         }
         const results = [];
-        for (const hostname of expected) results.push(await connectBuiltInHost(hostname, env));
+        for (const hostname of expected) {
+          const dns = await ensureBuiltInDnsRecord(hostname, env);
+          const host = await connectBuiltInHost(hostname, env);
+          results.push({...host,dnsConfigured:true,dnsTarget:dns.target});
+        }
         return json({ hosts: results }, 200, origin);
       }
       if (url.pathname === "/connectCustomDomain") {
