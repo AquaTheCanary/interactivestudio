@@ -37,6 +37,114 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       });
     }));
 
+  // Shared session policy: 60 minutes without activity, or 30 minutes after
+  // the last open app tab is closed. Activity is synchronised across tabs.
+  const SESSION_KEY = "interactive_studio_session_v2";
+  const TAB_KEY = "interactive_studio_tab_v2";
+  const IDLE_LIMIT = 60 * 60 * 1000;
+  const CLOSED_LIMIT = 30 * 60 * 1000;
+  const HEARTBEAT = 15000;
+  let sessionTimer = null;
+  let sessionTabId = null;
+  let sessionEnding = false;
+  function readSession() {
+    try { return JSON.parse(localStorage.getItem(SESSION_KEY) || "{}"); }
+    catch (_) { return {}; }
+  }
+  function writeSession(value) {
+    try { localStorage.setItem(SESSION_KEY, JSON.stringify(value)); } catch (_) {}
+  }
+  function sessionTabs(state, now) {
+    const tabs = state.tabs && typeof state.tabs === "object" ? state.tabs : {};
+    Object.keys(tabs).forEach(id => { if (!tabs[id] || now - tabs[id] > 60000) delete tabs[id]; });
+    state.tabs = tabs;
+    return tabs;
+  }
+  async function expireSession(reason) {
+    if (sessionEnding) return;
+    sessionEnding = true;
+    if (sessionTimer) clearInterval(sessionTimer);
+    const state = readSession();
+    state.tabs = {};
+    state.closedAt = Date.now();
+    writeSession(state);
+    try { await auth.signOut(); } catch (_) {}
+    ["is_user_email","is_user_name","is_user_photo","is_user_plan","is_user_provider"].forEach(key => localStorage.removeItem(key));
+    sessionEnding = false;
+    if (!/\\/auth\\/(personal|organisation)\\/(login|register)\\//.test(location.pathname)) {
+      const target = appUrl("/auth/personal/login/") + "?reason=" + encodeURIComponent(reason || "session-ended");
+      location.replace(target);
+    }
+  }
+  function startSessionLifecycle(user) {
+    if (!user || sessionTimer) return;
+    const now = Date.now();
+    const state = readSession();
+    const tabs = sessionTabs(state, now);
+    const otherTabsOpen = Object.keys(tabs).length > 0;
+    const lastActivity = Number(state.lastActivity || state.lastSeen || now);
+    const closedAt = Number(state.closedAt || 0);
+    const lastSeen = Number(state.lastSeen || 0);
+    const closedTooLong = !otherTabsOpen && ((closedAt && now - closedAt >= CLOSED_LIMIT) || (!closedAt && lastSeen && now - lastSeen >= CLOSED_LIMIT));
+    if (now - lastActivity >= IDLE_LIMIT || closedTooLong) {
+      expireSession(closedTooLong ? "tab-closed" : "inactivity");
+      return;
+    }
+    sessionTabId = sessionStorage.getItem(TAB_KEY);
+    if (!sessionTabId) {
+      sessionTabId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : "tab-" + Math.random().toString(36).slice(2);
+      sessionStorage.setItem(TAB_KEY, sessionTabId);
+    }
+    tabs[sessionTabId] = now;
+    state.tabs = tabs;
+    state.lastSeen = now;
+    state.lastActivity = lastActivity;
+    state.closedAt = 0;
+    writeSession(state);
+    const markActivity = () => {
+      const current = readSession();
+      current.tabs = sessionTabs(current, Date.now());
+      current.tabs[sessionTabId] = Date.now();
+      current.lastActivity = Date.now();
+      current.lastSeen = Date.now();
+      current.closedAt = 0;
+      writeSession(current);
+    };
+    let lastActivityWrite = 0;
+    const onActivity = () => {
+      if (Date.now() - lastActivityWrite < 10000) return;
+      lastActivityWrite = Date.now();
+      markActivity();
+    };
+    ["pointerdown","keydown","touchstart","scroll","click"].forEach(type => addEventListener(type, onActivity, { passive: true }));
+    addEventListener("storage", event => {
+      if (event.key !== SESSION_KEY || !event.newValue) return;
+      const latest = readSession();
+      if (Date.now() - Number(latest.lastActivity || 0) >= IDLE_LIMIT) expireSession("inactivity");
+    });
+    addEventListener("pagehide", () => {
+      const current = readSession();
+      current.tabs = sessionTabs(current, Date.now());
+      delete current.tabs[sessionTabId];
+      current.lastSeen = Date.now();
+      if (!Object.keys(current.tabs).length) current.closedAt = Date.now();
+      writeSession(current);
+    });
+    sessionTimer = setInterval(() => {
+      const current = readSession();
+      const stamp = Date.now();
+      current.tabs = sessionTabs(current, stamp);
+      current.tabs[sessionTabId] = stamp;
+      current.lastSeen = stamp;
+      if (stamp - Number(current.lastActivity || 0) >= IDLE_LIMIT) {
+        writeSession(current);
+        expireSession("inactivity");
+        return;
+      }
+      writeSession(current);
+    }, HEARTBEAT);
+  }
+
   const studioAuth = {
     auth,
     ready: authReady,
@@ -104,7 +212,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     },
     async finishSignIn(user, organisation = false) {
       if (organisation) { try { await studioAuth.validateOrganisation(user); } catch (error) { await auth.signOut(); throw error; } }
-      const profile = await studioAuth.getProfile(user);
+      const session = readSession();\n      session.lastActivity = Date.now();\n      session.lastSeen = Date.now();\n      session.closedAt = 0;\n      session.tabs = sessionTabs(session, Date.now());\n      writeSession(session);\n      const profile = await studioAuth.getProfile(user);
       localStorage.setItem("is_user_email", profile.email);
       localStorage.setItem("is_user_name", profile.name);
       localStorage.setItem("is_user_photo", profile.photoURL);
@@ -221,7 +329,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   // Firebase LOCAL persistence survives navigation, reloads and browser restarts.
   studioAuth.redirectReady = Promise.resolve().then(() => studioAuth.completeRedirectSignIn());
 
-  window.studioAuth = studioAuth;
+  auth.onAuthStateChanged(user => { if (user) startSessionLifecycle(user); else { if (sessionTimer) clearInterval(sessionTimer); sessionTimer = null; } });\n\n  window.studioAuth = studioAuth;
   window.loginWithGoogle = organisation => studioAuth.signInGoogle(!!organisation).catch(showAuthError);
   window.loginWithMicrosoft = organisation => studioAuth.signInMicrosoft(!!organisation).catch(showAuthError);
   window.showAuthError = showAuthError;
