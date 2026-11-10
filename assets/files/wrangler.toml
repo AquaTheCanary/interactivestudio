@@ -2,8 +2,9 @@
 name = "interactive-studio"
 main = "worker.js"
 compatibility_date = "2026-11-02"
+workers_dev = true
+preview_urls = true
 
 [vars]
 FIREBASE_API_KEY = "AIzaSyAHQDuRXq77XRZvnE-dDuoy8A1TLLtfSy8"
 FIREBASE_PROJECT_ID = "interactive-studio-convexllc"
-
