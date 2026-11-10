@@ -123,6 +123,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       if (Date.now() - Number(latest.lastActivity || 0) >= IDLE_LIMIT) expireSession("inactivity");
     });
     addEventListener("pagehide", () => {
+      if (sessionEnding) return;
       const current = readSession();
       current.tabs = sessionTabs(current, Date.now());
       delete current.tabs[sessionTabId];
@@ -302,6 +303,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       return true;
     },
     async signOut() {
+      sessionEnding = true;
       await auth.signOut();
       ["is_user_email","is_user_name","is_user_photo","is_user_plan","is_user_provider"].forEach(key => localStorage.removeItem(key));
       localStorage.removeItem("interactive_studio_session");
