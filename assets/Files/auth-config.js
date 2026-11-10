@@ -69,10 +69,11 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     state.closedAt = Date.now();
     writeSession(state);
     try { await auth.signOut(); } catch (_) {}
-    ["is_user_email","is_user_name","is_user_photo","is_user_plan","is_user_provider"].forEach(key => localStorage.removeItem(key));
+    ["is_user_email","is_user_name","is_user_photo","is_user_plan","is_user_provider","is_user_account_type"].forEach(key => localStorage.removeItem(key));
     sessionEnding = false;
     if (location.pathname.indexOf("/auth/") !== 0) {
-      const target = appUrl("/auth/personal/login/") + "?reason=" + encodeURIComponent(reason || "session-ended");
+      const accountType = localStorage.getItem("is_user_account_type") === "organisation" ? "organisation" : "personal";
+      const target = appUrl("/auth/" + accountType + "/login/") + "?reason=" + encodeURIComponent(reason || "session-ended");
       location.replace(target);
     }
   }
@@ -137,7 +138,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       current.tabs = sessionTabs(current, stamp);
       current.tabs[sessionTabId] = stamp;
       current.lastSeen = stamp;
-      if (stamp - Number(current.lastActivity || 0) >= IDLE_LIMIT) {
+      if (stamp - Number(current.lastActivity || current.lastSeen || stamp) >= IDLE_LIMIT) {
         writeSession(current);
         expireSession("inactivity");
         return;
@@ -225,6 +226,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       localStorage.setItem("is_user_photo", profile.photoURL);
       localStorage.setItem("is_user_plan", profile.plan);
       localStorage.setItem("is_user_provider", profile.provider);
+      localStorage.setItem("is_user_account_type", organisation ? "organisation" : "personal");
       window.location.replace(appUrl("/dashboard/"));
     },
     async signInEmail(email, password, organisation = false) {
