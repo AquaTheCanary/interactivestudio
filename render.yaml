@@ -6,5 +6,5 @@ services:
     buildCommand: echo "Static publishing site - no build required"
     staticPublishPath: ./published-sites-static
     domains:
-      - "*.sites.is-sites.abrdns.com"
+      - "*.websites.is-sites.abrdns.com"
     autoDeployTrigger: commit
