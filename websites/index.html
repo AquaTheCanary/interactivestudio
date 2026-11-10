@@ -144,6 +144,68 @@ body.page-body{color:#eef0fa;background:radial-gradient(ellipse at 8% -10%,#4535
 @media(max-width:620px){.head{border-radius:18px!important}.builder{border-radius:0 0 14px 14px!important}.main{border-radius:14px!important}.design-toolbar{border-radius:14px 14px 0 0!important}.builder-tools,.builder-properties{border-radius:0!important}}
 @media(prefers-reduced-motion:reduce){.shell,.head:before{animation:none!important}.btn,.item,.toolbtn,.layer-item{transition:none!important}}
 
+
+/* RENDER-INSPIRED WORKSPACE REFRESH */
+:root{color-scheme:dark;--render-bg:#0e1014;--render-panel:#15181e;--render-panel-2:#1b1f27;--render-border:#2b303a;--render-text:#e8ebf0;--render-muted:#969eaa;--render-green:#46d39a;--render-blue:#8bb8ff}
+html,body.page-body{background:var(--render-bg)!important;color:var(--render-text)!important}
+body.page-body{background-image:none!important}
+.home-nav{min-height:62px!important;padding:0 26px!important;background:#101216f5!important;border-bottom:1px solid var(--render-border)!important;box-shadow:none!important}
+.home-nav .brand-logo{max-height:27px!important}
+.home-nav .brand-name,.home-nav .nav-links a,.home-nav .user-email-badge{color:#cbd1db!important}
+.home-nav .nav-links a{font-size:13px!important;font-weight:600!important}
+.home-nav .nav-links a.active{color:#fff!important;border-bottom:2px solid var(--render-green)!important}
+.home-nav .nav-links a:hover{color:var(--render-green)!important}
+.shell{max-width:1500px!important;padding:34px 28px 72px!important;animation:none!important}
+.head{padding:0 0 22px!important;margin:0 0 24px!important;border:0!important;border-bottom:1px solid var(--render-border)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+.head:before,.head:after{display:none!important}
+.head h1{font-size:clamp(28px,4vw,38px)!important;letter-spacing:-.045em!important;background:none!important;color:#f3f5f8!important;-webkit-text-fill-color:currentColor!important}
+.head p{color:var(--render-muted)!important;font-size:13px!important}
+.section-kicker,.panel-title,.toolbar-label,.stage-top{color:#9ca6b5!important;letter-spacing:.11em!important}
+.layout{grid-template-columns:245px minmax(0,1fr)!important;gap:18px!important}
+.panel,.list,.main{background:var(--render-panel)!important;border:1px solid var(--render-border)!important;border-radius:10px!important;box-shadow:none!important;color:var(--render-text)!important}
+.list{padding:15px!important;position:sticky!important;top:82px!important}
+.panel-title{font-size:10px!important;margin:4px 0 12px!important}
+.item{background:transparent!important;border:1px solid transparent!important;border-radius:7px!important;color:#dce1e9!important;padding:11px!important;margin:3px 0!important}
+.item:hover{background:#20252d!important;border-color:#343b47!important;transform:none!important;box-shadow:none!important}
+.item.active{background:#1c2927!important;border-color:#315b4c!important;box-shadow:inset 2px 0 var(--render-green)!important}
+.item strong{font-size:12px!important}.item small{color:var(--render-muted)!important}
+.main{padding:22px!important}
+.empty h2,.main h2,.sectionhead h3{color:#f1f3f6!important}
+.empty p,.muted,.head p{color:var(--render-muted)!important}
+.btn{background:#20252d!important;border:1px solid #343b47!important;color:#e7ebf1!important;border-radius:7px!important;box-shadow:none!important;transition:background .15s,border-color .15s!important}
+.btn:hover{background:#292f39!important;border-color:#596575!important;transform:none!important;box-shadow:none!important}
+.btn.primary{background:var(--render-green)!important;color:#07160f!important;border:1px solid var(--render-green)!important;font-weight:750!important;box-shadow:none!important}
+.btn.primary:hover{background:#62e2ad!important}
+.status{background:#252b35!important;color:#c3ccd8!important;border:1px solid #343c49!important;border-radius:5px!important}
+.status.live{background:#173328!important;color:#70e0ad!important;border-color:#285b45!important}
+.callout{background:#111b1b!important;border:1px solid #2b5145!important;color:#bfe8d6!important;border-radius:7px!important}
+.domainbox{background:#11151b!important;border:1px solid var(--render-border)!important;border-radius:8px!important}
+.field input,.field textarea,.site-name-edit,.prop-field input,.prop-field textarea,.prop-field select,.create-modal input{background:#0d1015!important;border:1px solid #343b47!important;color:#edf0f5!important;border-radius:6px!important}
+.field input:focus,.field textarea:focus,.prop-field input:focus,.prop-field textarea:focus,.prop-field select:focus{border-color:var(--render-blue)!important;outline:2px solid #8bb8ff20!important;box-shadow:none!important}
+.design-toolbar{background:#171b22!important;border:1px solid #303743!important;border-radius:8px 8px 0 0!important;box-shadow:none!important}
+.toolbtn.compact{background:#252b34!important;border:1px solid #39414e!important;color:#e4e9f0!important;border-radius:6px!important}
+.toolbtn.compact:hover,.toolbtn.compact.active{background:#293d38!important;border-color:#4c9b7a!important;color:#8de8ba!important}
+.builder{background:#11151b!important;border:1px solid #303743!important;border-radius:0 0 8px 8px!important;box-shadow:none!important}
+.builder-tools,.builder-properties{background:#151920!important;color:#e8ebf0!important}
+.builder-tools{border-right:1px solid #303743!important}.builder-properties{border-left:1px solid #303743!important}
+.builder-tools h3,.builder-properties h3{color:#aab3c0!important}
+.builder-tools .toolbtn{background:#1c222b!important;border:1px solid #303743!important;color:#dfe5ed!important;border-radius:6px!important;box-shadow:none!important}
+.builder-tools .toolbtn:hover{background:#242d38!important;border-color:#587c9f!important;box-shadow:none!important}
+.panel-rule{background:#303743!important}
+.layer-item{color:#cbd3de!important;border-radius:6px!important}
+.layer-item:hover{background:#202731!important;transform:none!important}
+.layer-item.active{background:#1b302a!important;border-color:#356c54!important;color:#91e8bb!important}
+.layer-icon{background:#263b34!important;color:#8de4b7!important;border-radius:5px!important}
+.builder-stage{background-color:#0e1218!important;background-image:radial-gradient(#333b48 .7px,transparent .7px)!important}
+.builder-canvas{background:#fff!important;box-shadow:0 12px 35px #0008!important;border-radius:3px!important}
+.builder-block.selected{border-color:#438f70!important;box-shadow:inset 0 0 0 1px #438f70!important}
+.create-overlay{background:#05070bcc!important;backdrop-filter:blur(8px)!important}
+.create-modal{background:#171c24!important;border:1px solid #343d4a!important;color:#f1f4f8!important;box-shadow:0 24px 80px #000b!important;border-radius:10px!important}
+.message{color:#9ca6b5!important}.message.success{color:#70e0ad!important}.message.error{color:#ff8793!important}
+#editor-title{color:#f1f4f8!important}
+@media(max-width:900px){.layout{grid-template-columns:1fr!important}.list{position:static!important}}
+@media(max-width:620px){.shell{padding:22px 14px 48px!important}.home-nav{padding:0 14px!important}.main{padding:15px!important}.head{padding-bottom:18px!important}.builder{border-radius:0 0 8px 8px!important}}
+
 </style></head>
 <body class="page-body">
 <header class="home-nav"><div class="nav-brand"><a data-route="/home/"><img src="../assets/images/headerlogo.png" class="brand-logo" alt="Interactive Studio"></a><span class="brand-name">Websites</span></div><nav class="nav-links"><a data-route="/dashboard/">Workspace</a><a data-route="/editor/">Presentations</a><a data-route="/websites/" class="active">Websites</a></nav><div class="nav-actions"><span class="user-email-badge" id="account">Loading account…</span></div></header>
@@ -160,7 +222,7 @@ body.page-body{color:#eef0fa;background:radial-gradient(ellipse at 8% -10%,#4535
 <span class="muted">Drag sections to reorder · Select a section to edit</span></div>
 <div class="design-toolbar"><div class="toolbar-group"><button class="toolbtn compact" id="undo" title="Undo">↶</button><button class="toolbtn compact" id="redo" title="Redo">↷</button><span class="toolbar-divider"></span><span class="toolbar-label">DESIGN CANVAS</span></div><div class="toolbar-group"><button class="toolbtn compact device active" data-device="desktop">Desktop</button><button class="toolbtn compact device" data-device="tablet">Tablet</button><button class="toolbtn compact device" data-device="mobile">Mobile</button><span class="toolbar-divider"></span><button class="toolbtn compact" id="zoom-out">−</button><span id="zoom-label" class="zoom-label">100%</span><button class="toolbtn compact" id="zoom-in">＋</button></div></div>
 <div class="builder"><aside class="builder-tools"><h3>Layers</h3><div id="layer-list" class="layer-list"><p class="muted">Your page layers appear here.</p></div><div class="panel-rule"></div><h3>Insert</h3>
-<button class="toolbtn" data-add="hero">▰ Hero section</button><button class="toolbtn" data-add="text">≡ Text section</button><button class="toolbtn" data-add="image">▧ Image / media</button><button class="toolbtn" data-add="button">↗ Button / link</button><button class="toolbtn" data-add="features">▦ Feature cards</button><p class="muted">Add a section, then select it on the canvas.</p></aside>
+<button class="toolbtn" data-add="hero">▰ Hero section</button><button class="toolbtn" data-add="text">≡ Text section</button><button class="toolbtn" data-add="image">▧ Image / media</button><button class="toolbtn" data-add="button">↗ Button / link</button><button class="toolbtn" data-add="features">▦ Feature cards</button><p class="muted">Add sections, select them on the canvas, and arrange your page before publishing.</p></aside>
 <div class="builder-stage"><div class="stage-top"><span>PAGE · HOME</span><span id="canvas-size">Desktop · 1440px</span></div><div id="builder-canvas" class="builder-canvas device-desktop"></div></div>
 <aside class="builder-properties"><h3>Design properties</h3><div id="builder-properties-body" class="muted">Select a layer to inspect and edit it.</div><div class="actions"><button class="btn" id="move-up">↑ Move up</button><button class="btn" id="move-down">↓ Move down</button><button class="btn" id="delete-section">Delete</button></div></aside></div>
 <div class="actions"><button class="btn" id="save">Save draft</button><button class="btn" id="preview-button">Refresh preview</button><button class="btn primary" id="publish">Publish website ↗</button><button class="btn hidden" id="unpublish">Unpublish</button></div>
@@ -168,7 +230,7 @@ body.page-body{color:#eef0fa;background:radial-gradient(ellipse at 8% -10%,#4535
 
 <div id="legacy-fields" class="hidden"><input id="site-name"><input id="slug"><input id="description"><input id="eyebrow"><input id="headline"><textarea id="subheadline"></textarea><textarea id="body-copy"></textarea><input id="button-label"><input id="button-url"><input id="accent" type="color" value="#635bff"><input id="background" type="color" value="#f7f8fc"></div>
 <div class="sectionhead"><h3>Connect a custom domain</h3><span class="muted">Optional</span></div>
-<div class="domainbox"><h4>Use a domain you already own</h4><p class="muted">Connect a hostname such as www.example.com. You must own the domain and be able to edit its DNS.</p>
+<div class="domainbox"><h4>Use a domain you already own</h4><p class="muted">Connect a domain you own, such as www.example.com. Your DNS provider must let you add the records shown after connection.</p>
 <label class="field"><span>Custom domain</span><input id="custom-domain" maxlength="253" placeholder="www.example.com"></label>
 <div class="actions"><button class="btn" id="connect">Connect domain</button><button class="btn hidden" id="check">Check DNS & SSL</button></div>
 <div class="callout hidden" id="dns"></div><div class="message" id="domain-message" aria-live="polite"></div></div>
@@ -177,7 +239,7 @@ body.page-body{color:#eef0fa;background:radial-gradient(ellipse at 8% -10%,#4535
 <div class="create-overlay" id="create-overlay" role="dialog" aria-modal="true"><div class="create-modal"><h2 style="margin:0 0 8px">Create a website</h2><p class="muted">Choose a name. You can design the page in the visual builder next.</p><input id="create-name" maxlength="70" placeholder="My website"><div class="actions" style="justify-content:flex-end"><button class="btn" id="cancel-create">Cancel</button><button class="btn primary" id="confirm-create">Create</button></div></div></div>
 <script>
 (function(){
-const $=id=>document.getElementById(id),API="https://interactive-studio-api.convexllc.workers.dev",PLATFORM="websites.is-sites.abrdns.com";
+const $=id=>document.getElementById(id),API="https://interactive-studio.convexllc.workers.dev",PLATFORM="is-sites.abrdns.com";
 let user=null,db=null,active=null,domains={},sections=[],selectedSection=0,dragSection=-1;
 const ids=["site-name","description","eyebrow","headline","subheadline","body-copy","button-label","button-url","accent","background"];
 function msg(id,text,type){$(id).textContent=text;$(id).className="message"+(type?" "+type:"")}
