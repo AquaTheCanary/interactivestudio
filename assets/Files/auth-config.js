@@ -71,7 +71,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     try { await auth.signOut(); } catch (_) {}
     ["is_user_email","is_user_name","is_user_photo","is_user_plan","is_user_provider"].forEach(key => localStorage.removeItem(key));
     sessionEnding = false;
-    if (!/\\/auth\\/(personal|organisation)\\/(login|register)\\//.test(location.pathname)) {
+    if (location.pathname.indexOf("/auth/") !== 0) {
       const target = appUrl("/auth/personal/login/") + "?reason=" + encodeURIComponent(reason || "session-ended");
       location.replace(target);
     }
