@@ -1,10 +1,10 @@
 # Interactive Studio
 
-Interactive Studio is a browser-based creative workspace for building presentations, exploring ideas with AI and sharing work.
+Interactive Studio is a browser-based creative workspace for building presentations, sharing interactive sessions and publishing websites.
 
 ## Hosting
 
-The frontend is static and supports both:
+The frontend is static and supports:
 
 - GitHub Pages: `https://aquathecanary.github.io/interactivestudio/`
 - Custom domain: `https://interactivestudio.abrdns.com/`
@@ -13,39 +13,56 @@ The shared `router.js` detects the GitHub Pages repository subpath and generates
 
 ## Frontend pages
 
-- `/home/` — marketing homepage
+- `/home/` — homepage
 - `/products/` — product overview
 - `/solutions/` — use cases
 - `/resources/` — guides and FAQs
-- `/pricing/` — subscription plans
-- `/contact/` — support and sales
+- `/pricing/` — confirms the free-forever policy; no paid tiers are offered
+- `/contact/` — support and partnerships
 - `/auth/personal/login/` and `/auth/personal/register/`
 - `/auth/organisation/login/` and `/auth/organisation/register/`
 - `/dashboard/` — account workspace
 - `/editor/` — presentation canvas
-- `/ai/` — integrated AI workspace
+- `/websites/` — website builder and publishing
 
-## Firebase authentication setup
+The former `/ai/` route redirects to the presentation editor. Built-in AI integrations and provider API calls have been removed.
 
-The frontend uses Firebase Authentication for a single consistent user session. Google and Microsoft sign-in both use Firebase OAuth providers, so they share the same Firebase user/session and do not create a separate MSAL-only browser session.
+## Firebase authentication
+
+The frontend uses Firebase Authentication for a consistent user session. Google and Microsoft sign-in use Firebase OAuth providers.
 
 In Firebase Console for project `interactive-studio-convexllc`:
 
 1. Open **Authentication → Sign-in method**.
-2. Enable **Email/Password**, **Google**, and **Microsoft**.
-3. For Microsoft, create/configure an Entra app registration and enter its client ID and client secret in Firebase's Microsoft provider configuration. Add the Firebase-provided redirect URI to the Entra app registration.
-4. Add these authorised domains in **Authentication → Settings → Authorised domains**:
+2. Enable **Email/Password**, **Google**, and **Microsoft** as required.
+3. For Microsoft, configure an Entra app registration and enter its client ID and client secret in Firebase.
+4. Add the authorised domains:
    - `aquathecanary.github.io`
    - `interactivestudio.abrdns.com`
-5. Ensure email verification is enabled and test with accounts you control.
+5. Enable email verification and test with accounts you control.
 
-Organisation login rejects common consumer email providers in the browser and then calls the server-side `assertOrganisationAccess` function. The server checks the verified Firebase ID token and corporate email domain. This is a corporate-domain filter, not a company-domain allowlist or proof of employment; for a stricter tenant policy, maintain an approved-domain collection and add an administrator provisioning workflow.
+Organisation login applies a corporate-domain check and calls the server-side `assertOrganisationAccess` endpoint. This is a corporate-domain filter, not proof of employment or a company-domain allowlist.
 
-## Deploy the secure Firebase backend
+## Cloudflare Worker and website publishing
 
-The `functions/` directory contains the server-side AI proxy and organisation verification endpoints. Provider keys are read from Firebase Secret Manager and are never shipped to the browser.
+The `assets/files/worker.js` file contains the all-in-one Cloudflare Worker for the platform API and published website routing. It uses Firebase Authentication and Firestore to verify ownership and read published website records.
 
-Requirements: Node.js 20, Firebase CLI, access to the Firebase project, and a Firestore database.
+Worker configuration may include:
+
+- `FIREBASE_API_KEY`
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ZONE_ID`
+- `CLOUDFLARE_SAAS_TARGET`
+
+Only configure the Cloudflare values needed by the enabled publishing and custom-domain routes. Keep all secrets in Cloudflare Worker secrets, never in frontend files or Git.
+
+The Worker deployment workflow is in `.github/workflows/worker.yml`. It requires GitHub Actions secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
+
+## Firebase backend
+
+The `functions/` directory contains the organisation access verification endpoint. The built-in AI proxy and paid subscription entitlement functions have been removed.
+
+Requirements: Node.js 20, Firebase CLI and access to the Firebase project.
 
 Install and deploy:
 
@@ -56,62 +73,23 @@ firebase use interactive-studio-convexllc
 firebase deploy --only functions,firestore:rules
 ```
 
-Set provider secrets before using each live model:
+If Firebase reports that previously deployed `generateAI` or `getEntitlements` functions are no longer present, approve their deletion. They are obsolete and are not used by the current app.
 
-```bash
-firebase functions:secrets:set GEMINI_API_KEY
-firebase functions:secrets:set AZURE_OPENAI_ENDPOINT
-firebase functions:secrets:set AZURE_OPENAI_API_KEY
-firebase functions:secrets:set AZURE_OPENAI_DEPLOYMENT
-firebase functions:secrets:set OPENAI_API_KEY
-firebase functions:secrets:set ANTHROPIC_API_KEY
-```
+## Product policy
 
-Deploy functions again after setting or rotating secrets:
-
-```bash
-firebase deploy --only functions
-```
-
-Endpoints:
-
-- `https://us-central1-interactive-studio-convexllc.cloudfunctions.net/assertOrganisationAccess`
-- `https://us-central1-interactive-studio-convexllc.cloudfunctions.net/getEntitlements`
-- `https://us-central1-interactive-studio-convexllc.cloudfunctions.net/generateAI`
-
-### AI provider notes
-
-- **Gemini Flash** uses the Gemini API and requires `GEMINI_API_KEY`.
-- **Copilot Mini** is wired to an Azure OpenAI deployment alias. Microsoft does not provide a general public API endpoint named “Copilot Mini”; configure the Azure deployment you want to use with the three Azure secrets above. Azure usage may incur charges.
-- **ChatGPT-4o** uses OpenAI's API and requires `OPENAI_API_KEY`.
-- **Claude Sonnet (current supported API model)** uses Anthropic's Messages API and requires `ANTHROPIC_API_KEY`.
-
-Provider API usage is subject to provider pricing, quotas, account eligibility and model availability. A free Interactive Studio plan does not guarantee a provider will supply unlimited free API usage.
-
-The AI endpoint requires a valid Firebase ID token. It allows Gemini and the configured Azure model on Basic accounts; ChatGPT-4o and Claude require a server-managed paid entitlement.
-
-## Subscription entitlements
-
-The backend reads subscription plans from Firestore collection `userEntitlements`, document ID equal to the Firebase Auth UID:
-
-```json
-{
-  "plan": "Pro"
-}
-```
-
-Create/update these documents only through trusted administrator tooling or a secure billing webhook. Firestore rules deliberately deny client writes. Do not use localStorage or browser-supplied plan names to grant paid access.
-
-This repository does not yet include a payment checkout or billing webhook. Until those are implemented, entitlements must be provisioned by an administrator in a trusted environment.
+- Interactive Studio is free for every account.
+- There are no paid plans, subscriptions, billing webhooks or paid feature gates.
+- No built-in AI model integrations or AI provider API keys are required.
+- Website publishing and custom-domain availability still depend on the relevant DNS, Cloudflare and provider configuration.
 
 ## Current implementation boundaries
 
-- Dashboard/editor drafts are saved in the current browser's localStorage. Cloud project sync is not implemented.
-- The editor exports a single slide to PNG/JPEG. Multi-slide export and native installers are not implemented.
-- The Share action copies the editor URL; it does not create a secure share token or real-time multiplayer session.
-- Organisation checks reject common consumer domains and require verified email. A managed approved-domain registry and administrator provisioning interface remain future work.
-- The frontend can be deployed to GitHub Pages independently. Firebase Functions and Firestore rules must be deployed separately using the Firebase CLI.
+- Presentation drafts are saved in the current browser's localStorage.
+- The editor exports a single slide to PNG/JPEG; multi-slide export is not implemented.
+- Website records and publishing are account-backed through Firebase and the Cloudflare Worker.
+- Organisation checks reject common consumer email domains and require verified email; a managed approved-domain registry remains future work.
+- GitHub Pages and the Cloudflare Worker are deployed separately.
 
 ## Security
 
-Never commit provider API keys, Microsoft client secrets, Firebase service-account JSON, private signing keys or other credentials to this repository. Use Firebase Secret Manager for backend provider credentials.
+Never commit API keys, Microsoft client secrets, Firebase service-account JSON, private signing keys or other credentials to this repository. Keep backend credentials in the relevant provider's secret manager.
