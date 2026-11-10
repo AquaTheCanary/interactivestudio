@@ -6,3 +6,9 @@ compatibility_date = "2026-11-02"
 [vars]
 FIREBASE_API_KEY = "AIzaSyAHQDuRXq77XRZvnE-dDuoy8A1TLLtfSy8"
 FIREBASE_PROJECT_ID = "interactive-studio-convexllc"
+
+# Route all traffic entering the delegated website zone through the Worker.
+# This includes one-label and nested two-label customer website hostnames.
+[[routes]]
+pattern = "*/*"
+zone_name = "is-sites.abrdns.com"
