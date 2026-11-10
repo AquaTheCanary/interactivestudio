@@ -3,7 +3,6 @@ const ALLOWED_ORIGINS = new Set([
   "https://interactivestudio.abrdns.com",
   "https://is-sites.abrdns.com"
 ]);
-const SYSTEM_PROMPT = "You are Interactive Studio's creative presentation assistant. Help users plan, write and improve clear, accurate, engaging presentations. Be concise and practical.";
 const FREE_DOMAINS = new Set(["gmail.com","googlemail.com","yahoo.com","yahoo.co.uk","ymail.com","hotmail.com","hotmail.co.uk","outlook.com","outlook.co.uk","live.com","live.co.uk","msn.com","icloud.com","me.com","mac.com","aol.com","mail.com","proton.me","protonmail.com","gmx.com","gmx.co.uk","yandex.com","hey.com","fastmail.com","pm.me","zoho.com"]);
 
 const PLATFORM_HOST = "is-sites.abrdns.com";
@@ -203,63 +202,7 @@ async function authenticatedUser(request, env) {
   const user = data.users[0];
   return { uid: user.localId, email: user.email || "", emailVerified: !!user.emailVerified };
 }
-async function planFor() {
-  // Interactive Studio is free for every account. Entitlements no longer gate features.
-  return "free";
-}
-function extractGemini(data) {
-  return data?.candidates?.[0]?.content?.parts?.map(part => part.text || "").join("") || "";
-}
-async function generate(model, prompt, env) {
-  if (model === "gemini") {
-    if (!env.GEMINI_API_KEY) throw new Error("Gemini isn't configured yet. Add GEMINI_API_KEY in Cloudflare Worker secrets.");
-    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=" + encodeURIComponent(env.GEMINI_API_KEY), {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }, contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: 1800 } })
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error?.message || "Gemini request failed.");
-    return extractGemini(data);
-  }
-  if (model === "claude") {
-    if (!env.ANTHROPIC_API_KEY) throw new Error("Claude isn't configured yet. Add ANTHROPIC_API_KEY in Cloudflare Worker secrets.");
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST", headers: { "Content-Type": "application/json", "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01" },
-      body: JSON.stringify({ model: "claude-sonnet-4-5", system: SYSTEM_PROMPT, max_tokens: 1800, messages: [{ role: "user", content: prompt }] })
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      if (response.status === 401) throw new Error("Claude rejected ANTHROPIC_API_KEY (401). The Worker has a key saved, but Anthropic says it is invalid or revoked. Replace it with a fresh Anthropic Console API key; never paste it into chat.");
-      throw new Error(data.error?.message || "Anthropic request failed.");
-    }
-    return (data.content || []).map(item => item.text || "").join("\n");
-  }
-  if (model === "copilot") {
-    if (!env.AZURE_OPENAI_ENDPOINT || !env.AZURE_OPENAI_API_KEY || !env.AZURE_OPENAI_DEPLOYMENT) {
-      throw new Error("Copilot needs AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY and AZURE_OPENAI_DEPLOYMENT configured on the Worker.");
-    }
-    let parsedEndpoint;
-    try { parsedEndpoint = new URL(env.AZURE_OPENAI_ENDPOINT); } catch (_) {
-      throw new Error("Copilot's AZURE_OPENAI_ENDPOINT is not a valid URL. Use your full Azure AI resource endpoint, for example https://your-resource.openai.azure.com.");
-    }
-    if (parsedEndpoint.protocol !== "https:" || parsedEndpoint.hostname === "-" || !parsedEndpoint.hostname.includes(".")) {
-      throw new Error("Copilot's AZURE_OPENAI_ENDPOINT is invalid. Replace the placeholder value with your full HTTPS Azure AI endpoint.");
-    }
-    if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{1,127}$/.test(String(env.AZURE_OPENAI_DEPLOYMENT)) || env.AZURE_OPENAI_DEPLOYMENT === "-") {
-      throw new Error("Copilot's AZURE_OPENAI_DEPLOYMENT is still a placeholder or invalid. Enter the exact deployment name from your Azure AI resource.");
-    }
-    const endpoint = parsedEndpoint.origin.replace(/\/$/, "");
-    const url = endpoint + "/openai/deployments/" + encodeURIComponent(env.AZURE_OPENAI_DEPLOYMENT) + "/chat/completions?api-version=2024-10-21";
-    const response = await fetch(url, {
-      method: "POST", headers: { "Content-Type": "application/json", "api-key": env.AZURE_OPENAI_API_KEY },
-      body: JSON.stringify({ messages: [{ role: "system", content: SYSTEM_PROMPT }, { role: "user", content: prompt }], temperature: 0.7, max_tokens: 1800 })
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error?.message || "Azure OpenAI request failed.");
-    return data.choices?.[0]?.message?.content || "";
-  }
-  throw new Error("Unknown AI model.");
-}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
@@ -313,31 +256,10 @@ export default {
         if (!domain || !domain.includes(".") || FREE_DOMAINS.has(domain)) return json({ error: "A corporate email domain is required for organisation access." }, 403, origin);
         return json({ ok: true, domain }, 200, origin);
       }
-      if (url.pathname === "/aiStatus") {
-        if (!user.emailVerified) return json({ error: "Verify your email address before using AI features." }, 403, origin);
-        return json({ providers: { gemini: !!env.GEMINI_API_KEY, claude: !!env.ANTHROPIC_API_KEY, copilot: !!(env.AZURE_OPENAI_ENDPOINT && env.AZURE_OPENAI_API_KEY && env.AZURE_OPENAI_DEPLOYMENT) } }, 200, origin);
-      }
-      if (url.pathname === "/getEntitlements") {
-        if (!user.emailVerified) return json({ error: "Verify your email address before accessing account services." }, 403, origin);
-        const plan = await planFor(user, env, token);
-        return json({ plan: plan.charAt(0).toUpperCase() + plan.slice(1) }, 200, origin);
-      }
-      if (url.pathname === "/generateAI") {
-        if (!user.emailVerified) return json({ error: "Verify your email address before using AI features." }, 403, origin);
-        const body = await request.json();
-        const model = String(body.model || "gemini").toLowerCase();
-        const prompt = String(body.prompt || "").trim().slice(0, 16000);
-        if (!prompt) return json({ error: "Enter a prompt." }, 400, origin);
-        if (!["gemini", "copilot", "claude"].includes(model)) return json({ error: "Unknown AI model." }, 400, origin);
-        const plan = await planFor(user, env, token);
-        const text = await generate(model, prompt, env);
-        if (!text) throw new Error("The AI provider returned an empty response.");
-        return json({ text, model, plan }, 200, origin);
-      }
       return json({ error: "Endpoint not found." }, 404, origin);
     } catch (error) {
       const message = error?.message || "Request failed.";
-      const status = /sign in|session is invalid|expired/i.test(message) ? 401 : (/not configured|needs AZURE_OPENAI/i.test(message) ? 503 : 502);
+      const status = /sign in|session is invalid|expired/i.test(message) ? 401 : 502;
       return json({ error: message }, status, origin);
     }
   }
