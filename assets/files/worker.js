@@ -138,25 +138,76 @@ async function connectCustomDomain(hostnameInput, env) {
   }
   return {hostname,id:details.id||result.id,status:details.status||result.status||"pending",sslStatus:details.ssl?.status||result.ssl?.status||"pending",validationRecords:details.ssl?.validation_records||result.ssl?.validation_records||[],cnameTarget:env.CLOUDFLARE_SAAS_TARGET};
 }
-async function ensureBuiltInDnsRecord(hostname, env) {
-  const target = String(env.CLOUDFLARE_SAAS_TARGET || "").trim().toLowerCase().replace(/\.$/, "");
-  if (!target) throw new Error("Set CLOUDFLARE_SAAS_TARGET to your Cloudflare for SaaS CNAME target first.");
-  const records = await cloudflareRequest("/dns_records?name=" + encodeURIComponent(hostname), {method:"GET"}, env);
-  const exact = Array.isArray(records) ? records.filter(record => String(record.name || "").toLowerCase() === hostname) : [];
-  if (exact.some(record => record.type !== "CNAME")) {
-    throw new Error("The DNS name " + hostname + " already has a non-CNAME record. Remove that conflicting record before publishing.");
+async function cloudnsRequest(endpoint, parameters, env) {
+  const authId = String(env.CLOUDNS_AUTH_ID || "").trim();
+  const authPassword = String(env.CLOUDNS_AUTH_PASSWORD || "");
+  if (!authId || !authPassword) {
+    throw new Error("ClouDNS automation is not configured. Add CLOUDNS_AUTH_ID and CLOUDNS_AUTH_PASSWORD as Worker secrets.");
   }
-  if (exact.length > 1) throw new Error("Multiple DNS records already exist for " + hostname + ". Remove duplicates before publishing.");
-  const body = {type:"CNAME",name:hostname,content:target,ttl:1,proxied:false};
-  if (exact.length === 1) {
-    const current = exact[0];
-    if (String(current.content || "").toLowerCase().replace(/\.$/, "") !== target || current.proxied !== false) {
-      await cloudflareRequest("/dns_records/" + current.id, {method:"PUT",body:JSON.stringify(body)}, env);
+  const body = new URLSearchParams({
+    "auth-id": authId,
+    "auth-password": authPassword,
+    "domain-name": PLATFORM_HOST,
+    ...(parameters || {})
+  });
+  const response = await fetch("https://api.cloudns.net/dns/" + endpoint + ".json", {
+    method: "POST",
+    headers: {"Content-Type":"application/x-www-form-urlencoded"},
+    body
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || String(data.status || "").toLowerCase() === "failed") {
+    throw new Error(data.statusDescription || "ClouDNS could not update the website DNS record.");
+  }
+  return data;
+}
+function cloudnsRecordList(data) {
+  const source = data && data.records && typeof data.records === "object" ? data.records : data;
+  if (Array.isArray(source)) return source;
+  if (!source || typeof source !== "object") return [];
+  return Object.values(source).filter(item => item && typeof item === "object" && ("type" in item || "record" in item || "id" in item));
+}
+async function ensureBuiltInDnsRecord(hostname, env) {
+  const target = String(env.CLOUDFLARE_SAAS_TARGET || "").trim().toLowerCase().replace(/\\.$/, "");
+  if (!target || target.includes("/") || target.includes(":")) {
+    throw new Error("Set CLOUDFLARE_SAAS_TARGET to the Cloudflare for SaaS CNAME target hostname, without https://.");
+  }
+  const suffix = "." + PLATFORM_HOST;
+  if (!hostname.endsWith(suffix)) throw new Error("The website hostname is outside the ClouDNS website zone.");
+  const relativeHost = hostname.slice(0, -suffix.length);
+  const listed = await cloudnsRequest("records", {
+    host: relativeHost,
+    "rows-per-page": "100",
+    page: "1",
+    "include-notes": "0"
+  }, env);
+  const matches = cloudnsRecordList(listed).filter(item => String(item.host || item.name || "").toLowerCase() === relativeHost.toLowerCase());
+  if (matches.some(item => String(item.type || "").toUpperCase() !== "CNAME")) {
+    throw new Error("The ClouDNS name " + relativeHost + " already has a non-CNAME record. Remove that conflicting record first.");
+  }
+  if (matches.length > 1) throw new Error("Multiple DNS records already exist for " + hostname + ". Remove duplicates in ClouDNS first.");
+  if (matches.length === 1) {
+    const current = matches[0];
+    const currentTarget = String(current.record || current.content || current.points_to || "").toLowerCase().replace(/\\.$/, "");
+    if (currentTarget !== target) {
+      const recordId = current.id || current.record_id || current["record-id"];
+      if (!recordId) throw new Error("ClouDNS returned an existing CNAME without a record ID, so it cannot be updated safely.");
+      await cloudnsRequest("mod-record", {
+        "record-id": String(recordId),
+        host: relativeHost,
+        record: target,
+        ttl: "300"
+      }, env);
     }
   } else {
-    await cloudflareRequest("/dns_records", {method:"POST",body:JSON.stringify(body)}, env);
+    await cloudnsRequest("add-record", {
+      "record-type": "CNAME",
+      host: relativeHost,
+      record: target,
+      ttl: "300"
+    }, env);
   }
-  return {hostname,type:"CNAME",target,proxied:false};
+  return {hostname,type:"CNAME",target};
 }
 async function connectBuiltInHost(hostnameInput, env) {
   const hostname = String(hostnameInput || "").trim().toLowerCase();
