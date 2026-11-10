@@ -178,9 +178,9 @@ function extractGemini(data) {
 async function generate(model, prompt, env) {
   if (model === "gemini") {
     if (!env.GEMINI_API_KEY) throw new Error("Gemini isn't configured yet. Add GEMINI_API_KEY in Cloudflare Worker secrets.");
-    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + encodeURIComponent(env.GEMINI_API_KEY), {
+    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=" + encodeURIComponent(env.GEMINI_API_KEY), {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }, contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 1800 } })
+      body: JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }, contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: 1800 } })
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error?.message || "Gemini request failed.");
