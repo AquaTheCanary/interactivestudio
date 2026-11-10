@@ -6,7 +6,7 @@ const SYSTEM_PROMPT = "You are Interactive Studio's creative presentation assist
 const FREE_DOMAINS = new Set(["gmail.com","googlemail.com","yahoo.com","yahoo.co.uk","ymail.com","hotmail.com","hotmail.co.uk","outlook.com","outlook.co.uk","live.com","live.co.uk","msn.com","icloud.com","me.com","mac.com","aol.com","mail.com","proton.me","protonmail.com","gmx.com","gmx.co.uk","yandex.com","hey.com","fastmail.com","pm.me","zoho.com"]);
 
 const PLATFORM_HOST = "is-sites.abrdns.com";
-const API_HOST = "interactive-studio-api.convexllc.workers.dev";
+const API_HOST = "interactive-studio.convexllc.workers.dev";
 const FIREBASE_PROJECT_ID = "interactive-studio-convexllc";
 
 function decodeFirestoreValue(value) {
