@@ -1,5 +1,5 @@
 // Interactive Studio authentication shared by every account page.
-// Google and email/password are the supported sign-in methods.
+// Google, GitHub and email/password are the supported sign-in methods.
 const firebaseConfig = {
   apiKey: "AIzaSyAHQDuRXq77XRZvnE-dDuoy8A1TLLtfSy8",
   authDomain: "interactive-studio-convexllc.firebaseapp.com",
@@ -267,6 +267,13 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       provider.setCustomParameters({ prompt: "select_account" });
       return studioAuth.runSSO(provider, organisation);
     },
+    async signInGithub(organisation = false) {
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      beginFreshSession();
+      const provider = new firebase.auth.GithubAuthProvider();
+      provider.addScope("user:email");
+      return studioAuth.runSSO(provider, organisation);
+    },
     async runSSO(provider, organisation) {
       try {
         const credential = await auth.signInWithPopup(provider);
@@ -335,11 +342,15 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
   window.studioAuth = studioAuth;
   window.loginWithGoogle = organisation => studioAuth.signInGoogle(!!organisation).catch(showAuthError);
+  window.loginWithGithub = organisation => studioAuth.signInGithub(!!organisation).catch(showAuthError);
   window.showAuthError = showAuthError;
   function showAuthError(error) {
     const messages = {
       "auth/unauthorized-domain": "This website domain is not authorised in Firebase. Add interactivestudio.abrdns.com and aquathecanary.github.io under Firebase Authentication → Settings → Authorised domains.",
-      "auth/operation-not-allowed": "This sign-in provider is not enabled yet. Enable Google in Firebase Authentication → Sign-in method.",
+      "auth/operation-not-allowed": "This sign-in provider is not enabled yet. Enable Google or GitHub in Firebase Authentication → Sign-in providers.",
+      "auth/invalid-oauth-client-id": "GitHub sign-in is not configured correctly. Check the GitHub Client ID in Firebase Authentication → Sign-in providers → GitHub.",
+      "auth/invalid-oauth-provider": "GitHub sign-in is not enabled in Firebase Authentication. Enable the GitHub provider and save its credentials.",
+      "auth/missing-email": "GitHub did not share an email address. Make your email visible to the GitHub OAuth app, then try again.",
       "auth/popup-closed-by-user": "The sign-in window was closed before sign-in finished. Please try again.",
       "auth/popup-blocked": "Your browser blocked the sign-in window. Allow pop-ups for this site and try again.",
       "auth/network-request-failed": "A network error interrupted sign-in. Check your connection and try again.",
