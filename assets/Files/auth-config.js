@@ -284,14 +284,13 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     async sendVerificationEmail(user) {
       const activeUser = user || await studioAuth.currentUser();
       if (!activeUser) throw new Error("Sign in before requesting a verification email.");
-      const token = await activeUser.getIdToken(true);
-      const response = await fetch("https://interactivestudio.vercel.app/api/send-verification", {
-        method: "POST",
-        headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" },
-        body: "{}"
+      // Firebase Auth sends the verification message directly. No Vercel API,
+      // Admin SDK endpoint, or extra email-service secret is required.
+      const returnUrl = window.location.origin + appUrl("/auth/personal/login/") + "?verified=1";
+      await activeUser.sendEmailVerification({
+        url: returnUrl,
+        handleCodeInApp: false
       });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(result.error || "We could not send your verification email. Please try again.");
       return true;
     },
     async resetPassword(email) {
