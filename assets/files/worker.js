@@ -136,7 +136,9 @@ async function connectCustomDomain(hostnameInput, env) {
     await new Promise(resolve => setTimeout(resolve, 900));
     try { details = await cloudflareRequest("/custom_hostnames/" + result.id, {method:"GET"}, env); } catch (_) {}
   }
-  let cloudnsDns = null;\n  try { cloudnsDns = await ensureCustomDomainDns(hostname, String(env.CLOUDFLARE_SAAS_TARGET).trim().toLowerCase().replace(/\\.$/, ""), env); } catch (error) { cloudnsDns = {configured:false,error:error.message}; }\n  return {hostname,id:details.id||result.id,status:details.status||result.status||"pending",sslStatus:details.ssl?.status||result.ssl?.status||"pending",validationRecords:details.ssl?.validation_records||result.ssl?.validation_records||[],cnameTarget:env.CLOUDFLARE_SAAS_TARGET,cloudnsDns};
+  let cloudnsDns = null;
+  try { cloudnsDns = await ensureCustomDomainDns(hostname, String(env.CLOUDFLARE_SAAS_TARGET).trim().toLowerCase().replace(/\.$/, ""), env); } catch (error) { cloudnsDns = {configured:false,error:error.message}; }
+  return {hostname,id:details.id||result.id,status:details.status||result.status||"pending",sslStatus:details.ssl?.status||result.ssl?.status||"pending",validationRecords:details.ssl?.validation_records||result.ssl?.validation_records||[],cnameTarget:env.CLOUDFLARE_SAAS_TARGET,cloudnsDns};
 }
 async function cloudnsRequest(endpoint, parameters, env, zoneName = PLATFORM_HOST) {
   const authId = String(env.CLOUDNS_AUTH_ID || "").trim();
