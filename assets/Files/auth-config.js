@@ -314,6 +314,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       const credential = await auth.createUserWithEmailAndPassword(email.trim(), password);
       await credential.user.updateProfile({ displayName: name.trim() });
       await studioAuth.sendVerificationEmail(credential.user);
+      await auth.signOut();
       return true;
     },
     async signOut() {
