@@ -340,6 +340,10 @@ export default {
     const hostname = url.hostname.toLowerCase();
     if (hostname === PLATFORM_HOST) return proxyStudioApp(request);
     if (hostname !== API_HOST) return serveWebsite(request, env);
+    // Pathflo forwards the www platform hostname to this Worker as its workers.dev
+    // upstream. Serve the Studio app for browser page/navigation requests; API
+    // operations remain POST requests handled below.
+    if (request.method === "GET" || request.method === "HEAD") return proxyStudioApp(request);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders(origin) });
     if (origin && !ALLOWED_ORIGINS.has(origin)) return json({ error: "Origin not allowed.", receivedOrigin: origin }, 403, origin);
     if (request.method !== "POST") return json({ error: "Method not allowed." }, 405, origin);
