@@ -17,3 +17,13 @@ This folder is a separate Vercel project used only to serve published customer w
 The wildcard project reads published website documents from the existing Firestore database. Drafts remain private because the handler only serves documents whose status is `published`.
 
 The main app stays on Netlify. The existing Cloudflare Worker remains the API for AI and custom-domain connection; it is not the wildcard website host.
+
+## Email verification API
+
+The same Vercel project also exposes `/api/send-verification`. It validates the signed-in Firebase ID token and asks Firebase Authentication to send a real `VERIFY_EMAIL` action email.
+
+The endpoint uses the existing `FIREBASE_API_KEY` environment variable listed above. If that variable is already configured for the website publishing function, no additional Vercel secret is needed. After the GitHub change deploys, the app will use:
+
+`https://interactivestudio.vercel.app/api/send-verification`
+
+Firebase Authentication delivers the email. Set the sender name, reply-to address and template in Firebase Console → Authentication → Templates; Vercel is the secure API layer, not an SMTP mail provider.
