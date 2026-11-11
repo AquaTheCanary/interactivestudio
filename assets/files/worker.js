@@ -341,7 +341,7 @@ export default {
     if (hostname === PLATFORM_HOST) return proxyStudioApp(request);
     if (hostname !== API_HOST) return serveWebsite(request, env);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders(origin) });
-    if (!ALLOWED_ORIGINS.has(origin)) return json({ error: "Origin not allowed.", receivedOrigin: origin || "(no Origin header)" }, 403, origin);
+    if (origin && !ALLOWED_ORIGINS.has(origin)) return json({ error: "Origin not allowed.", receivedOrigin: origin }, 403, origin);
     if (request.method !== "POST") return json({ error: "Method not allowed." }, 405, origin);
     try {
       const token = (request.headers.get("Authorization") || "").slice(7);
