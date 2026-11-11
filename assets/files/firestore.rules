@@ -126,7 +126,7 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.handle == handle
-        && handle.matches('^[a-z0-9][a-z0-9-]{1,22}[a-z0-9]
+        && handle.matches('[a-z0-9][a-z0-9-]{1,22}[a-z0-9]')
       allow update: if false;
       allow delete: if signedIn() && resource.data.uid == request.auth.uid;
     }
