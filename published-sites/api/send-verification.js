@@ -38,14 +38,10 @@ export default async function handler(req, res) {
     const user = account.users && account.users[0];
     if (!lookup.ok || !user) return res.status(401).json({ error: "Your session has expired. Sign in again." });
     if (user.emailVerified) return res.status(200).json({ ok: true, alreadyVerified: true });
-    const continueUrl = String(req.body && req.body.continueUrl || "https://interactivestudio.abrdns.com/auth/personal/login/");
-    if (!/^https:\/\/(interactivestudio\.abrdns\.com|aquathecanary\.github\.io)(\/|$)/i.test(continueUrl)) {
-      return res.status(400).json({ error: "The verification return address is invalid." });
-    }
     const sent = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=" + encodeURIComponent(apiKey), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ requestType: "VERIFY_EMAIL", idToken, continueUrl })
+      body: JSON.stringify({ requestType: "VERIFY_EMAIL", idToken })
     });
     const result = await sent.json().catch(() => ({}));
     if (!sent.ok) return res.status(400).json({ error: result.error && result.error.message || "Firebase could not send the verification email." });
