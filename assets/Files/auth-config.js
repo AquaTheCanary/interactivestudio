@@ -288,7 +288,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       const response = await fetch("https://interactivestudio.vercel.app/api/send-verification", {
         method: "POST",
         headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" },
-        body: JSON.stringify({ continueUrl: window.location.origin + appUrl("/auth/personal/login/") })
+        body: "{}"
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || "We could not send your verification email. Please try again.");
