@@ -1,6 +1,5 @@
 // Interactive Studio authentication shared by every account page.
-// Configure Google and Microsoft providers in Firebase Authentication.
-// Microsoft uses Firebase's microsoft.com OAuth provider so all sign-ins share one Firebase session.
+// Google and email/password are the supported sign-in methods.
 const firebaseConfig = {
   apiKey: "AIzaSyAHQDuRXq77XRZvnE-dDuoy8A1TLLtfSy8",
   authDomain: "interactive-studio-convexllc.firebaseapp.com",
@@ -265,14 +264,6 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       provider.setCustomParameters({ prompt: "select_account" });
       return studioAuth.runSSO(provider, organisation);
     },
-    async signInMicrosoft(organisation = false) {
-      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-      beginFreshSession();
-      const provider = new firebase.auth.OAuthProvider("microsoft.com");
-      provider.setCustomParameters({ prompt: "select_account" });
-      provider.addScope("email");
-      return studioAuth.runSSO(provider, organisation);
-    },
     async runSSO(provider, organisation) {
       try {
         const credential = await auth.signInWithPopup(provider);
@@ -287,6 +278,19 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         throw error;
       }
     },
+    async sendVerificationEmail(user) {
+      const activeUser = user || await studioAuth.currentUser();
+      if (!activeUser) throw new Error("Sign in before requesting a verification email.");
+      const token = await activeUser.getIdToken(true);
+      const response = await fetch("https://interactivestudio.vercel.app/api/send-verification", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" },
+        body: JSON.stringify({ continueUrl: window.location.origin + appUrl("/auth/personal/login/") })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "We could not send your verification email. Please try again.");
+      return true;
+    },
     async resetPassword(email) {
       if (!email) throw new Error("Enter your email address first.");
       await auth.sendPasswordResetEmail(email.trim());
@@ -297,7 +301,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       beginFreshSession();
       const credential = await auth.createUserWithEmailAndPassword(email.trim(), password);
       await credential.user.updateProfile({ displayName: name.trim() });
-      await credential.user.sendEmailVerification();
+      await studioAuth.sendVerificationEmail(credential.user);
       return true;
     },
     async registerPersonal({ name, email, password }) {
@@ -327,12 +331,11 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
   window.studioAuth = studioAuth;
   window.loginWithGoogle = organisation => studioAuth.signInGoogle(!!organisation).catch(showAuthError);
-  window.loginWithMicrosoft = organisation => studioAuth.signInMicrosoft(!!organisation).catch(showAuthError);
   window.showAuthError = showAuthError;
   function showAuthError(error) {
     const messages = {
       "auth/unauthorized-domain": "This website domain is not authorised in Firebase. Add interactivestudio.abrdns.com and aquathecanary.github.io under Firebase Authentication → Settings → Authorised domains.",
-      "auth/operation-not-allowed": "This sign-in provider is not enabled yet. Enable Google or Microsoft in Firebase Authentication → Sign-in method.",
+      "auth/operation-not-allowed": "This sign-in provider is not enabled yet. Enable Google in Firebase Authentication → Sign-in method.",
       "auth/popup-closed-by-user": "The sign-in window was closed before sign-in finished. Please try again.",
       "auth/popup-blocked": "Your browser blocked the sign-in window. Allow pop-ups for this site and try again.",
       "auth/network-request-failed": "A network error interrupted sign-in. Check your connection and try again.",
