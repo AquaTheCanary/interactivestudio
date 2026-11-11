@@ -41,7 +41,12 @@ export default async function handler(req, res) {
     const sent = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=" + encodeURIComponent(apiKey), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ requestType: "VERIFY_EMAIL", idToken })
+      body: JSON.stringify({
+        requestType: "VERIFY_EMAIL",
+        idToken,
+        continueUrl: "https://interactivestudio.abrdns.com/auth/personal/login/?verified=1",
+        canHandleCodeInApp: false
+      })
     });
     const result = await sent.json().catch(() => ({}));
     if (!sent.ok) return res.status(400).json({ error: result.error && result.error.message || "Firebase could not send the verification email." });
