@@ -136,9 +136,13 @@ async function connectCustomDomain(hostnameInput, env) {
     await new Promise(resolve => setTimeout(resolve, 900));
     try { details = await cloudflareRequest("/custom_hostnames/" + result.id, {method:"GET"}, env); } catch (_) {}
   }
+  const validationRecords = details.ssl?.validation_records || result.ssl?.validation_records || [];
   let cloudnsDns = null;
-  try { cloudnsDns = await ensureCustomDomainDns(hostname, String(env.CLOUDFLARE_SAAS_TARGET).trim().toLowerCase().replace(/\.$/, ""), env); } catch (error) { cloudnsDns = {configured:false,error:error.message}; }
-  return {hostname,id:details.id||result.id,status:details.status||result.status||"pending",sslStatus:details.ssl?.status||result.ssl?.status||"pending",validationRecords:details.ssl?.validation_records||result.ssl?.validation_records||[],cnameTarget:env.CLOUDFLARE_SAAS_TARGET,cloudnsDns};
+  try {
+    cloudnsDns = await ensureCustomDomainDns(hostname, String(env.CLOUDFLARE_SAAS_TARGET).trim().toLowerCase().replace(/\.$/, ""), env);
+    if (cloudnsDns.configured) cloudnsDns.txtRecordsAdded = await ensureCloudnsValidationRecords(validationRecords, cloudnsDns.zone, env);
+  } catch (error) { cloudnsDns = {configured:false,error:error.message}; }
+  return {hostname,id:details.id||result.id,status:details.status||result.status||"pending",sslStatus:details.ssl?.status||result.ssl?.status||"pending",validationRecords,cnameTarget:env.CLOUDFLARE_SAAS_TARGET,cloudnsDns};
 }
 async function cloudnsRequest(endpoint, parameters, env, zoneName = PLATFORM_HOST) {
   const authId = String(env.CLOUDNS_AUTH_ID || "").trim();
@@ -198,6 +202,22 @@ async function ensureCustomDomainDns(hostname, target, env) {
     await cloudnsRequest("add-record", {"record-type":"CNAME",host,record:target,ttl:"300"}, env, zone);
   }
   return {configured:true,zone,host,type:"CNAME",target};
+}
+async function ensureCloudnsValidationRecords(validationRecords, zone, env) {
+  let added = 0;
+  for (const item of Array.isArray(validationRecords) ? validationRecords : []) {
+    const rawName = String(item.txt_name || item.name || "").trim().toLowerCase().replace(/\\.$/, "");
+    const value = String(item.txt_value || item.value || "").trim();
+    if (!rawName || !value) continue;
+    const host = rawName === zone ? "@" : rawName.endsWith("." + zone) ? rawName.slice(0, -(zone.length + 1)) : "";
+    if (!host) continue;
+    const listed = await cloudnsRequest("records", {host,type:"TXT","rows-per-page":"100",page:"1"}, env, zone);
+    const records = cloudnsRecordList(listed).filter(record => String(record.host || record.name || "").toLowerCase() === host.toLowerCase() && String(record.type || "").toUpperCase() === "TXT");
+    if (records.some(record => String(record.record || record.content || "").replace(/^"|"$/g, "") === value)) continue;
+    await cloudnsRequest("add-record", {"record-type":"TXT",host,record:value,ttl:"300"}, env, zone);
+    added++;
+  }
+  return added;
 }
 function cloudnsRecordList(data) {
   const source = data && data.records && typeof data.records === "object" ? data.records : data;
