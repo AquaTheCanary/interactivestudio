@@ -330,17 +330,18 @@ export default {
         const body = await request.json();
         const slug = String(body.websiteSlug || "").toLowerCase();
         const username = String(body.username || "").toLowerCase();
+        const subdomain = String(body.subdomain || "").toLowerCase();
         const hostname = String(body.hostname || "").trim().toLowerCase();
-        if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(username) || username.length > 32 || slug.length > 63) {
+        if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(username) || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(subdomain) || username.length > 32 || subdomain.length > 40 || slug.length > 63) {
           return json({ error: "The website ID or public handle is not valid." }, 400, origin);
         }
         const expected = [
-          username + "." + String(body.subdomain || "").toLowerCase() + "." + PLATFORM_HOST,
-          String(body.subdomain || "").toLowerCase() + "." + username + "." + PLATFORM_HOST,
-          username + "-" + String(body.subdomain || "").toLowerCase() + "." + PLATFORM_HOST,
-          String(body.subdomain || "").toLowerCase() + "-" + username + "." + PLATFORM_HOST
+          username + "." + subdomain + "." + PLATFORM_HOST,
+          subdomain + "." + username + "." + PLATFORM_HOST,
+          username + "-" + subdomain + "." + PLATFORM_HOST,
+          subdomain + "-" + username + "." + PLATFORM_HOST
         ];
-        if (!expected.includes(hostname)) return json({ error: "Choose one of the four supported address formats for your handle and subdomain." }, 400, origin);
+        if (!expected.includes(hostname) || ((hostname.includes(username + "-") || hostname.includes("-" + username + ".")) && username.length + subdomain.length + 1 > 63)) return json({ error: "Choose one of the four supported address formats and keep each hostname label under 64 characters." }, 400, origin);
         const site = await readPublicDocument("websites", slug, env, token);
         if (!site || site.ownerUid !== user.uid || site.username !== username || site.status !== "published" || site.publishedHostname !== hostname) {
           return json({ error: "You can only provision the selected address for your own published website." }, 403, origin);
