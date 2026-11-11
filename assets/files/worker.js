@@ -136,7 +136,7 @@ async function connectCustomDomain(hostnameInput, env) {
     await new Promise(resolve => setTimeout(resolve, 900));
     try { details = await cloudflareRequest("/custom_hostnames/" + result.id, {method:"GET"}, env); } catch (_) {}
   }
-  const validationRecords = details.ssl?.validation_records || result.ssl?.validation_records || [];
+  const validationRecords = [...(details.ssl?.validation_records || result.ssl?.validation_records || []), ...((details.ownership_verification || result.ownership_verification) ? [{txt_name:(details.ownership_verification || result.ownership_verification).name,txt_value:(details.ownership_verification || result.ownership_verification).value}] : [])];
   let cloudnsDns = null;
   try {
     cloudnsDns = await ensureCustomDomainDns(hostname, String(env.CLOUDFLARE_SAAS_TARGET).trim().toLowerCase().replace(/\.$/, ""), env);
