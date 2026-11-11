@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Settings | Interactive Studio</title>
 <link rel="icon" href="../assets/images/tablogo.png"><link rel="stylesheet" href="../assets/Files/style.css"><script src="../assets/Files/router.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script><script src="../assets/Files/auth-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script><script src="../assets/Files/auth-config.js"></script>
 <style>
 body.page-body{background:radial-gradient(ellipse at 8% 0%,#4535a322,transparent 34%),#090b12;color:#eef0fa}.settings-shell{max-width:1050px;margin:0 auto;padding:48px 22px 80px}.settings-head{margin-bottom:25px}.settings-head h1{font-size:clamp(34px,5vw,50px);letter-spacing:-.06em;margin:7px 0}.settings-head p{color:#9ca4b8}.settings-card{background:linear-gradient(150deg,#151927,#10131d);border:1px solid #2a3041;border-radius:18px;padding:24px;margin:16px 0;box-shadow:0 18px 55px #0004}.settings-card h2{font-size:18px;margin:0 0 6px}.settings-card>p{font-size:12px;color:#9ca4b8;line-height:1.6}.profile-row{display:flex;gap:22px;align-items:center;flex-wrap:wrap}.avatar{width:104px;height:104px;border-radius:50%;object-fit:cover;background:#24283a;border:2px solid #665bff}.upload-label{display:inline-flex;padding:10px 14px;border:1px solid #414960;border-radius:10px;cursor:pointer;font-size:12px;font-weight:750}.settings-field{display:block;margin:17px 0}.settings-field span{display:block;color:#b5bdd0;font-size:11px;font-weight:750;margin-bottom:7px}.settings-field input{width:100%;max-width:520px;padding:12px 13px;border:1px solid #343b50;border-radius:10px;background:#0c1019;color:#f5f6ff;font:inherit}.settings-field small{display:block;color:#8992a8;margin-top:6px;font-size:10px}.settings-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:20px}.settings-message{min-height:20px;font-size:12px;color:#a5afbf}.settings-message.error{color:#ff8e9d}.settings-message.success{color:#83dfb4}.verified{color:#83dfb4}.unverified{color:#ffcf83}@media(max-width:600px){.settings-shell{padding:28px 14px 55px}.settings-card{padding:18px}}
 </style></head>
@@ -21,10 +21,27 @@ body.page-body{background:radial-gradient(ellipse at 8% 0%,#4535a322,transparent
 (async()=>{
  const $=id=>document.getElementById(id);let user=null,profile={},selectedPhoto=null;
  const say=(id,text,type)=>{$(id).textContent=text;$(id).className="settings-message"+(type?" "+type:"")};
+ async function compressPhoto(file){
+  return new Promise((resolve,reject)=>{
+   const image=new Image(),url=URL.createObjectURL(file);
+   image.onload=()=>{
+    try{
+     const size=256,scale=Math.max(size/image.width,size/image.height),width=image.width*scale,height=image.height*scale;
+     const canvas=document.createElement("canvas");canvas.width=size;canvas.height=size;
+     const context=canvas.getContext("2d");context.drawImage(image,(size-width)/2,(size-height)/2,width,height);
+     const data=canvas.toDataURL("image/webp",0.78);URL.revokeObjectURL(url);
+     if(data.length>450000)throw new Error("That picture is too detailed to store. Choose another image.");
+     resolve(data);
+    }catch(error){URL.revokeObjectURL(url);reject(error)}
+   };
+   image.onerror=()=>{URL.revokeObjectURL(url);reject(new Error("The selected image could not be opened."))};
+   image.src=url;
+  });
+ }
  const fallback="data:image/svg+xml;charset=utf-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" rx="60" fill="#24283a"/><text x="60" y="75" text-anchor="middle" font-size="52" fill="#a99fff">✦</text></svg>');
  try{
   user=await studioAuth.currentUser();if(!user){location.replace(window.getAppUrl("/auth/personal/login/"));return}
-  const db=firebase.firestore(),storage=firebase.storage(),ref=db.collection("userProfiles").doc(user.uid);
+  const db=firebase.firestore(),ref=db.collection("userProfiles").doc(user.uid);
   const snap=await ref.get();profile=snap.exists?snap.data():{};
   $("display-name").value=profile.displayName||user.displayName||"";
   $("email").value=user.email||"";
@@ -32,7 +49,7 @@ body.page-body{background:radial-gradient(ellipse at 8% 0%,#4535a322,transparent
   $("avatar").src=profile.photoURL||user.photoURL||fallback;
   $("verification-status").innerHTML=user.emailVerified?'<span class="verified">✓ Email verified</span>':'<span class="unverified">! Email not verified</span>';
   $("photo").addEventListener("change",e=>{const file=e.target.files&&e.target.files[0];if(!file)return;if(!/^image\/(png|jpeg|webp)$/.test(file.type)||file.size>5*1024*1024){say("profile-message","Choose a PNG, JPG or WebP image smaller than 5 MB.","error");e.target.value="";return}selectedPhoto=file;$("avatar").src=URL.createObjectURL(file);say("profile-message","Image ready. Save your profile to upload it.")});
-  $("save-profile").onclick=async()=>{const b=$("save-profile");b.disabled=true;try{const displayName=$("display-name").value.trim();if(!displayName)throw new Error("Enter a display name.");let photoURL=profile.photoURL||user.photoURL||"";if(selectedPhoto){const path="profilePictures/"+user.uid+"/profile-"+Date.now()+"."+selectedPhoto.type.split("/")[1].replace("jpeg","jpg");const fileRef=storage.ref(path);await fileRef.put(selectedPhoto,{contentType:selectedPhoto.type});photoURL=await fileRef.getDownloadURL()}await user.updateProfile({displayName,photoURL});await ref.set({uid:user.uid,email:user.email||"",displayName,photoURL,handle:profile.handle||"",updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});profile={...profile,displayName,photoURL};localStorage.setItem("is_user_name",displayName);localStorage.setItem("is_user_photo",photoURL);selectedPhoto=null;say("profile-message","Profile saved.","success")}catch(e){say("profile-message",e.message||"Could not save profile.","error")}finally{b.disabled=false}};
+  $("save-profile").onclick=async()=>{const b=$("save-profile");b.disabled=true;try{const displayName=$("display-name").value.trim();if(!displayName)throw new Error("Enter a display name.");let photoURL=profile.photoURL||user.photoURL||"";if(selectedPhoto)photoURL=await compressPhoto(selectedPhoto);await user.updateProfile({displayName});await ref.set({uid:user.uid,email:user.email||"",displayName,photoURL,handle:profile.handle||"",updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});profile={...profile,displayName,photoURL};localStorage.setItem("is_user_name",displayName);localStorage.setItem("is_user_photo",photoURL);selectedPhoto=null;say("profile-message","Profile saved.","success")}catch(e){say("profile-message",e.message||"Could not save profile.","error")}finally{b.disabled=false}};
   $("save-handle").onclick=async()=>{const b=$("save-handle");b.disabled=true;try{const handle=$("handle").value.trim().toLowerCase();if(!/^[a-z0-9](?:[a-z0-9-]{1,22}[a-z0-9])$/.test(handle))throw new Error("Use 3–24 lowercase letters, numbers or internal hyphens.");if(["www","api","admin","mail","ftp","sites","app","interactivestudio","settings","support"].includes(handle))throw new Error("That handle is reserved.");const old=profile.handle||"";await db.runTransaction(async tx=>{const newRef=db.collection("handles").doc(handle),newSnap=await tx.get(newRef);const oldRef=old&&old!==handle?db.collection("handles").doc(old):null;const oldSnap=oldRef?await tx.get(oldRef):null;if(newSnap.exists&&newSnap.data().uid!==user.uid)throw new Error("That handle is already taken.");if(!newSnap.exists)tx.set(newRef,{uid:user.uid,handle,createdAt:firebase.firestore.FieldValue.serverTimestamp()});tx.set(ref,{uid:user.uid,handle,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});if(oldRef&&oldSnap&&oldSnap.exists&&oldSnap.data().uid===user.uid)tx.delete(oldRef)});profile.handle=handle;say("handle-message","Your handle is saved. New website publications will use it.","success")}catch(e){say("handle-message",e.message||"Could not save your handle.","error")}finally{b.disabled=false}};
   $("resend-verification").onclick=async()=>{const b=$("resend-verification");b.disabled=true;try{await studioAuth.sendVerificationEmail(user);say("security-message","Verification email sent. Check your inbox and spam folder.","success")}catch(e){say("security-message",e.message,"error")}finally{b.disabled=false}};
   $("signout").onclick=()=>studioAuth.signOut();
