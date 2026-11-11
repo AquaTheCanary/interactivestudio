@@ -252,16 +252,17 @@ body.page-body{background-image:none!important}
 <div class="publish-overlay" id="publish-overlay" role="dialog" aria-modal="true" aria-labelledby="publish-title">
   <div class="publish-modal">
     <div class="publish-modal-kicker">PUBLISHING STUDIO</div>
-    <h2 id="publish-title">Your website is live.</h2>
-    <p>Your changes have been published. Your website now has a public address.</p>
-    <div class="publish-address"><span id="publish-address">https://yourname.yoursite.is-sites.abrdns.com</span><button class="btn" id="copy-publish-address">Copy</button></div>
-    <div class="publish-alternatives"><strong>Other built-in address formats</strong><div id="publish-alternatives"></div></div>
-    <p class="publish-footnote" id="publish-status">Your built-in addresses are being secured with HTTPS.</p>
-    <div class="publish-actions"><a class="btn primary" id="open-published" href="#" target="_blank" rel="noopener">Open website ↗</a><button class="btn" id="close-publish-menu">Back to builder</button></div>
+    <h2 id="publish-title">Publish your website</h2>
+    <p>Choose a public address. Your website title and web address are independent, so you can change either without changing the other.</p>
+    <label class="field"><span>Subdomain name</span><input id="publish-subdomain" maxlength="40" placeholder="your-site" autocomplete="off"></label>
+    <label class="field"><span>Address format</span><select id="publish-format"><option value="handle-subdomain">handle-subdomain.is-sites.abrdns.com</option><option value="subdomain-handle">subdomain-handle.is-sites.abrdns.com</option><option value="handle.subdomain">handle.subdomain.is-sites.abrdns.com</option><option value="subdomain.handle">subdomain.handle.is-sites.abrdns.com</option></select></label>
+    <div class="publish-address"><span id="publish-address">Choose a subdomain to preview your address.</span><button class="btn" id="copy-publish-address">Copy</button></div>
+    <div class="previewwrap"><div class="muted" style="margin:0 0 8px">LIVE PUBLISH PREVIEW</div><iframe class="preview" id="publish-preview" title="Publish preview" sandbox="allow-same-origin"></iframe></div>
+    <p class="publish-footnote" id="publish-status">Select your address and preview the site before publishing.</p>
+    <div class="publish-actions"><button class="btn primary" id="confirm-publish">Publish website ↗</button><a class="btn hidden" id="open-published" href="#" target="_blank" rel="noopener">Open website ↗</a><button class="btn" id="close-publish-menu">Back to builder</button></div>
     <p class="publish-footnote">You can return to the builder at any time to make changes and publish an update.</p>
   </div>
-</div>
-<script>
+</div><script>
 (function(){
 const $=id=>document.getElementById(id),API="https://interactive-studio.convexllc.workers.dev",PLATFORM="is-sites.abrdns.com";
 let user=null,db=null,active=null,domains={},sections=[],selectedSection=0,dragSection=-1,profileHandle="";
