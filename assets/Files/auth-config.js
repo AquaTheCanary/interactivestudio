@@ -235,7 +235,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       beginFreshSession();
       const credential = await auth.signInWithEmailAndPassword(email.trim(), password);
       if (!credential.user.emailVerified) {
-        try { await credential.user.sendEmailVerification(); } catch (_) {}
+        try { await studioAuth.sendVerificationEmail(credential.user); } catch (_) {}
         if (organisation) {
           throw new Error("Your work email is not verified yet. We sent a fresh verification link. Verify it, then sign in again.");
         }
@@ -309,7 +309,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       beginFreshSession();
       const credential = await auth.createUserWithEmailAndPassword(email.trim(), password);
       await credential.user.updateProfile({ displayName: name.trim() });
-      await credential.user.sendEmailVerification();
+      await studioAuth.sendVerificationEmail(credential.user);
       return true;
     },
     async signOut() {
