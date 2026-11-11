@@ -1,6 +1,5 @@
 // Interactive Studio authentication shared by every account page.
-// Configure Google and Microsoft providers in Firebase Authentication.
-// Microsoft uses Firebase's microsoft.com OAuth provider so all sign-ins share one Firebase session.
+// Google and email/password are the supported sign-in methods.
 const firebaseConfig = {
   apiKey: "AIzaSyAHQDuRXq77XRZvnE-dDuoy8A1TLLtfSy8",
   authDomain: "interactive-studio-convexllc.firebaseapp.com",
@@ -124,14 +123,6 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       const credential = await auth.signInWithPopup(provider);
       await studioAuth.finishSignIn(credential.user, organisation);
     },
-    async signInMicrosoft(organisation = false) {
-      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-      const provider = new firebase.auth.OAuthProvider("microsoft.com");
-      provider.setCustomParameters({ prompt: "select_account" });
-      provider.addScope("email");
-      const credential = await auth.signInWithPopup(provider);
-      await studioAuth.finishSignIn(credential.user, organisation);
-    },
     async resetPassword(email) {
       if (!email) throw new Error("Enter your email address first.");
       await auth.sendPasswordResetEmail(email.trim());
@@ -163,7 +154,6 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
   window.studioAuth = studioAuth;
   window.loginWithGoogle = organisation => studioAuth.signInGoogle(!!organisation).catch(showAuthError);
-  window.loginWithMicrosoft = organisation => studioAuth.signInMicrosoft(!!organisation).catch(showAuthError);
   window.showAuthError = showAuthError;
   function showAuthError(error) {
     const message = document.querySelector("[data-auth-message]");
