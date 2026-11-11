@@ -349,6 +349,8 @@ export default {
         // A wildcard CNAME catches future single-label built-in addresses. The
         // exact CNAME is still created for each selected two-label hostname.
         await ensureBuiltInDnsRecord("*." + PLATFORM_HOST, env);
+        await ensureBuiltInDnsRecord("*." + username + "." + PLATFORM_HOST, env);
+        await ensureBuiltInDnsRecord("*." + subdomain + "." + PLATFORM_HOST, env);
         const dns = await ensureBuiltInDnsRecord(hostname, env);
         const host = await connectBuiltInHost(hostname, env);
         return json({ host: {...host,dnsConfigured:true,dnsTarget:dns.target} }, 200, origin);
