@@ -292,28 +292,27 @@ export default {
         const body = await request.json();
         const slug = String(body.websiteSlug || "").toLowerCase();
         const username = String(body.username || "").toLowerCase();
-        const hosts = Array.isArray(body.hostnames) ? body.hostnames.map(value => String(value).toLowerCase()) : [];
-        if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(username) || username.length > 32 || slug.length > 63 || username.length + slug.length + 1 > 63) {
-          return json({ error: "The website slug or username is not valid for DNS hostnames." }, 400, origin);
+        const hostname = String(body.hostname || "").trim().toLowerCase();
+        if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(username) || username.length > 32 || slug.length > 63) {
+          return json({ error: "The website ID or public handle is not valid." }, 400, origin);
         }
         const expected = [
-          username + "." + slug + "." + PLATFORM_HOST,
-          slug + "." + username + "." + PLATFORM_HOST,
-          username + "-" + slug + "." + PLATFORM_HOST,
-          slug + "-" + username + "." + PLATFORM_HOST
+          username + "." + String(body.subdomain || "").toLowerCase() + "." + PLATFORM_HOST,
+          String(body.subdomain || "").toLowerCase() + "." + username + "." + PLATFORM_HOST,
+          username + "-" + String(body.subdomain || "").toLowerCase() + "." + PLATFORM_HOST,
+          String(body.subdomain || "").toLowerCase() + "-" + username + "." + PLATFORM_HOST
         ];
-        if (hosts.length !== 4 || expected.some(host => !hosts.includes(host))) return json({ error: "The four built-in hostnames do not match this website and username." }, 400, origin);
+        if (!expected.includes(hostname)) return json({ error: "Choose one of the four supported address formats for your handle and subdomain." }, 400, origin);
         const site = await readPublicDocument("websites", slug, env, token);
-        if (!site || site.ownerUid !== user.uid || site.username !== username || site.status !== "published") {
-          return json({ error: "You can only provision addresses for your own published website." }, 403, origin);
+        if (!site || site.ownerUid !== user.uid || site.username !== username || site.status !== "published" || site.publishedHostname !== hostname) {
+          return json({ error: "You can only provision the selected address for your own published website." }, 403, origin);
         }
-        const results = [];
-        for (const hostname of expected) {
-          const dns = await ensureBuiltInDnsRecord(hostname, env);
-          const host = await connectBuiltInHost(hostname, env);
-          results.push({...host,dnsConfigured:true,dnsTarget:dns.target});
-        }
-        return json({ hosts: results }, 200, origin);
+        // A wildcard CNAME catches future single-label built-in addresses. The
+        // exact CNAME is still created for each selected two-label hostname.
+        await ensureBuiltInDnsRecord("*." + PLATFORM_HOST, env);
+        const dns = await ensureBuiltInDnsRecord(hostname, env);
+        const host = await connectBuiltInHost(hostname, env);
+        return json({ host: {...host,dnsConfigured:true,dnsTarget:dns.target} }, 200, origin);
       }
       if (url.pathname === "/connectCustomDomain") {
         if (!user.emailVerified) return json({ error: "Verify your email before connecting a custom domain." }, 403, origin);
