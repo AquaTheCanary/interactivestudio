@@ -116,5 +116,20 @@ service cloud.firestore {
           .hasOnly(['status', 'checkedAt', 'updatedAt']);
       allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
     }
+    match /userProfiles/{uid} {
+      allow read, create, update, delete: if signedIn() && request.auth.uid == uid;
+    }
+
+    match /handles/{handle} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.handle == handle
+        && handle.matches('^[a-z0-9](?:[a-z0-9-]{1,22}[a-z0-9]));
+      allow update: if false;
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+
   }
 }
