@@ -29,13 +29,12 @@ The former `/ai/` route redirects to the presentation editor. Built-in AI integr
 
 ## Firebase authentication
 
-The frontend uses Firebase Authentication for a consistent user session. Google and Microsoft sign-in use Firebase OAuth providers.
+The frontend uses Firebase Authentication for a consistent user session. Google sign-in uses Firebase OAuth; email/password accounts require verified email.
 
 In Firebase Console for project `interactive-studio-convexllc`:
 
 1. Open **Authentication → Sign-in method**.
-2. Enable **Email/Password**, **Google**, and **Microsoft** as required.
-3. For Microsoft, configure an Entra app registration and enter its client ID and client secret in Firebase.
+2. Enable **Email/Password** and **Google**.
 4. Add the authorised domains:
    - `aquathecanary.github.io`
    - `interactivestudio.abrdns.com`
@@ -94,4 +93,4 @@ If Firebase reports that previously deployed `generateAI` or `getEntitlements` f
 
 ## Security
 
-Never commit API keys, Microsoft client secrets, Firebase service-account JSON, private signing keys or other credentials to this repository. Keep backend credentials in the relevant provider's secret manager.
+Never commit API keys, Firebase service-account JSON, private signing keys or other credentials to this repository. Keep backend credentials in the relevant provider's secret manager.
