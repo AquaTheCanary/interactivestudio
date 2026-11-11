@@ -1,6 +1,7 @@
 const ALLOWED_ORIGINS = new Set([
   "https://aquathecanary.github.io",
   "https://interactivestudio.abrdns.com",
+  "https://www.interactivestudio.abrdns.com",
   "https://is-sites.abrdns.com"
 ]);
 const FREE_DOMAINS = new Set(["gmail.com","googlemail.com","yahoo.com","yahoo.co.uk","ymail.com","hotmail.com","hotmail.co.uk","outlook.com","outlook.co.uk","live.com","live.co.uk","msn.com","icloud.com","me.com","mac.com","aol.com","mail.com","proton.me","protonmail.com","gmx.com","gmx.co.uk","yandex.com","hey.com","fastmail.com","pm.me","zoho.com"]);
