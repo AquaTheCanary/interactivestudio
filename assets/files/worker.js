@@ -75,9 +75,25 @@ function notPublished(hostname) {
   const html = "<!doctype html><html><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>Website not found</title><body style='font:16px system-ui;background:#f7f8fc;color:#252638;display:grid;place-items:center;min-height:100vh;margin:0'><main style='max-width:520px;padding:32px;text-align:center;background:white;border:1px solid #e7e8f0;border-radius:18px'><h1 style='letter-spacing:-.05em'>This website isn't published yet.</h1><p style='color:#73788a'>The address <b>" + escapeHTML(hostname) + "</b> is not connected to a published Interactive Studio website.</p><a href='https://is-sites.abrdns.com/websites/' style='color:#635bff;font-weight:700'>Create a website with Interactive Studio</a></main></body></html>";
   return new Response(html, {status:404,headers:{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store","X-Content-Type-Options":"nosniff"}});
 }
-async function serveWebsite(request, env) {
+async function verifyApexlyRequest(request, env) {
+  const customerHost = String(request.headers.get("X-Apexly-Host") || "").trim().toLowerCase().replace(/:\\d+$/, "");
+  const timestamp = String(request.headers.get("X-Apexly-Timestamp") || "").trim();
+  const signature = String(request.headers.get("X-Apexly-Signature") || "").trim().toLowerCase();
+  const domainId = String(request.headers.get("X-Apexly-Domain-Id") || "").trim();
+  if (!customerHost || !domainId || !/^\\d{10}$/.test(timestamp) || !/^[a-f0-9]{64}$/.test(signature) || !env.APEXLY_SIGNING_SECRET) return null;
+  const seconds = Number(timestamp);
+  if (!Number.isFinite(seconds) || Math.abs(Math.floor(Date.now() / 1000) - seconds) > 300) return null;
+  if (!/^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$/.test(customerHost)) return null;
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(env.APEXLY_SIGNING_SECRET), {name:"HMAC",hash:"SHA-256"}, false, ["sign"]);
+  const digest = new Uint8Array(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(timestamp + "." + customerHost)));
+  const expected = Array.from(digest, byte => byte.toString(16).padStart(2,"0")).join("");
+  let mismatch = 0;
+  for (let i = 0; i < expected.length; i++) mismatch |= expected.charCodeAt(i) ^ signature.charCodeAt(i);
+  return mismatch === 0 ? customerHost : null;
+}
+async function serveWebsite(request, env, hostnameOverride) {
   if (request.method !== "GET" && request.method !== "HEAD") return new Response("Method not allowed.", {status:405});
-  const host = new URL(request.url).hostname.toLowerCase();
+  const host = String(hostnameOverride || new URL(request.url).hostname).toLowerCase();
   let slug = "";
   if (host.endsWith("." + PLATFORM_HOST)) {
     const hostMapping = await readPublicDocument("websiteHosts", host, env);
@@ -338,6 +354,13 @@ export default {
     const origin = request.headers.get("Origin") || "";
     const url = new URL(request.url);
     const hostname = url.hostname.toLowerCase();
+    // Apexly sends our workers.dev hostname as Host and the visitor's hostname
+    // in X-Apexly-Host. Only trust that tenant hostname after HMAC verification.
+    if (request.headers.has("X-Apexly-Domain-Id")) {
+      const customerHost = await verifyApexlyRequest(request, env);
+      if (!customerHost) return new Response("Forbidden: invalid Apexly proxy signature.", {status:403,headers:{"Cache-Control":"no-store"}});
+      return serveWebsite(request, env, customerHost);
+    }
     if (hostname === PLATFORM_HOST) return proxyStudioApp(request);
     if (hostname !== API_HOST) return serveWebsite(request, env);
     // Pathflo forwards the www platform hostname to this Worker as its workers.dev
