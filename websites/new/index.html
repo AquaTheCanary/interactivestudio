@@ -393,7 +393,6 @@ $("confirm-publish").onclick=async()=>{
  button.textContent="Publishing…";
  try{
   await ensureReady();
-  if(!profileHandle)throw new Error("Create your public handle in Settings first.");
   const previousHost=active.publishedHostname||"";
   if($("publish-target").value==="custom"){
    const hostname=$("custom-domain").value.trim().toLowerCase();
