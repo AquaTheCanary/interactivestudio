@@ -252,10 +252,10 @@ body.page-body{background-image:none!important}
     <label class="field"><span>Publish destination</span><select id="publish-target"><option value="builtin">Free Interactive Studio address</option><option value="custom">A custom domain I own</option></select></label>
     <div id="builtin-publish-fields">
       <label class="field"><span>Subdomain name</span><input id="publish-subdomain" maxlength="40" placeholder="your-site" autocomplete="off"></label>
-      <label class="field"><span>Address format</span><select id="publish-format"><option value="handle-subdomain">handle-subdomain.is-sites.abrdns.com</option><option value="subdomain-handle">subdomain-handle.is-sites.abrdns.com</option><option value="handle.subdomain">handle.subdomain.is-sites.abrdns.com</option><option value="subdomain.handle">subdomain.handle.is-sites.abrdns.com</option></select></label>
+      <label class="field"><span>Address format</span><select id="publish-format"><option value="handle-subdomain">username-site.is-sites.abrdns.com</option><option value="subdomain-handle">site-username.is-sites.abrdns.com</option></select></label>
     </div>
     <div id="custom-publish-fields" class="hidden">
-      <div class="domainbox"><h4>Connect a domain you own</h4><p class="muted">Enter a hostname such as www.example.com. If it is in your connected ClouDNS account, Interactive Studio will create the exact CNAME and certificate-validation records automatically. Otherwise, the DNS records you need will be shown here. Wildcard DNS is already provisioned for the four built-in address patterns; wildcard HTTPS for customer domains requires a separate Cloudflare for SaaS feature.</p>
+      <div class="domainbox"><h4>Connect a domain you own</h4><p class="muted">Enter a hostname such as www.example.com. If it is in your connected ClouDNS account, Interactive Studio will create the exact CNAME and certificate-validation records automatically. Otherwise, the DNS records you need will be shown here. Free Interactive Studio addresses use wildcard DNS and HTTPS, so they are ready without per-site setup. Custom domains are separate: connect a domain you own, point its CNAME to the target shown, and complete the DNS verification records. Automatic HTTPS for custom domains requires the platform custom-hostname service to be configured.</p>
         <label class="field"><span>Custom domain</span><input id="custom-domain" maxlength="253" placeholder="www.example.com" autocomplete="url"></label>
         <div class="actions"><button class="btn" id="connect">Connect domain</button><button class="btn hidden" id="check">Check DNS & SSL</button></div>
         <div class="callout hidden" id="dns"></div><div class="message" id="domain-message" aria-live="polite"></div>
@@ -356,7 +356,7 @@ async function create(){await ensureReady();const name=await askSiteName();if(na
 async function api(path,body){const token=await user.getIdToken(),r=await fetch(API+path,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(body)}),d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||"The domain service could not complete this request.");return d}
 $("new").onclick=$("first").onclick=async()=>{const buttons=[$("new"),$("first")];buttons.forEach(b=>{b.disabled=true;b.textContent="Creating…"});try{await create();msg("create-message","Website created. You can now edit it below.","success")}catch(e){console.error("Website creation failed:",e);msg("create-message",e.message||"Could not create the website. Please try again.","error")}finally{buttons.forEach((b,i)=>{b.disabled=false;b.textContent=i===0?"＋ Create website":"Create your first website →"})}};
 $("save").onclick=async()=>{try{await save("draft");msg("save-message","Draft saved to your account.","success")}catch(e){msg("save-message",e.message,"error")}};
-function selectedHostname(){const sub=slugify($("publish-subdomain").value);if(!profileHandle||!sub)return "";const f=$("publish-format").value;const host=f==="handle-subdomain"?profileHandle+"-"+sub:f==="subdomain-handle"?sub+"-"+profileHandle:f==="handle.subdomain"?profileHandle+"."+sub:sub+"."+profileHandle;return host+"."+PLATFORM}
+function selectedHostname(){const sub=slugify($("publish-subdomain").value);if(!profileHandle||!sub)return "";const f=$("publish-format").value;const host=f==="handle-subdomain"?profileHandle+"-"+sub:sub+"-"+profileHandle;return host+"."+PLATFORM}
 function updatePublishPreview(){
  const custom=$("publish-target").value==="custom";
  $("builtin-publish-fields").classList.toggle("hidden",custom);
@@ -433,19 +433,14 @@ $("confirm-publish").onclick=async()=>{
   active={...active,...update};
   await db.collection("websiteHosts").doc(hostname).set({hostname,websiteSlug:active.slug,ownerUid:user.uid,status:"published",updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
   $("publish-address").textContent="https://"+hostname;
-  $("publish-status").textContent="Website published. Setting up DNS and requesting HTTPS for this address…";
+  $("publish-status").textContent="Website published. Wildcard DNS and HTTPS are already active for this address.";
   $("publish-title").textContent="Your website is published";
   $("open-published").href="https://"+hostname;
   $("open-published").classList.remove("hidden");
   button.textContent="Published ✓";
   button.disabled=true;
   address();
-  msg("save-message","Website published. DNS and HTTPS setup is running.","success");
-  try{
-   const provision=await api("/registerBuiltInHosts",{websiteSlug:active.slug,username:profileHandle,subdomain:sub,hostname});
-   await db.collection("websiteHosts").doc(hostname).set({cloudflareHostnameId:provision.host.id,sslStatus:provision.host.sslStatus,validationRecords:provision.host.validationRecords||[],cnameTarget:provision.host.cnameTarget||"",updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
-   $("publish-status").textContent=provision.host.status==="active"&&provision.host.sslStatus==="active"?"Your address is ready with HTTPS.":"DNS is configured. HTTPS is provisioning; check again shortly.";
-  }catch(domainError){$("publish-status").textContent="Website published, but automatic DNS/HTTPS setup needs attention: "+domainError.message;}
+  msg("save-message","Website published. Your address is ready with HTTPS.","success");
  }catch(e){
   msg("save-message",e.message,"error");
   $("publish-status").textContent=e.message;
