@@ -1,0 +1,13 @@
+{
+  "name": "interactive-studio-sites-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Wildcard hostname gateway for published Interactive Studio websites",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
