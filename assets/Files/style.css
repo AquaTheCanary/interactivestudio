@@ -91,3 +91,20 @@ main{animation:studioEnter .55s cubic-bezier(.2,.7,.2,1) both}
 button,.btn,.btn-primary-small,.btn-primary-large,.btn-launch,.btn-submit,.btn-secondary-small,.btn-secondary-large,.btn-sso{transition:transform .16s ease,background .16s ease,border-color .16s ease,box-shadow .16s ease}
 button:active,.btn:active{transform:translateY(1px)}
 @media(prefers-reduced-motion:reduce){body:before,main{animation:none!important}.feature-card,.pricing-card,.solution-card,.contact-card,.download-card,.project-card,.dashboard-card,button,.btn{transition:none!important}}
+
+
+/* User-selectable appearance. Dark remains the default; light mode overrides shared surfaces. */
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin:10px 12px;padding:9px 13px;border:1px solid #465064;border-radius:999px;background:#151a23;color:#eef1f5;font:600 12px/1.2 inherit;cursor:pointer}
+.theme-toggle:hover{border-color:#8b83ff}
+html[data-theme="light"]{color-scheme:light}
+html[data-theme="light"] body{background:#f7f8fc!important;color:#202431!important}
+html[data-theme="light"] .site-header,html[data-theme="light"] .home-nav,html[data-theme="light"] .app-header{background:#ffffffed!important;border-color:#e5e7ef!important}
+html[data-theme="light"] .nav-links a{color:#555d70}
+html[data-theme="light"] .nav-links a:hover,html[data-theme="light"] .nav-links a.active{color:#282b3b}
+html[data-theme="light"] .feature-card,html[data-theme="light"] .pricing-card,html[data-theme="light"] .solution-card,html[data-theme="light"] .contact-card,html[data-theme="light"] .download-card,html[data-theme="light"] .auth-container,html[data-theme="light"] .dashboard-card,html[data-theme="light"] .panel,html[data-theme="light"] .card,html[data-theme="light"] .modal-content,html[data-theme="light"] .editor-panel,html[data-theme="light"] .ai-sidebar,html[data-theme="light"] .ai-chat{background:#fff!important;color:#202431!important;border-color:#e5e7ef!important;box-shadow:0 8px 28px #2029420d}
+html[data-theme="light"] .feature-card p,html[data-theme="light"] .pricing-card p,html[data-theme="light"] .solution-card p,html[data-theme="light"] .contact-card p,html[data-theme="light"] .download-card p,html[data-theme="light"] .dashboard-card p,html[data-theme="light"] .panel p,html[data-theme="light"] .card p{color:#667085}
+html[data-theme="light"] input,html[data-theme="light"] select,html[data-theme="light"] textarea{background:#fff!important;color:#202431!important;border-color:#dfe3eb!important}
+html[data-theme="light"] .mobile-menu-button,html[data-theme="light"] .btn-secondary-small,html[data-theme="light"] .btn-secondary-large,html[data-theme="light"] .btn-sso{background:#fff!important;color:#202431!important;border-color:#dfe3eb!important}
+html[data-theme="light"] .site-footer,html[data-theme="light"] footer{color:#667085;border-color:#e5e7ef}
+html[data-theme="light"] .theme-toggle{background:#fff;color:#202431;border-color:#dfe3eb}
+html[data-theme="light"] body:before{opacity:.28}
