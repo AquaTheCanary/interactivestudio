@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Websites | Interactive Studio</title><link rel="icon" href="../../assets/images/tablogo.png">
+<link rel="stylesheet" href="../../assets/Files/style.css"><script src="../../assets/Files/router.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="../../assets/Files/auth-config.js"></script>
+<style>
+:root{--blue:#635bff}
+.design-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 12px;margin:18px 0 0;background:#202033;border:1px solid #303047;border-radius:14px 14px 0 0;color:#fff}
+.toolbar-group{display:flex;align-items:center;gap:6px}.toolbar-label,.stage-top{font-size:10px;font-weight:850;letter-spacing:.13em}.toolbar-divider{height:22px;width:1px;background:#4a4a60;margin:0 5px}.toolbtn.compact{display:inline-flex;width:auto;min-width:34px;justify-content:center;align-items:center;margin:0;padding:8px 10px;background:#303047;border-color:#46465f;color:#f5f5ff}.toolbtn.compact.active{background:#635bff;border-color:#8b85ff}.zoom-label{font-size:11px;min-width:42px;text-align:center;color:#e5e5f5}
+.builder{grid-template-columns:205px minmax(0,1fr) 255px;gap:0;margin:0;border:1px solid #e1e2ec;border-top:0;border-radius:0 0 14px 14px;overflow:hidden;background:#fff;box-shadow:0 16px 50px #22223a0c}
+.builder-tools,.builder-properties{border:0;border-radius:0;background:#fff;padding:15px}.builder-tools{border-right:1px solid #e8e9f1}.builder-properties{border-left:1px solid #e8e9f1}.builder-tools h3,.builder-properties h3{color:#777b8e;font-size:10px;letter-spacing:.14em}
+.toolbtn{display:flex;align-items:center;gap:9px;padding:10px;margin:5px 0;border-color:transparent;background:#f7f7fb;font-size:11px;transition:transform .18s,border-color .18s,background .18s}.toolbtn:hover{transform:translateY(-1px);background:#f0efff;border-color:#d9d5ff}
+.panel-rule{height:1px;background:#ececf3;margin:15px 0}.layer-list{display:grid;gap:4px;max-height:260px;overflow:auto}.layer-item{display:flex;align-items:center;gap:8px;width:100%;padding:9px 8px;border:1px solid transparent;border-radius:8px;background:transparent;color:#45475b;text-align:left;font-size:11px;cursor:pointer}.layer-item.active{background:#f0efff;border-color:#d8d4ff;color:#4d45c9;font-weight:800}.layer-icon{width:23px;height:23px;display:grid;place-items:center;border-radius:6px;background:#f0efff;color:#635bff;font-weight:900}
+.builder-stage{background:radial-gradient(#d9dbe5 .8px,transparent .8px);background-size:16px 16px;padding:16px;min-height:620px;overflow:auto}.stage-top{display:flex;justify-content:space-between;color:#73788c;margin:0 auto 12px;max-width:1440px}
+.builder-canvas{width:100%;max-width:1440px;min-height:620px;margin:0 auto;background:#fff;box-shadow:0 12px 42px #25263818;border-radius:8px;overflow:hidden;transition:width .25s ease,transform .25s ease;transform-origin:top center}.builder-canvas.device-tablet{max-width:768px}.builder-canvas.device-mobile{max-width:390px}
+.builder-block{transition:outline-color .18s,box-shadow .18s}.builder-block.selected{border-color:#635bff;box-shadow:inset 0 0 0 1px #635bff}.builder-block:hover:not(.selected){border-color:#b9b4ff}.studio-motion{animation:motionRise .8s cubic-bezier(.2,.7,.2,1) both}.motion-fade{animation-name:motionFade}.motion-zoom{animation-name:motionZoom}.motion-float{animation:motionFloat 4s ease-in-out infinite}@keyframes motionRise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}@keyframes motionFade{from{opacity:0}to{opacity:1}}@keyframes motionZoom{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}@keyframes motionFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@media(max-width:950px){.builder{grid-template-columns:175px minmax(0,1fr)}.builder-properties{grid-column:1/-1;border-left:0;border-top:1px solid #e8e9f1}.builder-properties .actions{display:flex}.builder-stage{min-height:520px}}
+@media(max-width:620px){.design-toolbar{border-radius:12px 12px 0 0}.toolbar-label{display:none}.builder{grid-template-columns:1fr}.builder-tools{border-right:0;border-bottom:1px solid #e8e9f1}.layer-list{grid-template-columns:repeat(2,minmax(0,1fr));max-height:150px}.builder-stage{padding:9px;min-height:450px}.builder-canvas{min-height:500px}.builder-properties{grid-column:auto}.builder-tools .toolbtn{display:inline-flex;width:calc(50% - 5px)}}
+
+.builder{display:grid;grid-template-columns:170px minmax(0,1fr) 240px;gap:12px;margin:18px 0}
+.builder-tools,.builder-properties{background:#fafaff;border:1px solid #e7e8f0;border-radius:12px;padding:12px;min-width:0}
+.builder-tools h3,.builder-properties h3{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#85899b;margin:4px 0 12px}
+.toolbtn{display:block;width:100%;text-align:left;margin:7px 0;padding:11px;border:1px solid #e5e5ef;border-radius:9px;background:white;color:#34364a;font-weight:700;font-size:12px;cursor:pointer}
+.builder-stage{background:#eceef5;border:1px solid #e4e6ef;border-radius:12px;padding:14px;min-width:0;overflow:auto}
+.builder-canvas{width:100%;max-width:900px;min-height:520px;margin:auto;background:white;box-shadow:0 8px 30px #25263812;border-radius:5px;overflow:hidden}
+.builder-block{position:relative;border:2px solid transparent;cursor:grab;overflow-wrap:anywhere}
+.builder-block.selected{border-color:#635bff;outline:2px solid #635bff22}
+.builder-block h1{font-size:clamp(30px,5vw,60px);line-height:1.05;letter-spacing:-.06em;margin:12px 0}
+.builder-block h2{font-size:26px;letter-spacing:-.04em;margin:6px 0}
+.builder-block p{font-size:15px;line-height:1.7;white-space:pre-wrap}
+.builder-block img{display:block;max-width:100%;max-height:300px;object-fit:cover;margin:auto;border-radius:10px}
+.prop-field{display:block;margin:10px 0}.prop-field span{display:block;font-size:10px;font-weight:750;color:#666b7e;margin-bottom:5px}.prop-field input,.prop-field textarea,.prop-field select{width:100%;padding:9px;border:1px solid #e1e3ec;border-radius:8px;font:inherit;font-size:12px;background:white}.prop-field textarea{min-height:75px}
+.site-name-edit{width:min(300px,100%);padding:9px 11px;border:1px solid #e3e5ee;border-radius:9px;font:inherit;font-size:13px}
+.create-overlay{position:fixed;inset:0;background:#17172b88;display:none;place-items:center;padding:20px;z-index:9999}.create-overlay.open{display:grid}.create-modal{width:min(420px,100%);background:white;border-radius:18px;padding:24px}.create-modal input{width:100%;padding:12px;border:1px solid #dddfea;border-radius:9px;font:inherit;margin:10px 0}
+@media(max-width:850px){.builder{grid-template-columns:1fr}.builder-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.builder-tools h3,.builder-tools .muted{grid-column:1/-1}.builder-properties{order:3}}body{background:#f7f8fc;color:#252638}.shell{max-width:1440px;margin:auto;padding:34px 26px 70px}.head{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:24px}.head h1{font-size:clamp(30px,5vw,46px);letter-spacing:-.065em;margin:7px 0}.head p{color:#777d90;margin:0;font-size:13px}.layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:18px;align-items:start}.panel{background:#fff;border:1px solid #e7e8f0;border-radius:16px;box-shadow:0 10px 35px #27264a08}.list{padding:16px;position:sticky;top:90px}.panel-title{font-size:11px;font-weight:850;letter-spacing:.13em;color:#85899b;margin:3px 0 13px}.items{display:flex;flex-direction:column}.item{display:block;width:100%;text-align:left;padding:12px;border:1px solid transparent;background:#fafaff;border-radius:11px;margin:7px 0;cursor:pointer;color:#303247}.item.active{border-color:#c9c5ff;background:#f4f2ff}.item strong{display:block;font-size:12px}.item small{display:block;color:#85899b;margin-top:4px}.main{padding:22px;min-width:0}.empty{padding:54px 22px;text-align:center}.empty h2{font-size:25px;letter-spacing:-.05em;margin:0 0 8px}.empty p{max-width:480px;margin:0 auto 20px;color:#777d90;font-size:13px;line-height:1.7}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.field{display:block;margin:12px 0}.field span{display:block;font-size:11px;font-weight:750;color:#666b7e;margin:0 0 6px}.field input,.field textarea{width:100%;border:1px solid #e3e5ee;border-radius:9px;padding:11px 12px;font:inherit;font-size:13px;color:#282a3b;background:#fff}.field textarea{min-height:90px;resize:vertical;line-height:1.5}.field input:focus,.field textarea:focus{outline:3px solid #635bff18;border-color:#aaa5ff}.muted{font-size:11px;color:#8b90a1;line-height:1.6}.slugrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.slugrow input{min-width:130px;flex:1}.suffix{font-size:11px;color:#85899a}.actions{display:flex;gap:8px;flex-wrap:wrap;margin:17px 0}.btn{border:1px solid #e3e4ed;border-radius:9px;background:#fff;padding:10px 14px;font-size:12px;font-weight:750;cursor:pointer;color:#41445a}.btn.primary{background:#635bff;border-color:#635bff;color:#fff}.btn:disabled{opacity:.55;cursor:wait}.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:22px 0 8px}.sectionhead h3{font-size:15px;letter-spacing:-.03em;margin:0}.status{display:inline-flex;font-size:10px;font-weight:800;padding:5px 8px;border-radius:20px;background:#f1efff;color:#6259dd}.status.live{background:#eaf8f1;color:#247c55}.callout{background:#f5f4ff;border:1px solid #e5e2ff;border-radius:10px;padding:12px;color:#59558a;font-size:11px;line-height:1.65;overflow-wrap:anywhere}.domainbox{padding:15px;border:1px solid #e8e8f1;border-radius:12px;background:#fcfcff;margin-top:12px}.domainbox h4{font-size:13px;margin:0 0 5px}.previewwrap{background:#f0f1f7;border:1px solid #e7e8f0;border-radius:12px;padding:12px}.preview{display:block;width:100%;height:420px;border:1px solid #e4e5ed;border-radius:8px;background:#fff}.message{min-height:18px;color:#767b8e;font-size:11px;margin-top:8px}.message.error{color:#bd3b50}.message.success{color:#237a54}.hidden{display:none!important}@media(max-width:900px){.layout{grid-template-columns:1fr}.list{position:static}.items{flex-direction:row;gap:7px;overflow:auto}.item{min-width:170px;margin:0}}@media(max-width:600px){.shell{padding:22px 14px 50px}.main{padding:16px}.grid{grid-template-columns:1fr}.suffix{white-space:normal}.preview{height:360px}}
+
+/* Final cascade: keep the design workspace rules above legacy builder defaults. */
+.design-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 12px;margin:18px 0 0;background:#202033;border:1px solid #303047;border-radius:14px 14px 0 0;color:#fff}
+.toolbar-group{display:flex;align-items:center;gap:6px}.toolbar-divider{height:22px;width:1px;background:#4a4a60;margin:0 5px}.toolbar-label,.stage-top{font-size:10px;font-weight:850;letter-spacing:.13em}.toolbtn.compact{display:inline-flex;width:auto;min-width:34px;justify-content:center;align-items:center;margin:0;padding:8px 10px;background:#303047;border:1px solid #46465f;color:#f5f5ff}.toolbtn.compact.active{background:#635bff;border-color:#8b85ff}.zoom-label{font-size:11px;min-width:42px;text-align:center;color:#e5e5f5}
+.builder{display:grid;grid-template-columns:205px minmax(0,1fr) 255px;gap:0;margin:0;border:1px solid #e1e2ec;border-top:0;border-radius:0 0 14px 14px;overflow:hidden;background:#fff;box-shadow:0 16px 50px #22223a0c}
+.builder-tools,.builder-properties{border:0;border-radius:0;background:#fff;padding:15px;min-width:0}.builder-tools{border-right:1px solid #e8e9f1}.builder-properties{border-left:1px solid #e8e9f1}.builder-tools h3,.builder-properties h3{color:#777b8e;font-size:10px;letter-spacing:.14em}
+.builder-tools .toolbtn{display:flex;align-items:center;gap:9px;padding:10px;margin:5px 0;border:1px solid transparent;border-radius:8px;background:#f7f7fb;font-size:11px;transition:transform .18s,border-color .18s,background .18s}.builder-tools .toolbtn:hover{transform:translateY(-1px);background:#f0efff;border-color:#d9d5ff}
+.panel-rule{height:1px;background:#ececf3;margin:15px 0}.layer-list{display:grid;gap:4px;max-height:260px;overflow:auto}.layer-item{display:flex;align-items:center;gap:8px;width:100%;padding:9px 8px;border:1px solid transparent;border-radius:8px;background:transparent;color:#45475b;text-align:left;font-size:11px;cursor:pointer}.layer-item.active{background:#f0efff;border-color:#d8d4ff;color:#4d45c9;font-weight:800}.layer-icon{width:23px;height:23px;display:grid;place-items:center;border-radius:6px;background:#f0efff;color:#635bff;font-weight:900}
+.builder-stage{background:radial-gradient(#d9dbe5 .8px,transparent .8px);background-size:16px 16px;padding:16px;min-height:620px;overflow:auto}.stage-top{display:flex;justify-content:space-between;color:#73788c;margin:0 auto 12px;max-width:1440px}.builder-canvas{width:100%;max-width:1440px;min-height:620px;margin:0 auto;background:#fff;box-shadow:0 12px 42px #25263818;border-radius:8px;overflow:hidden;transition:width .25s ease,transform .25s ease;transform-origin:top center}.builder-canvas.device-tablet{max-width:768px}.builder-canvas.device-mobile{max-width:390px}.builder-block{transition:outline-color .18s,box-shadow .18s}.builder-block.selected{border-color:#635bff;box-shadow:inset 0 0 0 1px #635bff}.builder-block:hover:not(.selected){border-color:#b9b4ff}
+@media(max-width:950px){.builder{grid-template-columns:175px minmax(0,1fr)}.builder-properties{grid-column:1/-1;border-left:0;border-top:1px solid #e8e9f1}.builder-properties .actions{display:flex}.builder-stage{min-height:520px}}
+@media(max-width:620px){.design-toolbar{border-radius:12px 12px 0 0}.toolbar-label{display:none}.builder{grid-template-columns:1fr}.builder-tools{border-right:0;border-bottom:1px solid #e8e9f1}.layer-list{grid-template-columns:repeat(2,minmax(0,1fr));max-height:150px}.builder-stage{padding:9px;min-height:450px}.builder-canvas{min-height:500px}.builder-properties{grid-column:auto}.builder-tools .toolbtn{display:inline-flex;width:calc(50% - 5px)}}
+
+/* Aura pass: luminous workspace chrome, sharper hierarchy and tactile controls. */
+:root{--studio-ink:#20213a;--studio-violet:#655bff;--studio-lilac:#a99fff;--studio-line:#e8e7f2}
+body{background:radial-gradient(ellipse at 12% 0%,#eeebff 0,transparent 34%),radial-gradient(ellipse at 92% 12%,#e5f5ff 0,transparent 30%),#f7f8fc}
+.shell{max-width:1560px;padding-top:42px}
+.head{position:relative;padding:25px 28px;border:1px solid #ffffffc9;border-radius:22px;background:linear-gradient(115deg,#fffefaed,#f7f5ffed 55%,#f0f8ffed);box-shadow:0 18px 60px #4437a012;overflow:hidden}
+.head:after{content:"";position:absolute;width:260px;height:260px;right:-90px;top:-150px;border-radius:50%;background:radial-gradient(circle,#b9adff66,transparent 70%);pointer-events:none}
+.head h1{font-size:clamp(34px,5.5vw,54px);background:linear-gradient(100deg,#24243c 5%,#6657e8 58%,#2699c9);-webkit-background-clip:text;background-clip:text;color:transparent}
+.head p{font-size:14px;max-width:560px;line-height:1.7}
+.panel{border-color:#e6e5f0;box-shadow:0 14px 45px #302b6410}
+.list{background:#ffffffd9;backdrop-filter:blur(14px)}
+.main{background:#ffffffed;backdrop-filter:blur(16px)}
+.design-toolbar{background:linear-gradient(105deg,#1e2038,#302a59 60%,#263f5d);border-color:#49436e;box-shadow:0 12px 30px #342c6b24}
+.toolbtn.compact{transition:transform .18s,background .18s,box-shadow .18s}
+.toolbtn.compact:hover{transform:translateY(-2px);background:#48416e;box-shadow:0 5px 15px #09091d55}
+.builder{border-color:#dcdbea;box-shadow:0 22px 65px #29244b15}
+.builder-tools,.builder-properties{background:linear-gradient(180deg,#fff,#fbfaff)}
+.builder-stage{background-color:#f2f1f9;background-image:radial-gradient(#c7c5d8 .8px,transparent .8px);background-size:17px 17px}
+.builder-canvas{box-shadow:0 18px 55px #27234220,0 2px 8px #2723420b}
+.layer-item{transition:background .16s,border-color .16s,transform .16s}
+.layer-item:hover{background:#f7f5ff;transform:translateX(2px)}
+.builder-tools .toolbtn{box-shadow:0 2px 5px #29244b08}
+.builder-tools .toolbtn:active,.btn:active{transform:translateY(1px)}
+.btn{transition:transform .16s,box-shadow .16s,border-color .16s}
+.btn:hover{box-shadow:0 7px 18px #332c6816;transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(110deg,#665bff,#8a63ed 60%,#4b9bd8);border-color:transparent;box-shadow:0 7px 20px #685bff35}
+.btn.primary:hover{box-shadow:0 10px 26px #685bff50}
+.prop-field input:focus,.prop-field textarea:focus,.prop-field select:focus{outline:3px solid #7568ff20;border-color:#8b80ff;box-shadow:0 0 0 1px #8b80ff22}
+.status{letter-spacing:.04em}
+.callout{background:linear-gradient(110deg,#f4f1ff,#eff8ff);border-color:#e2defe}
+@media(max-width:620px){.head{padding:20px 18px;border-radius:17px}.shell{padding-top:24px}.builder{border-radius:0 0 12px 12px}}
+
+
+/* NIGHTSHIFT — dark, cinematic editor skin */
+:root{color-scheme:dark;--night:#08090f;--panel:#10121c;--panel2:#151827;--line:#252a3b;--muted:#9299ad;--electric:#8b7cff;--cyan:#69d9f2}
+html{background:#08090f}
+body.page-body{color:#eef0fa;background:radial-gradient(ellipse at 8% -10%,#4535a333,transparent 34%),radial-gradient(ellipse at 95% 8%,#087e9d22,transparent 30%),linear-gradient(145deg,#08090f,#0b0d15 55%,#090b12);background-attachment:fixed}
+.home-nav{background:#090b12e8!important;border-bottom:1px solid #252a3b!important;backdrop-filter:blur(22px);box-shadow:0 10px 40px #0005}
+.home-nav .brand-name,.home-nav .nav-links a,.home-nav .user-email-badge{color:#e8eaf6!important}
+.home-nav .nav-links a.active{color:#a99fff!important}
+.home-nav .nav-links a:hover{color:#8de6fa!important}
+.shell{animation:nightEnter .7s cubic-bezier(.2,.75,.2,1) both}
+@keyframes nightEnter{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.head{background:linear-gradient(115deg,#121522f2,#151326f2 55%,#0d1b26f2)!important;border:1px solid #35334f!important;box-shadow:0 22px 80px #0006,inset 0 1px #ffffff0b!important}
+.head:before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 25%,#a69aff0b 48%,transparent 72%);transform:translateX(-100%);animation:headSheen 8s ease-in-out infinite;pointer-events:none}
+@keyframes headSheen{0%,65%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.head h1{background:linear-gradient(100deg,#fff 5%,#b7aaff 55%,#78dff4);-webkit-background-clip:text;background-clip:text;color:transparent}
+.head p{color:#a7aec2!important}
+.section-kicker,.panel-title,.toolbar-label,.stage-top{color:#9d94ff!important}
+.panel,.list,.main{background:linear-gradient(160deg,#111420f5,#0d1019f5)!important;border-color:#282d40!important;color:#edf0fb;box-shadow:0 20px 65px #0005!important}
+.list{backdrop-filter:blur(18px)}
+.item{background:#171b29!important;color:#edf0fb!important;border-color:#242a3d!important;transition:transform .2s,border-color .2s,background .2s,box-shadow .2s}
+.item:hover{transform:translateY(-2px);border-color:#655bff!important;box-shadow:0 8px 22px #0005}
+.item.active{background:linear-gradient(110deg,#292344,#172b39)!important;border-color:#8c7cff!important;box-shadow:0 0 0 1px #8c7cff22,0 8px 24px #0005}
+.item small,.muted,.head p{color:#9299ad!important}
+.empty h2,.main h2,.sectionhead h3{color:#f4f5ff}
+.empty p{color:#a1a8bb}
+.field span,.prop-field span{color:#b6bdd0!important}
+.field input,.field textarea,.site-name-edit,.prop-field input,.prop-field textarea,.prop-field select,.create-modal input{background:#0b0e17!important;color:#f1f3ff!important;border:1px solid #30364b!important}
+.field input:focus,.field textarea:focus,.prop-field input:focus,.prop-field textarea:focus,.prop-field select:focus{border-color:#8b7cff!important;outline:3px solid #8b7cff2b!important;box-shadow:0 0 22px #8b7cff1c!important}
+.btn{background:#171b29!important;color:#e9ecf8!important;border-color:#30364b!important}
+.btn:hover{border-color:#8275ff!important;box-shadow:0 8px 26px #0008!important}
+.btn.primary{background:linear-gradient(110deg,#7668ff,#986dff 58%,#36b9d5)!important;color:#fff!important;border:0!important;box-shadow:0 8px 28px #7668ff42!important}
+.btn.primary:hover{box-shadow:0 10px 34px #7668ff65!important}
+.status{background:#282344!important;color:#c1b8ff!important}
+.status.live{background:#12382f!important;color:#7de5ba!important}
+.callout{background:linear-gradient(110deg,#1d1934,#10232d)!important;border-color:#373052!important;color:#c5c4e8!important}
+.domainbox{background:#101521!important;border-color:#2b3042!important;color:#edf0fb}
+.design-toolbar{background:linear-gradient(105deg,#080a11,#17152b 58%,#10212b)!important;border:1px solid #34334e!important;box-shadow:0 15px 42px #0008!important}
+.toolbtn.compact{background:#1b2030!important;border-color:#343b52!important;color:#eef0ff!important}
+.toolbtn.compact:hover,.toolbtn.compact.active{background:linear-gradient(110deg,#6356d9,#286b80)!important;border-color:#9d91ff!important}
+.builder{background:#0d1019!important;border-color:#30354a!important;box-shadow:0 24px 80px #0009!important}
+.builder-tools,.builder-properties{background:linear-gradient(180deg,#111521,#0c1019)!important;color:#eef0fb!important}
+.builder-tools{border-right:1px solid #292f43!important}.builder-properties{border-left:1px solid #292f43!important}
+.builder-tools h3,.builder-properties h3{color:#a39aff!important}
+.builder-tools .toolbtn{background:#191e2c!important;color:#e8ebf8!important;border-color:#282f43!important}
+.builder-tools .toolbtn:hover{background:#24213d!important;border-color:#7165df!important;box-shadow:0 8px 22px #0006!important}
+.panel-rule{background:#292f43!important}
+.layer-item{color:#c8cde0!important}.layer-item:hover{background:#1b2030!important}
+.layer-item.active{background:linear-gradient(110deg,#292344,#152a36)!important;border-color:#7568ef!important;color:#fff!important}
+.layer-icon{background:#282344!important;color:#bcb1ff!important}
+.builder-stage{background-color:#0b0e16!important;background-image:radial-gradient(#35394d .8px,transparent .8px)!important}
+.builder-canvas{background:#fff!important;box-shadow:0 24px 80px #0009,0 0 0 1px #ffffff1c!important}
+.builder-block.selected{border-color:#897cff!important;box-shadow:inset 0 0 0 1px #897cff,0 0 0 2px #897cff2b!important}
+.prop-field input,.prop-field textarea,.prop-field select{border-radius:9px!important}
+.create-overlay{background:#02030bd9!important;backdrop-filter:blur(12px)}
+.create-modal{background:linear-gradient(145deg,#171b2a,#0e111b)!important;border:1px solid #353b51!important;color:#f4f5ff;box-shadow:0 28px 100px #000b}
+.message{color:#a1a8bc}.message.success{color:#75e1b5}.message.error{color:#ff8298}
+#editor-title{color:#f3f4ff!important}
+#builder-site-name{min-height:40px}
+#save,#publish,#unpublish,#preview-button{border-radius:10px}
+#publish{box-shadow:0 0 26px #6e61ff2b}
+@media(max-width:950px){.builder-properties{border-top:1px solid #292f43!important}.builder-tools{border-bottom:1px solid #292f43!important}}
+@media(max-width:620px){.head{border-radius:18px!important}.builder{border-radius:0 0 14px 14px!important}.main{border-radius:14px!important}.design-toolbar{border-radius:14px 14px 0 0!important}.builder-tools,.builder-properties{border-radius:0!important}}
+@media(prefers-reduced-motion:reduce){.shell,.head:before{animation:none!important}.btn,.item,.toolbtn,.layer-item{transition:none!important}}
+
+
+/* RENDER-INSPIRED WORKSPACE REFRESH */
+:root{color-scheme:dark;--render-bg:#0e1014;--render-panel:#15181e;--render-panel-2:#1b1f27;--render-border:#2b303a;--render-text:#e8ebf0;--render-muted:#969eaa;--render-green:#46d39a;--render-blue:#8bb8ff}
+html,body.page-body{background:var(--render-bg)!important;color:var(--render-text)!important}
+body.page-body{background-image:none!important}
+.home-nav{min-height:62px!important;padding:0 26px!important;background:#101216f5!important;border-bottom:1px solid var(--render-border)!important;box-shadow:none!important}
+.home-nav .brand-logo{max-height:27px!important}
+.home-nav .brand-name,.home-nav .nav-links a,.home-nav .user-email-badge{color:#cbd1db!important}
+.home-nav .nav-links a{font-size:13px!important;font-weight:600!important}
+.home-nav .nav-links a.active{color:#fff!important;border-bottom:2px solid var(--render-green)!important}
+.home-nav .nav-links a:hover{color:var(--render-green)!important}
+.shell{max-width:1500px!important;padding:34px 28px 72px!important;animation:none!important}
+.head{padding:0 0 22px!important;margin:0 0 24px!important;border:0!important;border-bottom:1px solid var(--render-border)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+.head:before,.head:after{display:none!important}
+.head h1{font-size:clamp(28px,4vw,38px)!important;letter-spacing:-.045em!important;background:none!important;color:#f3f5f8!important;-webkit-text-fill-color:currentColor!important}
+.head p{color:var(--render-muted)!important;font-size:13px!important}
+.section-kicker,.panel-title,.toolbar-label,.stage-top{color:#9ca6b5!important;letter-spacing:.11em!important}
+.layout{grid-template-columns:245px minmax(0,1fr)!important;gap:18px!important}
+.panel,.list,.main{background:var(--render-panel)!important;border:1px solid var(--render-border)!important;border-radius:10px!important;box-shadow:none!important;color:var(--render-text)!important}
+.list{padding:15px!important;position:sticky!important;top:82px!important}
+.panel-title{font-size:10px!important;margin:4px 0 12px!important}
+.item{background:transparent!important;border:1px solid transparent!important;border-radius:7px!important;color:#dce1e9!important;padding:11px!important;margin:3px 0!important}
+.item:hover{background:#20252d!important;border-color:#343b47!important;transform:none!important;box-shadow:none!important}
+.item.active{background:#1c2927!important;border-color:#315b4c!important;box-shadow:inset 2px 0 var(--render-green)!important}
+.item strong{font-size:12px!important}.item small{color:var(--render-muted)!important}
+.main{padding:22px!important}
+.empty h2,.main h2,.sectionhead h3{color:#f1f3f6!important}
+.empty p,.muted,.head p{color:var(--render-muted)!important}
+.btn{background:#20252d!important;border:1px solid #343b47!important;color:#e7ebf1!important;border-radius:7px!important;box-shadow:none!important;transition:background .15s,border-color .15s!important}
+.btn:hover{background:#292f39!important;border-color:#596575!important;transform:none!important;box-shadow:none!important}
+.btn.primary{background:var(--render-green)!important;color:#07160f!important;border:1px solid var(--render-green)!important;font-weight:750!important;box-shadow:none!important}
+.btn.primary:hover{background:#62e2ad!important}
+.status{background:#252b35!important;color:#c3ccd8!important;border:1px solid #343c49!important;border-radius:5px!important}
+.status.live{background:#173328!important;color:#70e0ad!important;border-color:#285b45!important}
+.callout{background:#111b1b!important;border:1px solid #2b5145!important;color:#bfe8d6!important;border-radius:7px!important}
+.domainbox{background:#11151b!important;border:1px solid var(--render-border)!important;border-radius:8px!important}
+.field input,.field textarea,.site-name-edit,.prop-field input,.prop-field textarea,.prop-field select,.create-modal input{background:#0d1015!important;border:1px solid #343b47!important;color:#edf0f5!important;border-radius:6px!important}
+.field input:focus,.field textarea:focus,.prop-field input:focus,.prop-field textarea:focus,.prop-field select:focus{border-color:var(--render-blue)!important;outline:2px solid #8bb8ff20!important;box-shadow:none!important}
+.design-toolbar{background:#171b22!important;border:1px solid #303743!important;border-radius:8px 8px 0 0!important;box-shadow:none!important}
+.toolbtn.compact{background:#252b34!important;border:1px solid #39414e!important;color:#e4e9f0!important;border-radius:6px!important}
+.toolbtn.compact:hover,.toolbtn.compact.active{background:#293d38!important;border-color:#4c9b7a!important;color:#8de8ba!important}
+.builder{background:#11151b!important;border:1px solid #303743!important;border-radius:0 0 8px 8px!important;box-shadow:none!important}
+.builder-tools,.builder-properties{background:#151920!important;color:#e8ebf0!important}
+.builder-tools{border-right:1px solid #303743!important}.builder-properties{border-left:1px solid #303743!important}
+.builder-tools h3,.builder-properties h3{color:#aab3c0!important}
+.builder-tools .toolbtn{background:#1c222b!important;border:1px solid #303743!important;color:#dfe5ed!important;border-radius:6px!important;box-shadow:none!important}
+.builder-tools .toolbtn:hover{background:#242d38!important;border-color:#587c9f!important;box-shadow:none!important}
+.panel-rule{background:#303743!important}
+.layer-item{color:#cbd3de!important;border-radius:6px!important}
+.layer-item:hover{background:#202731!important;transform:none!important}
+.layer-item.active{background:#1b302a!important;border-color:#356c54!important;color:#91e8bb!important}
+.layer-icon{background:#263b34!important;color:#8de4b7!important;border-radius:5px!important}
+.builder-stage{background-color:#0e1218!important;background-image:radial-gradient(#333b48 .7px,transparent .7px)!important}
+.builder-canvas{background:#fff!important;box-shadow:0 12px 35px #0008!important;border-radius:3px!important}
+.builder-block.selected{border-color:#438f70!important;box-shadow:inset 0 0 0 1px #438f70!important}
+.create-overlay{background:#05070bcc!important;backdrop-filter:blur(8px)!important}
+.create-modal{background:#171c24!important;border:1px solid #343d4a!important;color:#f1f4f8!important;box-shadow:0 24px 80px #000b!important;border-radius:10px!important}
+.message{color:#9ca6b5!important}.message.success{color:#70e0ad!important}.message.error{color:#ff8793!important}
+#editor-title{color:#f1f4f8!important}
+@media(max-width:900px){.layout{grid-template-columns:1fr!important}.list{position:static!important}}
+@media(max-width:620px){.shell{padding:22px 14px 48px!important}.home-nav{padding:0 14px!important}.main{padding:15px!important}.head{padding-bottom:18px!important}.builder{border-radius:0 0 8px 8px!important}}
+
+
+.username-field{display:inline-flex;align-items:center;gap:8px;margin-left:8px;color:#aeb7c7;font-size:11px}.username-field input{width:140px;padding:9px 10px;border:1px solid #303846;border-radius:8px;background:#0d121a;color:#f1f3f6;font:inherit}.publish-overlay{position:fixed;inset:0;z-index:10000;display:none;place-items:center;padding:20px;background:#05070bd9;backdrop-filter:blur(12px)}
+.publish-overlay.open{display:grid}
+.publish-modal{width:min(760px,100%);max-height:92vh;overflow:auto;padding:30px;border:1px solid #343d4a;border-radius:18px;background:linear-gradient(150deg,#171c27,#10141d);color:#f1f4f8;box-shadow:0 30px 100px #000b;animation:publishEnter .28s ease both}
+.publish-modal-kicker{font-size:10px;font-weight:850;letter-spacing:.16em;color:#a99fff}
+.publish-modal h2{font-size:clamp(26px,5vw,36px);letter-spacing:-.06em;margin:12px 0}
+.publish-modal>p{font-size:13px;line-height:1.7;color:#a5afbf}
+.publish-alternatives{display:grid;gap:8px;margin:14px 0}.publish-alternatives strong{font-size:11px;color:#a99fff}.publish-alternatives a{display:block;padding:9px 11px;border:1px solid #29313e;border-radius:8px;background:#0d121a;color:#cbd5e1;font-size:11px;overflow-wrap:anywhere;text-decoration:none}.publish-alternatives a:hover{border-color:#625bff;color:#fff}.callout#built-url{white-space:pre-line}.publish-address{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:22px 0;padding:12px;border:1px solid #303949;border-radius:11px;background:#0b1018}
+.publish-address span{font-size:12px;overflow-wrap:anywhere;color:#dce5f3}
+.publish-actions{display:flex;gap:9px;flex-wrap:wrap}
+.publish-footnote{margin:18px 0 0!important;font-size:11px!important}
+@keyframes publishEnter{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+body[data-website-page="publish"] main.shell{display:none!important}body[data-website-page="publish"] .publish-overlay{display:flex!important;position:static!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;background:transparent!important;padding:22px!important}body[data-website-page="publish"] .publish-modal{width:min(900px,100%);max-height:none;overflow:visible}</style></head>
+<body class="page-body" data-website-page="publish">
+<header class="home-nav"><div class="nav-brand"><a data-route="/home/"><img src="../../assets/images/headerlogo.png" class="brand-logo" alt="Interactive Studio"></a><span class="brand-name">Websites</span></div><nav class="nav-links"><a data-route="/dashboard/">Workspace</a><a data-route="/presentations/editor/">Presentations</a><a data-route="/websites/new/" class="active">Websites</a><a data-route="/settings/">Settings</a></nav><div class="nav-actions"><span class="user-email-badge" id="account">Loading account…</span></div></header>
+<main class="shell">
+<div class="head"><div><div class="section-kicker">PUBLISHING STUDIO</div><h1>Your websites.</h1><p>Build, preview and publish a website with its own address.</p></div><button class="btn primary" id="new" disabled>＋ Create website</button></div>
+<div class="layout">
+<aside class="panel list"><div class="panel-title">YOUR WEBSITES</div><div class="items" id="items"><p class="muted">Loading websites…</p></div></aside>
+<section class="panel main">
+<div class="empty" id="empty"><h2>Make your first website.</h2><p>Create a responsive website, edit its content and colours, then publish it to a free Interactive Studio address. You can connect a domain you already own too.</p><div class="message" id="create-message" aria-live="polite"></div><button class="btn primary" id="first" disabled>Loading your workspace…</button></div>
+<div id="editor" class="hidden">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap"><div><div class="section-kicker">WEBSITE EDITOR</div><h2 id="editor-title" style="font-size:25px;letter-spacing:-.05em;margin:5px 0">Untitled website</h2><span id="site-status" class="status">Draft</span></div><a id="open-live" class="btn hidden" target="_blank" rel="noopener">Open published site ↗</a></div>
+<div class="builder-top" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:16px 0">
+<input id="builder-site-name" class="site-name-edit" maxlength="70" placeholder="Website name"><span class="muted" id="builder-handle-note">Your public handle is managed in Settings.</span>
+<span class="muted">Drag sections to reorder · Select a section to edit</span></div>
+<div class="design-toolbar"><div class="toolbar-group"><button class="toolbtn compact" id="undo" title="Undo">↶</button><button class="toolbtn compact" id="redo" title="Redo">↷</button><span class="toolbar-divider"></span><span class="toolbar-label">DESIGN CANVAS</span></div><div class="toolbar-group"><button class="toolbtn compact device active" data-device="desktop">Desktop</button><button class="toolbtn compact device" data-device="tablet">Tablet</button><button class="toolbtn compact device" data-device="mobile">Mobile</button><span class="toolbar-divider"></span><button class="toolbtn compact" id="zoom-out">−</button><span id="zoom-label" class="zoom-label">100%</span><button class="toolbtn compact" id="zoom-in">＋</button></div></div>
+<div class="builder"><aside class="builder-tools"><h3>Layers</h3><div id="layer-list" class="layer-list"><p class="muted">Your page layers appear here.</p></div><div class="panel-rule"></div><h3>Insert</h3>
+<button class="toolbtn" data-add="hero">▰ Hero section</button><button class="toolbtn" data-add="text">≡ Text section</button><button class="toolbtn" data-add="image">▧ Image / media</button><button class="toolbtn" data-add="button">↗ Button / link</button><button class="toolbtn" data-add="features">▦ Feature cards</button><p class="muted">Add sections, select them on the canvas, and arrange your page before publishing.</p></aside>
+<div class="builder-stage"><div class="stage-top"><span>PAGE · HOME</span><span id="canvas-size">Desktop · 1440px</span></div><div id="builder-canvas" class="builder-canvas device-desktop"></div></div>
+<aside class="builder-properties"><h3>Design properties</h3><div id="builder-properties-body" class="muted">Select a layer to inspect and edit it.</div><div class="actions"><button class="btn" id="move-up">↑ Move up</button><button class="btn" id="move-down">↓ Move down</button><button class="btn" id="delete-section">Delete</button></div></aside></div>
+<div class="actions"><button class="btn" id="save">Save draft</button><button class="btn" id="preview-button">Refresh preview</button><button class="btn primary" id="publish">Publish… ↗</button><button class="btn hidden" id="unpublish">Unpublish</button></div>
+<div class="message" id="save-message" aria-live="polite"></div><div class="sectionhead"><h3>Built-in address</h3><span class="status" id="built-status">Not published</span></div><div class="callout" id="built-url">Save your website to reserve its built-in address.</div>
+
+<div id="legacy-fields" class="hidden"><input id="site-name"><input id="slug"><input id="description"><input id="eyebrow"><input id="headline"><textarea id="subheadline"></textarea><textarea id="body-copy"></textarea><input id="button-label"><input id="button-url"><input id="accent" type="color" value="#635bff"><input id="background" type="color" value="#f7f8fc"></div>
+<div class="sectionhead"><h3>Website preview</h3><span class="muted">Select Preview to refresh</span></div><div class="previewwrap"><iframe class="preview" id="frame" title="Website preview" sandbox="allow-same-origin"></iframe></div>
+</div></section></div></main>
+<div class="create-overlay" id="create-overlay" role="dialog" aria-modal="true"><div class="create-modal"><h2 style="margin:0 0 8px">Create a website</h2><p class="muted">Choose a name. You can design the page in the visual builder next.</p><input id="create-name" maxlength="70" placeholder="My website"><div class="actions" style="justify-content:flex-end"><button class="btn" id="cancel-create">Cancel</button><button class="btn primary" id="confirm-create">Create</button></div></div></div>
+<div class="publish-overlay" id="publish-overlay" role="dialog" aria-modal="true" aria-labelledby="publish-title">
+  <div class="publish-modal">
+    <div class="publish-modal-kicker">PUBLISHING STUDIO</div>
+    <h2 id="publish-title">Publish your website</h2>
+    <p>Choose where this website will live. Its website name and web address are independent.</p>
+    <label class="field"><span>Publish destination</span><select id="publish-target"><option value="builtin">Free Interactive Studio address</option><option value="custom">A custom domain I own</option></select></label>
+    <div id="builtin-publish-fields">
+      <label class="field"><span>Subdomain name</span><input id="publish-subdomain" maxlength="40" placeholder="your-site" autocomplete="off"></label>
+      <p class="muted">Your free address will be <strong>your-site.is-sites.abrdns.com</strong>.</p>
+    </div>
+    <div id="custom-publish-fields" class="hidden">
+      <div class="domainbox"><h4>Connect a domain you own</h4><p class="muted">Enter a hostname such as www.example.com. If it is in your connected ClouDNS account, Interactive Studio will create the exact CNAME and certificate-validation records automatically. Otherwise, the DNS records you need will be shown here. Free Interactive Studio addresses use wildcard DNS and HTTPS, so they are ready without per-site setup. Custom domains are separate: connect a domain you own, point its CNAME to the target shown, and complete the DNS verification records. Automatic HTTPS for custom domains requires the platform custom-hostname service to be configured.</p>
+        <label class="field"><span>Custom domain</span><input id="custom-domain" maxlength="253" placeholder="www.example.com" autocomplete="url"></label>
+        <div class="actions"><button class="btn" id="connect">Connect domain</button><button class="btn hidden" id="check">Check DNS & SSL</button></div>
+        <div class="callout hidden" id="dns"></div><div class="message" id="domain-message" aria-live="polite"></div>
+      </div>
+    </div>
+    <div class="publish-address"><span id="publish-address">Choose a destination to preview your address.</span><button class="btn" id="copy-publish-address">Copy</button></div>
+    <div class="previewwrap"><div class="muted" style="margin:0 0 8px">LIVE PUBLISH PREVIEW</div><iframe class="preview" id="publish-preview" title="Publish preview" sandbox="allow-same-origin"></iframe></div>
+    <p class="publish-footnote" id="publish-status">Select your address and preview the site before publishing.</p>
+    <div class="publish-actions"><button class="btn primary" id="confirm-publish">Publish website ↗</button><a class="btn hidden" id="open-published" href="#" target="_blank" rel="noopener">Open website ↗</a><button class="btn" id="close-publish-menu">Back to builder</button></div>
+    <p class="publish-footnote">You can return to the builder at any time to make changes and publish an update.</p>
+  </div>
+</div><script>
+(function(){
+const $=id=>document.getElementById(id),API="https://interactive-studio.convexllc.workers.dev",PLATFORM="is-sites.abrdns.com";
+let user=null,db=null,active=null,domains={},sections=[],selectedSection=0,dragSection=-1,profileHandle="";
+const ids=["site-name","description","eyebrow","headline","subheadline","body-copy","button-label","button-url","accent","background"];
+function msg(id,text,type){$(id).textContent=text;$(id).className="message"+(type?" "+type:"")}
+function slugify(v){return String(v||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)}
+function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function link(v){const x=String(v||"").trim();if(!x)return "";try{const u=new URL(x);return ["https:","http:","mailto:"].includes(u.protocol)?x:""}catch(_){return ""}}
+function data(){return {sections:sections.map(s=>({...s})),siteName:$("site-name").value.trim(),title:$("site-name").value.trim(),description:$("description").value.trim(),eyebrow:$("eyebrow").value.trim(),headline:$("headline").value.trim(),subheadline:$("subheadline").value.trim(),body:$("body-copy").value.trim(),buttonLabel:$("button-label").value.trim(),buttonUrl:link($("button-url").value),accent:$("accent").value,background:$("background").value,textColour:"#252638"}}
+function sectionDefaults(type){
+ if(type==="hero")return {type,eyebrow:"WELCOME",title:"Your big idea starts here",text:"A clear message that tells visitors what makes you different.",background:"#f7f8fc",accent:"#635bff",align:"center"};
+ if(type==="text")return {type,title:"Tell your story",text:"Add more detail about your project, business or idea.",background:"#ffffff",accent:"#252638",align:"left"};
+ if(type==="image")return {type,title:"A picture says a lot",imageUrl:"",text:"Add an image caption.",background:"#ffffff",accent:"#252638",align:"center"};
+ if(type==="button")return {type,title:"Ready to get started?",buttonLabel:"Get in touch",buttonUrl:"https://example.com",background:"#f7f8fc",accent:"#635bff",align:"center"};
+ return {type:"features",title:"What we do",features:["Thoughtful design","Simple experiences","Made for everyone"],background:"#ffffff",accent:"#635bff",align:"center"};
+}
+function sectionHtml(s){
+ const bg=esc(s.background||"#fff"),c=esc(s.accent||"#635bff"),a=["left","center","right"].includes(s.align)?s.align:"center";
+ const pad=Math.max(16,Math.min(160,Number(s.padding)||56)),radius=Math.max(0,Math.min(48,Number(s.radius)||0));
+ const size=Math.max(14,Math.min(96,Number(s.fontSize)||52)),motion=["none","fade","rise","zoom","float"].includes(s.animation)?s.animation:"rise";
+ const shadow=s.shadow==="bold"?"0 18px 48px #25263824":s.shadow==="soft"?"0 10px 30px #25263812":"none";
+ const style="padding:"+pad+"px 7%;background:"+bg+";text-align:"+a+";border-radius:"+radius+"px;box-shadow:"+shadow;
+ const cls=motion==="none"?"":"studio-motion motion-"+motion;
+ if(s.type==="hero")return '<section class="'+cls+'" style="'+style+'"><div style="color:'+c+';font-size:11px;font-weight:850;letter-spacing:.15em">'+esc(s.eyebrow||"")+'</div><h1 style="font-size:clamp(34px,5vw,'+size+'px)">'+esc(s.title||"Your headline")+'</h1><p>'+esc(s.text||"")+'</p></section>';
+ if(s.type==="text")return '<section class="'+cls+'" style="'+style+'"><h2 style="font-size:'+Math.min(64,size)+'px">'+esc(s.title||"")+'</h2><p>'+esc(s.text||"")+'</p></section>';
+ if(s.type==="image")return '<section class="'+cls+'" style="'+style+'"><h2>'+esc(s.title||"")+'</h2>'+(s.imageUrl?'<img src="'+esc(s.imageUrl)+'" alt="" style="max-width:100%;max-height:330px;object-fit:cover;border-radius:16px">':"")+'<p>'+esc(s.text||"")+'</p></section>';
+ if(s.type==="button")return '<section class="'+cls+'" style="'+style+'"><h2>'+esc(s.title||"")+'</h2><a href="'+esc(link(s.buttonUrl))+'" style="display:inline-block;padding:13px 20px;background:'+c+';color:white;border-radius:12px;text-decoration:none;box-shadow:0 8px 22px '+c+'44">'+esc(s.buttonLabel||"Learn more")+'</a></section>';
+ return '<section class="'+cls+'" style="'+style+'"><h2>'+esc(s.title||"Features")+'</h2><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">'+(s.features||[]).map(x=>'<div style="padding:18px;border:1px solid #e7e8f0;border-radius:14px;box-shadow:0 8px 24px #2526380b">'+esc(x)+'</div>').join("")+'</div></section>';
+}
+function syncLegacy(){const hero=sections.find(s=>s.type==="hero")||sections[0]||{};const txt=sections.find(s=>s.type==="text")||{};const btn=sections.find(s=>s.type==="button")||{};$("site-name").value=$("builder-site-name").value||active?.siteName||"Untitled";$("description").value=active?.description||"";$("eyebrow").value=hero.eyebrow||"";$("headline").value=hero.title||hero.titleText||$("site-name").value;$("subheadline").value=hero.text||"";$("body-copy").value=txt.text||"";$("button-label").value=btn.buttonLabel||"";$("button-url").value=btn.buttonUrl||"";$("accent").value=hero.accent||"#635bff";$("background").value=hero.background||"#f7f8fc"}
+function preview(){syncLegacy();$("frame").srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Arial}h1{font-size:clamp(34px,6vw,68px);line-height:1.05;letter-spacing:-.06em}h2{font-size:28px}p{font-size:17px;line-height:1.7;white-space:pre-wrap}img{display:block;margin:18px auto;border-radius:12px}.studio-motion{animation:motionRise .8s cubic-bezier(.2,.7,.2,1) both}.motion-fade{animation-name:motionFade}.motion-zoom{animation-name:motionZoom}.motion-float{animation:motionFloat 4s ease-in-out infinite}@keyframes motionRise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}@keyframes motionFade{from{opacity:0}to{opacity:1}}@keyframes motionZoom{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}@keyframes motionFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}a:hover{transform:translateY(-2px)}</style></head><body>'+sections.map(sectionHtml).join("")+'</body></html>'}
+let historyStack=[],historyIndex=-1,canvasZoom=100;
+function pushHistory(){const snap=JSON.stringify(sections);if(historyStack[historyIndex]===snap)return;historyStack=historyStack.slice(0,historyIndex+1);historyStack.push(snap);if(historyStack.length>60)historyStack.shift();historyIndex=historyStack.length-1;updateHistoryButtons()}
+function updateHistoryButtons(){$("undo").disabled=historyIndex<=0;$("redo").disabled=historyIndex>=historyStack.length-1}
+function restoreHistory(i){if(i<0||i>=historyStack.length)return;sections=JSON.parse(historyStack[i]);historyIndex=i;renderBuilder();updateHistoryButtons()}
+function setDevice(device){const canvas=$("builder-canvas");canvas.classList.remove("device-desktop","device-tablet","device-mobile");canvas.classList.add("device-"+device);document.querySelectorAll("[data-device]").forEach(b=>b.classList.toggle("active",b.dataset.device===device));$("canvas-size").textContent=({desktop:"Desktop · 1440px",tablet:"Tablet · 768px",mobile:"Mobile · 390px"})[device]}
+function renderBuilder(){
+ const canvas=$("builder-canvas");canvas.innerHTML="";
+ const layerBox=$("layer-list");layerBox.innerHTML="";
+ sections.forEach((s,i)=>{const b=document.createElement("button");b.className="layer-item"+(i===selectedSection?" active":"");const icons={hero:"H",text:"T",image:"▧",button:"↗",features:"▦"};const name=s.title||({hero:"Hero section",text:"Text section",image:"Image",button:"Button",features:"Feature cards"}[s.type]||"Section");b.innerHTML='<span class="layer-icon">'+(icons[s.type]||"▰")+'</span><span>'+esc(name)+'</span>';b.onclick=()=>{selectedSection=i;renderBuilder()};layerBox.append(b)});
+ sections.forEach((s,i)=>{const el=document.createElement("div");el.className="builder-block"+(i===selectedSection?" selected":"");el.draggable=true;el.innerHTML=sectionHtml(s);el.querySelectorAll("a").forEach(a=>a.addEventListener("click",e=>e.preventDefault()));el.onclick=()=>{selectedSection=i;renderBuilder()};
+ el.ondragstart=e=>{dragSection=i;e.dataTransfer.effectAllowed="move"};el.ondragover=e=>e.preventDefault();el.ondrop=e=>{e.preventDefault();if(dragSection<0||dragSection===i)return;const x=sections.splice(dragSection,1)[0];sections.splice(i,0,x);selectedSection=i;dragSection=-1;pushHistory();renderBuilder()};canvas.append(el)});
+ const box=$("builder-properties-body"),s=sections[selectedSection];if(!s){box.textContent="Add a section to begin.";preview();return}
+ const fields=[];const add=(k,label,v,m=false)=>fields.push('<label class="prop-field"><span>'+label+'</span>'+(m?'<textarea data-prop="'+k+'">'+esc(v||"")+'</textarea>':'<input data-prop="'+k+'" value="'+esc(v||"")+'">')+'</label>');
+ if(s.type!=="button"||s.title)add("title","Heading",s.title);
+ if(s.type==="hero")add("eyebrow","Small heading",s.eyebrow);
+ if(["hero","text","image"].includes(s.type))add("text",s.type==="image"?"Caption":"Text",s.text,true);
+ if(s.type==="image")add("imageUrl","Image URL (HTTPS)",s.imageUrl);
+ if(s.type==="button"){add("buttonLabel","Button label",s.buttonLabel);add("buttonUrl","Button link",s.buttonUrl)}
+ if(s.type==="features")add("features","Cards (one per line)",(s.features||[]).join("\n"),true);
+ add("background","Background colour",s.background);add("accent","Accent colour",s.accent);
+ fields.push('<div class="prop-group-title">LAYOUT & MOTION</div>');
+ add("fontSize","Heading size (px)",s.fontSize||52);
+ add("padding","Section spacing (px)",s.padding||56);
+ add("radius","Corner radius (px)",s.radius||0);
+ fields.push('<label class="prop-field"><span>Entrance animation</span><select data-prop="animation"><option value="none">None</option><option value="fade">Fade in</option><option value="rise">Rise up</option><option value="zoom">Soft zoom</option><option value="float">Float</option></select></label>');
+ fields.push('<label class="prop-field"><span>Shadow</span><select data-prop="shadow"><option value="none">None</option><option value="soft">Soft</option><option value="bold">Bold</option></select></label>');
+ fields.push('<label class="prop-field"><span>Alignment</span><select data-prop="align"><option value="left">Left</option><option value="center">Centre</option><option value="right">Right</option></select></label>');
+ box.innerHTML=fields.join("");const motionSelect=box.querySelector('[data-prop="animation"]');if(motionSelect)motionSelect.value=s.animation||"rise";const shadowSelect=box.querySelector('[data-prop="shadow"]');if(shadowSelect)shadowSelect.value=s.shadow||"none";const sel=box.querySelector('[data-prop="align"]');if(sel)sel.value=s.align||"center";
+ box.querySelectorAll("[data-prop]").forEach(inp=>{inp.addEventListener("change",()=>pushHistory());inp.addEventListener("input",()=>{const k=inp.dataset.prop;s[k]=k==="features"?inp.value.split("\n").map(x=>x.trim()).filter(Boolean):(["fontSize","padding","radius"].includes(k)?Number(inp.value):inp.value);Array.from(canvas.children).forEach((el,j)=>{el.innerHTML=sectionHtml(sections[j])});preview()})});preview();
+}
+function addSection(type){sections.push(sectionDefaults(type));selectedSection=sections.length-1;pushHistory();renderBuilder();msg("save-message","Section added. Select it to edit.","success")}
+function askSiteName(){return new Promise(resolve=>{const ov=$("create-overlay"),input=$("create-name");const done=v=>{ov.classList.remove("open");resolve(v)};ov.classList.add("open");input.value="";input.focus();$("confirm-create").onclick=()=>done(input.value.trim());$("cancel-create").onclick=()=>done(null);input.onkeydown=e=>{if(e.key==="Enter")done(input.value.trim());if(e.key==="Escape")done(null)}})}
+function address(){const host=active?.publishedHostname;$("built-url").textContent=host?"https://"+host:"Choose a subdomain and address format when you publish this website.";$("built-status").textContent=active&&active.status==="published"?"Published":"Not published";$("site-status").textContent=active&&active.status==="published"?"Published":"Draft";$("site-status").className="status"+(active&&active.status==="published"?" live":"");$("open-live").classList.toggle("hidden",!(active&&active.status==="published"&&host));$("unpublish").classList.toggle("hidden",!(active&&active.status==="published"));if(active&&active.status==="published"&&host)$("open-live").href="https://"+host}
+function list(items){const box=$("items");box.replaceChildren();if(!items.length){const p=document.createElement("p");p.className="muted";p.textContent="No websites yet. Create one to get started.";box.append(p);return}items.forEach(site=>{const b=document.createElement("button");b.className="item"+(active&&active.slug===site.slug?" active":"");const strong=document.createElement("strong");strong.textContent=site.siteName||site.slug;const small=document.createElement("small");small.textContent=(site.status==="published"?"Published":"Draft")+" · "+site.slug;b.append(strong,small);b.onclick=()=>load(site.slug).catch(e=>msg("save-message",e.message,"error"));box.append(b)})}
+function fill(site){$("editor").classList.remove("hidden");$("empty").classList.add("hidden");$("editor-title").textContent=site.siteName||site.slug;$("builder-site-name").value=site.siteName||site.slug;$("builder-handle-note").textContent=profileHandle?"Publishing handle: @"+profileHandle+" · change it in Settings.":"Set your public handle in Settings before publishing.";$("slug").value=site.slug;$("slug").disabled=true;sections=Array.isArray(site.sections)&&site.sections.length?site.sections.map(x=>({...x})):legacySections(site);selectedSection=0;historyStack=[];historyIndex=-1;pushHistory();address();renderBuilder();loadDomain(site.slug)}
+function legacySections(site){const a=[{type:"hero",eyebrow:site.eyebrow||"WELCOME",title:site.headline||site.siteName||"Welcome",text:site.subheadline||"",background:site.background||"#f7f8fc",accent:site.accent||"#635bff",align:"center"}];if(site.body)a.push({type:"text",title:"About",text:site.body,background:"#fff",accent:"#252638",align:"left"});if(site.buttonLabel)a.push({type:"button",title:"",buttonLabel:site.buttonLabel,buttonUrl:site.buttonUrl||"",background:"#f7f8fc",accent:site.accent||"#635bff",align:"center"});return a}
+function loadDomain(slug){const d=Object.values(domains).find(x=>x.websiteSlug===slug);$("custom-domain").value=d?d.hostname:"";$("check").classList.toggle("hidden",!d);$("dns").classList.toggle("hidden",!d);if(d)$("dns").textContent="CNAME record: point "+d.hostname+" to "+(d.cnameTarget||"the CNAME target shown by Interactive Studio")+". Status: "+d.status+". After DNS is set, check DNS & SSL.";else msg("domain-message","No custom domain connected to this website.")}
+let websiteCache=[];
+async function reload(){const [snap,ds]=await Promise.all([db.collection("websites").where("ownerUid","==",user.uid).get(),db.collection("websiteDomains").where("ownerUid","==",user.uid).get()]);websiteCache=snap.docs.map(x=>x.data());domains={};ds.docs.forEach(x=>domains[x.id]=x.data());list(websiteCache);if(!active&&websiteCache.length){active=websiteCache[0];fill(active)}if(!websiteCache.length){$("editor").classList.add("hidden");$("empty").classList.remove("hidden")}}
+async function load(slug){let site=websiteCache.find(x=>x.slug===slug);if(!site){const snap=await db.collection("websites").doc(slug).get();if(!snap.exists)throw new Error("That website no longer exists.");site=snap.data()}active=site;fill(active);list(websiteCache.length?websiteCache:[site])}
+async function save(status){
+ if(!active)throw new Error("Create a website first.");
+ syncLegacy();
+ const slug=$("slug").value.trim();
+ if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug))throw new Error("The internal website ID is invalid. Please recreate this draft.");
+ const finalStatus=status||active.status||"draft";
+ const d={...data(),siteName:$("builder-site-name").value.trim()||active.siteName,title:$("builder-site-name").value.trim()||active.siteName,ownerUid:user.uid,username:profileHandle||active.username||"",slug,status:finalStatus,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+ try{await db.collection("websites").doc(slug).set(d,{merge:true})}catch(e){console.error("Website document write denied",e);throw new Error("Firestore blocked saving the website record: "+(e.message||e.code||"permission denied"))}
+ active={...active,...d,status:d.status,updatedAt:{seconds:Math.floor(Date.now()/1000)}};
+ address();
+ try{const updated={...active};const at=websiteCache.findIndex(x=>x.slug===slug);if(at>=0)websiteCache[at]=updated;else websiteCache.unshift(updated);list(websiteCache)}catch(e){console.error("Website list refresh failed",e)}
+ return d;
+}
+async function ensureReady(){await studioAuth.ready;if(studioAuth.redirectReady)await studioAuth.redirectReady;user=studioAuth.auth.currentUser;if(!user)throw new Error("Your sign-in session is not ready. Please sign in again.");if(!db)db=firebase.firestore();const profileSnap=await db.collection("userProfiles").doc(user.uid).get();profileHandle=profileSnap.exists?String(profileSnap.data().handle||""):"";return user}
+async function create(){await ensureReady();const name=await askSiteName();if(name===null)return;const slug="site-"+(window.crypto&&crypto.randomUUID?crypto.randomUUID().replace(/-/g,"").slice(0,14):Math.random().toString(36).slice(2,16));const ref=db.collection("websites").doc(slug);const d={ownerUid:user.uid,username:profileHandle||"",slug,siteName:name.trim().slice(0,70),title:name.trim().slice(0,70),sections:[sectionDefaults("hero")],description:"",eyebrow:"WELCOME",headline:"Make something remarkable.",subheadline:"A clear message about what you do and why it matters.",body:"",buttonLabel:"Get in touch",buttonUrl:"",accent:"#635bff",background:"#f7f8fc",textColour:"#252638",status:"draft",createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()};await ref.set(d);active={...d};fill(active);msg("save-message","Website created. Make it yours, then save or publish.","success");const all=await db.collection("websites").where("ownerUid","==",user.uid).get();list(all.docs.map(x=>x.data()))}
+async function api(path,body){const token=await user.getIdToken(),r=await fetch(API+path,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(body)}),d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||"The domain service could not complete this request.");return d}
+$("new").onclick=$("first").onclick=async()=>{const buttons=[$("new"),$("first")];buttons.forEach(b=>{b.disabled=true;b.textContent="Creating…"});try{await create();msg("create-message","Website created. You can now edit it below.","success")}catch(e){console.error("Website creation failed:",e);msg("create-message",e.message||"Could not create the website. Please try again.","error")}finally{buttons.forEach((b,i)=>{b.disabled=false;b.textContent=i===0?"＋ Create website":"Create your first website →"})}};
+$("save").onclick=async()=>{try{await save("draft");msg("save-message","Draft saved to your account.","success")}catch(e){msg("save-message",e.message,"error")}};
+function selectedHostname(){const sub=slugify($("publish-subdomain").value);return sub?sub+"."+PLATFORM:""}
+function updatePublishPreview(){
+ const custom=$("publish-target").value==="custom";
+ $("builtin-publish-fields").classList.toggle("hidden",custom);
+ $("custom-publish-fields").classList.toggle("hidden",!custom);
+ const hostname=custom?$("custom-domain").value.trim().toLowerCase():selectedHostname();
+ const record=custom?domains[hostname]:null;
+ $("publish-address").textContent=hostname?"https://"+hostname:(custom?"Enter and connect your custom domain.":"Enter a subdomain to preview your address.");
+ $("confirm-publish").disabled=custom?!(record&&record.status==="active"):!hostname;
+ $("publish-preview").srcdoc=$("frame").srcdoc||"<!doctype html><html><body style='font:14px system-ui;padding:30px;color:#777'>Refresh the website preview to see your page here.</body></html>";
+}
+$("publish").onclick=()=>{
+ if(!active){msg("save-message","Create a website first.","error");return}
+ if(document.body.dataset.websitePage==="editor"){location.href=window.getAppUrl("/websites/"+encodeURIComponent(active.slug)+"/publish/");return}
+ $("publish-title").textContent="Publish your website";
+ $("open-published").classList.add("hidden");
+ $("confirm-publish").textContent="Publish website ↗";
+ preview();
+ $("publish-subdomain").value=active.domainSubdomain||"";
+ $("publish-format").value=active.domainFormat||"handle-subdomain";
+ $("custom-domain").value=active.customDomain||"";
+ $("publish-target").value=active.publishTarget||"builtin";
+ if(active.publishedHostname&&!active.publishedHostname.endsWith("."+PLATFORM))$("publish-target").value="custom";
+ updatePublishPreview();
+ $("publish-overlay").classList.add("open");
+};
+$("publish-target").addEventListener("change",updatePublishPreview);
+$("publish-subdomain").addEventListener("input",updatePublishPreview);
+$("publish-format").addEventListener("change",updatePublishPreview);
+$("custom-domain").addEventListener("input",updatePublishPreview);
+$("confirm-publish").onclick=async()=>{
+ const button=$("confirm-publish");
+ button.disabled=true;
+ button.textContent="Publishing…";
+ try{
+  await ensureReady();
+  if(!profileHandle)throw new Error("Create your public handle in Settings first.");
+  const previousHost=active.publishedHostname||"";
+  if($("publish-target").value==="custom"){
+   const hostname=$("custom-domain").value.trim().toLowerCase();
+   if(!/^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/.test(hostname))throw new Error("Enter a valid custom hostname, such as www.example.com.");
+   let record=domains[hostname];
+   if(!record){const snap=await db.collection("websiteDomains").doc(hostname).get();record=snap.exists?snap.data():null;if(record)domains[hostname]=record;}
+   if(!record||record.ownerUid!==user.uid||record.websiteSlug!==active.slug)throw new Error("Connect this custom domain to this website first.");
+   if(record.status!=="active")throw new Error("Your custom domain is not ready yet. Connect it, then use Check DNS & SSL until it is active.");
+   await save("published");
+   const update={customDomain:hostname,publishTarget:"custom",publishedHostname:hostname,username:profileHandle,status:"published",updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+   await db.collection("websites").doc(active.slug).set(update,{merge:true});
+   active={...active,...update};
+   if(previousHost&&previousHost!==hostname&&previousHost.endsWith("."+PLATFORM))await db.collection("websiteHosts").doc(previousHost).set({status:"draft",updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+   else if(previousHost&&previousHost!==hostname)await db.collection("websiteDomains").doc(previousHost).set({status:"inactive",updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+   $("publish-address").textContent="https://"+hostname;
+   $("publish-status").textContent="Your custom domain is published and its DNS/SSL status is active.";
+   $("publish-title").textContent="Your website is published";
+   $("open-published").href="https://"+hostname;
+   $("open-published").classList.remove("hidden");
+   button.textContent="Published ✓";
+   button.disabled=true;
+   address();
+   msg("save-message","Website published to your custom domain.","success");
+   return;
+  }
+  const sub=slugify($("publish-subdomain").value);
+  if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(sub)||sub.length>40||["www","api","admin","mail","ftp","sites","app","interactivestudio","settings","support"].includes(sub))throw new Error("Choose a valid, available subdomain using letters, numbers and hyphens.");
+  const format="subdomain-only";
+  const hostname=selectedHostname();
+  if(!hostname)throw new Error("Choose a subdomain and address format.");
+  await save("published");
+  if(previousHost&&previousHost!==hostname){
+   if(previousHost.endsWith("."+PLATFORM))await db.collection("websiteHosts").doc(previousHost).set({status:"draft",updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+   else await db.collection("websiteDomains").doc(previousHost).set({status:"inactive",updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+  }
+  const update={domainSubdomain:sub,domainFormat:format,publishTarget:"builtin",customDomain:"",publishedHostname:hostname,username:profileHandle,status:"published",updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+  await db.collection("websites").doc(active.slug).set(update,{merge:true});
+  active={...active,...update};
+  await db.collection("websiteHosts").doc(hostname).set({hostname,websiteSlug:active.slug,ownerUid:user.uid,status:"published",updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+  $("publish-address").textContent="https://"+hostname;
+  $("publish-status").textContent="Website published. Wildcard DNS and HTTPS are already active for this address.";
+  $("publish-title").textContent="Your website is published";
+  $("open-published").href="https://"+hostname;
+  $("open-published").classList.remove("hidden");
+  button.textContent="Published ✓";
+  button.disabled=true;
+  address();
+  msg("save-message","Website published. Your address is ready with HTTPS.","success");
+ }catch(e){
+  msg("save-message",e.message,"error");
+  $("publish-status").textContent=e.message;
+ }finally{
+  if(button.textContent!=="Published ✓"){button.disabled=false;button.textContent="Publish website ↗";}
+ }
+};
+$("close-publish-menu").onclick=()=>$("publish-overlay").classList.remove("open");
+$("publish-overlay").addEventListener("click",e=>{if(e.target===$("publish-overlay"))$("publish-overlay").classList.remove("open")});
+$("copy-publish-address").onclick=async()=>{try{await navigator.clipboard.writeText($("publish-address").textContent);$("copy-publish-address").textContent="Copied"}catch(e){$("copy-publish-address").textContent="Select address to copy"}};
+
+$("unpublish").onclick=async()=>{try{const oldHost=active&&active.publishedHostname;await save("draft");if(oldHost){if(oldHost.endsWith("."+PLATFORM))await db.collection("websiteHosts").doc(oldHost).set({status:"draft",updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});else await db.collection("websiteDomains").doc(oldHost).set({status:"inactive",updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}msg("save-message","Website unpublished. Your draft is safe.","success")}catch(e){msg("save-message",e.message,"error")}};
+$("preview-button").onclick=preview;$("undo").onclick=()=>restoreHistory(historyIndex-1);$("redo").onclick=()=>restoreHistory(historyIndex+1);document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){e.preventDefault();restoreHistory(e.shiftKey?historyIndex+1:historyIndex-1)}else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="y"){e.preventDefault();restoreHistory(historyIndex+1)}});document.querySelectorAll("[data-device]").forEach(b=>b.onclick=()=>setDevice(b.dataset.device));$("zoom-in").onclick=()=>{canvasZoom=Math.min(150,canvasZoom+10);$("builder-canvas").style.transform="scale("+canvasZoom/100+")";$("zoom-label").textContent=canvasZoom+"%"};$("zoom-out").onclick=()=>{canvasZoom=Math.max(60,canvasZoom-10);$("builder-canvas").style.transform="scale("+canvasZoom/100+")";$("zoom-label").textContent=canvasZoom+"%"};$("builder-site-name").addEventListener("input",()=>{$("editor-title").textContent=$("builder-site-name").value||"Untitled website";syncLegacy()});document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>addSection(b.dataset.add));$("move-up").onclick=()=>{if(selectedSection>0){[sections[selectedSection-1],sections[selectedSection]]=[sections[selectedSection],sections[selectedSection-1]];selectedSection--;pushHistory();renderBuilder()}};$("move-down").onclick=()=>{if(selectedSection<sections.length-1){[sections[selectedSection+1],sections[selectedSection]]=[sections[selectedSection],sections[selectedSection+1]];selectedSection++;pushHistory();renderBuilder()}};$("delete-section").onclick=()=>{sections.splice(selectedSection,1);selectedSection=Math.max(0,selectedSection-1);pushHistory();renderBuilder()};
+$("connect").onclick=async()=>{try{if(!active)throw new Error("Save your website before connecting a domain.");await save(active.status);const hostname=$("custom-domain").value.trim().toLowerCase();if(!hostname)throw new Error("Enter the custom domain you want to connect.");const r=await api("/connectCustomDomain",{hostname});const record={ownerUid:user.uid,hostname:r.hostname,websiteSlug:active.slug,cloudflareHostnameId:r.id,cnameTarget:r.cnameTarget,status:"pending",createdAt:firebase.firestore.FieldValue.serverTimestamp()};await db.collection("websiteDomains").doc(r.hostname).set(record);domains[r.hostname]=record;$("check").classList.remove("hidden");$("dns").classList.remove("hidden");$("dns").textContent=r.cloudnsDns&&r.cloudnsDns.configured?"ClouDNS created the CNAME for "+hostname+" → "+r.cnameTarget+" and added "+(r.cloudnsDns.txtRecordsAdded||0)+" TXT validation record(s).":"CNAME setup: "+(r.cloudnsDns&&r.cloudnsDns.reason?r.cloudnsDns.reason+" ":"")+"Name/Host = "+hostname+"; Target = "+r.cnameTarget+". Add any TXT validation record shown here: "+JSON.stringify(r.validationRecords||[]);msg("domain-message",r.cloudnsDns&&r.cloudnsDns.configured?"ClouDNS automatically added the CNAME record for "+hostname+" in your connected DNS account. Check DNS & SSL again shortly.":(r.cloudnsDns&&r.cloudnsDns.reason?r.cloudnsDns.reason+" CNAME target: "+r.cnameTarget+".":"Domain submitted to Cloudflare. Add a CNAME pointing to "+r.cnameTarget+" and any TXT validation record shown above, then check again."),"success");updatePublishPreview()}catch(e){msg("domain-message",e.message,"error")}};
+$("check").onclick=async()=>{try{const hostname=$("custom-domain").value.trim().toLowerCase(),record=domains[hostname];if(!record)throw new Error("Connect the domain first.");const r=await api("/checkCustomDomain",{hostname,hostnameId:record.cloudflareHostnameId}),ready=r.status==="active"&&r.sslStatus==="active";const update={status:ready?"active":"pending",checkedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()};await db.collection("websiteDomains").doc(hostname).update(update);domains[hostname]={...record,status:update.status};if(ready){msg("domain-message","Connected and secured! Your domain is ready: https://"+hostname,"success");$("dns").textContent="Your custom domain is active and HTTPS is ready. Publish your website to make it available."}else msg("domain-message","Still provisioning. Hostname: "+r.status+" · SSL: "+r.sslStatus+". Wait a few minutes, then check again.");updatePublishPreview()}catch(e){msg("domain-message",e.message,"error")}};
+(async()=>{const buttons=[$("new"),$("first")];try{await studioAuth.ready;if(studioAuth.redirectReady)await studioAuth.redirectReady;user=studioAuth.auth.currentUser;if(!user){location.replace(window.getAppUrl("/auth/personal/login/"));return}db=firebase.firestore();const profileSnap=await db.collection("userProfiles").doc(user.uid).get();profileHandle=profileSnap.exists?String(profileSnap.data().handle||""):"";$("account").textContent=user.email||"Signed in";await reload();const requestedId=new URLSearchParams(location.search).get("id");if(requestedId){await load(requestedId);$("publish").onclick()}buttons.forEach(b=>{b.disabled=false;b.textContent=b.id==="new"?"＋ Create website":"Create your first website →"})}catch(e){console.error(e);$("items").textContent=e.message||"Could not load your websites.";msg("create-message",e.message||"Could not load your workspace.","error")}})();
+})();
+</script></body></html>
