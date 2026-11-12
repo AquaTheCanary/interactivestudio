@@ -354,6 +354,24 @@ export default {
     const origin = request.headers.get("Origin") || "";
     const url = new URL(request.url);
     const hostname = url.hostname.toLowerCase();
+    // Render forwards wildcard site traffic through this authenticated gateway.
+    // Only trust a single-label hostname inside our delegated sites zone.
+    const renderProxyToken = request.headers.get("X-IS-Proxy-Token") || "";
+    if (renderProxyToken && env.IS_PROXY_TOKEN) {
+      const expected = String(env.IS_PROXY_TOKEN);
+      let mismatch = renderProxyToken.length ^ expected.length;
+      for (let i = 0; i < Math.max(renderProxyToken.length, expected.length); i++) {
+        mismatch |= (renderProxyToken.charCodeAt(i) || 0) ^ (expected.charCodeAt(i) || 0);
+      }
+      if (mismatch !== 0) return new Response("Forbidden: invalid sites proxy token.", {status:403,headers:{"Cache-Control":"no-store"}});
+      const originalHost = String(request.headers.get("X-IS-Original-Host") || "").trim().toLowerCase().replace(/:\\d+$/, "");
+      const suffix = "." + PLATFORM_HOST;
+      const label = originalHost.endsWith(suffix) ? originalHost.slice(0, -suffix.length) : "";
+      if (!label || label.includes(".") || !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label)) {
+        return new Response("Forbidden: invalid website hostname.", {status:403,headers:{"Cache-Control":"no-store"}});
+      }
+      return serveWebsite(request, env, originalHost);
+    }
     // Apexly sends our workers.dev hostname as Host and the visitor's hostname
     // in X-Apexly-Host. Only trust that tenant hostname after HMAC verification.
     if (request.headers.has("X-Apexly-Domain-Id")) {
