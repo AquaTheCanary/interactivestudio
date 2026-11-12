@@ -120,7 +120,23 @@ async function serveWebsite(request, env, hostnameOverride) {
 }
 async function proxyStudioApp(request) {
   const incoming = new URL(request.url);
-  const target = new URL("https://aquathecanary.github.io/interactivestudio" + incoming.pathname + incoming.search);
+  let pathname = incoming.pathname;
+  const params = new URLSearchParams(incoming.search);
+  let match;
+  // Clean, ID-based application URLs are mapped to static GitHub Pages entry points.
+  if ((match = pathname.match(/^\\/websites\\/([a-z0-9-]+)\\/(editor|publish)\\/?$/i))) {
+    params.set("id", match[1]);
+    pathname = match[2] === "editor" ? "/websites/editor/" : "/websites/publish/";
+  } else if ((match = pathname.match(/^\\/presentations\\/view\\/([a-z0-9_-]+)\\/(audience|presenter)\\/?$/i))) {
+    params.set("id", match[1]);
+    pathname = "/presentations/view/" + match[2] + "/";
+  } else if (pathname === "/editor" || pathname === "/editor/") {
+    pathname = "/presentations/editor/";
+  } else if (pathname === "/websites" || pathname === "/websites/") {
+    pathname = "/websites/new/";
+  }
+  const query = params.toString();
+  const target = new URL("https://aquathecanary.github.io/interactivestudio" + pathname + (query ? "?" + query : ""));
   return fetch(new Request(target.toString(), request));
 }
 function normaliseHostname(value) {
