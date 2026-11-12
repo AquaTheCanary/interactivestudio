@@ -24,6 +24,16 @@ const server = http.createServer(async (req, res) => {
     return res.end("Unknown website hostname.");
   }
 
+  // Keep the platform root on Render for wildcard-domain validation,
+  // but send visitors to the main Interactive Studio website.
+  if (isPlatformRoot) {
+    res.writeHead(302, {
+      location: "https://interactivestudio.abrdns.com" + req.url,
+      "cache-control": "no-store"
+    });
+    return res.end();
+  }
+
   try {
     const chunks = [];
     for await (const chunk of req) chunks.push(chunk);
