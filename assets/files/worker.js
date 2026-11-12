@@ -124,10 +124,10 @@ async function proxyStudioApp(request) {
   const params = new URLSearchParams(incoming.search);
   let match;
   // Clean, ID-based application URLs are mapped to static GitHub Pages entry points.
-  if ((match = pathname.match(/^\\/websites\\/([a-z0-9-]+)\\/(editor|publish)\\/?$/i))) {
+  if ((match = pathname.match(/^\/websites\/([a-z0-9-]+)\/(editor|publish)\/?$/i))) {
     params.set("id", match[1]);
     pathname = match[2] === "editor" ? "/websites/editor/" : "/websites/publish/";
-  } else if ((match = pathname.match(/^\\/presentations\\/view\\/([a-z0-9_-]+)\\/(audience|presenter)\\/?$/i))) {
+  } else if ((match = pathname.match(/^\/presentations\/view\/([a-z0-9_-]+)\/(audience|presenter)\/?$/i))) {
     params.set("id", match[1]);
     pathname = "/presentations/view/" + match[2] + "/";
   } else if (pathname === "/editor" || pathname === "/editor/") {
