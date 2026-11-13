@@ -370,6 +370,79 @@ async function authenticatedUser(request, env) {
   return { uid: user.localId, email: user.email || "", emailVerified: !!user.emailVerified };
 }
 
+
+let firebaseAdminTokenCache = null;
+function base64url(value) {
+  const bytes = value instanceof Uint8Array ? value : new TextEncoder().encode(String(value));
+  let binary = ""; for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/=/g,"").replace(/\\+/g,"-").replace(/\\//g,"_");
+}
+async function firebaseAdminAccessToken(env) {
+  if (firebaseAdminTokenCache && firebaseAdminTokenCache.expiresAt > Date.now()+60000) return firebaseAdminTokenCache.token;
+  if (!env.FIREBASE_SERVICE_ACCOUNT_JSON) throw new Error("Admin backend is not configured: add FIREBASE_SERVICE_ACCOUNT_JSON as a Worker secret.");
+  let account;
+  try { account = JSON.parse(env.FIREBASE_SERVICE_ACCOUNT_JSON); } catch (_) { throw new Error("FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON."); }
+  if (!account.client_email || !account.private_key) throw new Error("The Firebase service account secret is missing client_email or private_key.");
+  const now = Math.floor(Date.now()/1000);
+  const header = base64url(JSON.stringify({alg:"RS256",typ:"JWT"}));
+  const claim = base64url(JSON.stringify({iss:account.client_email,scope:"https://www.googleapis.com/auth/cloud-platform",aud:account.token_uri||"https://oauth2.googleapis.com/token",iat:now,exp:now+3600}));
+  const unsigned = header+"."+claim;
+  const pem = account.private_key.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\\s/g,"");
+  const binary = Uint8Array.from(atob(pem),c=>c.charCodeAt(0));
+  const key = await crypto.subtle.importKey("pkcs8",binary,{name:"RSASSA-PKCS1-v1_5",hash:"SHA-256"},false,["sign"]);
+  const signature = new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5",key,new TextEncoder().encode(unsigned)));
+  const assertion = unsigned+"."+base64url(signature);
+  const response = await fetch(account.token_uri||"https://oauth2.googleapis.com/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({grant_type:"urn:ietf:params:oauth:grant-type:jwt-bearer",assertion})});
+  const data = await response.json().catch(()=>({}));
+  if (!response.ok || !data.access_token) throw new Error("Firebase admin service account could not obtain an access token: "+(data.error_description||data.error||response.status));
+  firebaseAdminTokenCache = {token:data.access_token,expiresAt:Date.now()+Number(data.expires_in||3600)*1000};
+  return data.access_token;
+}
+async function firebaseAdminRequest(path, options, env) {
+  const token = await firebaseAdminAccessToken(env);
+  const response = await fetch("https://identitytoolkit.googleapis.com/v1/"+path,{...options,headers:{"Authorization":"Bearer "+token,"Content-Type":"application/json",...(options&&options.headers||{})}});
+  const data = await response.json().catch(()=>({}));
+  if (!response.ok) throw new Error(data.error?.message||"Firebase Admin request failed ("+response.status+").");
+  return data;
+}
+async function adminRequest(request, user, env) {
+  if (!user.emailVerified || user.email.toLowerCase() !== "admin@interactivestudio.abrdns.com") {
+    return json({error:"Admin access requires the verified admin@interactivestudio.abrdns.com account."},403,request.headers.get("Origin")||"");
+  }
+  const url = new URL(request.url), body = await request.json().catch(()=>({}));
+  if (url.pathname === "/admin/users/list") {
+    const result = await firebaseAdminRequest("projects/"+FIREBASE_PROJECT_ID+"/accounts:query",{method:"POST",body:JSON.stringify({returnUserInfo:true})},env);
+    const users = (result.users||[]).map(u=>({uid:u.localId,email:u.email||"",name:u.displayName||"",disabled:!!u.disabled,emailVerified:!!u.emailVerified,createdAt:u.createdAt||"",lastLoginAt:u.lastLoginAt||""}));
+    return json({users},200,request.headers.get("Origin")||"");
+  }
+  if (url.pathname === "/admin/users/update") {
+    if (typeof body.uid!=="string" || !body.uid || typeof body.disabled!=="boolean") return json({error:"A user ID and disabled boolean are required."},400,request.headers.get("Origin")||"");
+    if (body.uid === user.uid) return json({error:"You cannot ban your own admin account."},400,request.headers.get("Origin")||"");
+    const result = await firebaseAdminRequest("accounts:update",{method:"POST",body:JSON.stringify({localId:body.uid,disable:body.disabled})},env);
+    return json({ok:true,disabled:!!result.disabled},200,request.headers.get("Origin")||"");
+  }
+  if (url.pathname === "/admin/users/delete") {
+    if (typeof body.uid!=="string" || !body.uid || body.uid===user.uid) return json({error:"A different user ID is required."},400,request.headers.get("Origin")||"");
+    await firebaseAdminRequest("accounts:delete",{method:"POST",body:JSON.stringify({localId:body.uid})},env);
+    return json({ok:true},200,request.headers.get("Origin")||"");
+  }
+  if (url.pathname === "/admin/websites/list") {
+    const token = await firebaseAdminAccessToken(env);
+    const response = await fetch("https://firestore.googleapis.com/v1/projects/"+FIREBASE_PROJECT_ID+"/databases/(default)/documents/websites?pageSize=100",{headers:{Authorization:"Bearer "+token}});
+    const data = await response.json().catch(()=>({}));
+    if (!response.ok) throw new Error(data.error?.message||"Could not list websites.");
+    return json({websites:(data.documents||[]).map(d=>({id:d.name.split("/").pop(),...decodeFirestoreFields(d.fields||{})}))},200,request.headers.get("Origin")||"");
+  }
+  if (url.pathname === "/admin/websites/delete") {
+    if (typeof body.slug!=="string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(body.slug)) return json({error:"A valid website ID is required."},400,request.headers.get("Origin")||"");
+    const token = await firebaseAdminAccessToken(env);
+    const response = await fetch("https://firestore.googleapis.com/v1/projects/"+FIREBASE_PROJECT_ID+"/databases/(default)/documents/websites/"+encodeURIComponent(body.slug),{method:"DELETE",headers:{Authorization:"Bearer "+token}});
+    if (!response.ok && response.status!==404) { const data=await response.json().catch(()=>({})); throw new Error(data.error?.message||"Could not delete the website."); }
+    return json({ok:true},200,request.headers.get("Origin")||"");
+  }
+  return json({error:"Admin endpoint not found."},404,request.headers.get("Origin")||"");
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
@@ -413,6 +486,7 @@ export default {
     try {
       const token = (request.headers.get("Authorization") || "").slice(7);
       const user = await authenticatedUser(request, env);
+      if (url.pathname.startsWith("/admin/")) return await adminRequest(request,user,env);
       if (url.pathname === "/registerBuiltInHosts") {
         if (!user.emailVerified) return json({ error: "Verify your email before publishing built-in addresses." }, 403, origin);
         const body = await request.json();
