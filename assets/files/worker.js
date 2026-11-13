@@ -367,7 +367,8 @@ async function authenticatedUser(request, env) {
   const data = await response.json();
   if (!response.ok || !data.users?.[0]) throw new Error("Your sign-in session is invalid or expired. Please sign in again.");
   const user = data.users[0];
-  return { uid: user.localId, email: user.email || "", emailVerified: !!user.emailVerified };
+  if (user.disabled) throw new Error("This account has been suspended. Contact Interactive Studio support.");
+  return { uid: user.localId, email: user.email || "", emailVerified: !!user.emailVerified, disabled: !!user.disabled };
 }
 
 
@@ -418,7 +419,7 @@ async function adminRequest(request, user, env) {
   if (url.pathname === "/admin/users/update") {
     if (typeof body.uid!=="string" || !body.uid || typeof body.disabled!=="boolean") return json({error:"A user ID and disabled boolean are required."},400,request.headers.get("Origin")||"");
     if (body.uid === user.uid) return json({error:"You cannot ban your own admin account."},400,request.headers.get("Origin")||"");
-    const result = await firebaseAdminRequest("projects/"+FIREBASE_PROJECT_ID+"/accounts:update",{method:"POST",body:JSON.stringify({localId:body.uid,disableUser:body.disabled})},env);
+    const result = await firebaseAdminRequest("projects/"+FIREBASE_PROJECT_ID+"/accounts:update",{method:"POST",body:JSON.stringify({localId:body.uid,disableUser:body.disabled,...(body.disabled?{validSince:String(Math.floor(Date.now()/1000))}:{})})},env);
     return json({ok:true,disabled:!!result.disabled},200,request.headers.get("Origin")||"");
   }
   if (url.pathname === "/admin/users/delete") {
