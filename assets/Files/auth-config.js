@@ -304,7 +304,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       if (!activeUser) throw new Error("Sign in before requesting a verification email.");
       // Firebase Auth sends the verification message directly. No Vercel API,
       // Admin SDK endpoint, or extra email-service secret is required.
-      const returnUrl = window.location.origin + appUrl("/auth/personal/login/") + "?verified=1";
+      const returnUrl = window.location.origin + appUrl("/auth/personal/login/");
       await activeUser.sendEmailVerification({
         url: returnUrl,
         handleCodeInApp: false
