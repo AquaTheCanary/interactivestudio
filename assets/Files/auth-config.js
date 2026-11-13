@@ -26,15 +26,18 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   // Set durable browser persistence before resolving the initial auth state.
   // This prevents page guards from briefly treating a returning user as signed out.
   const authReady = auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-    .catch(error => {
-      console.error("Firebase persistence setup failed:", error);
-    })
-    .then(() => new Promise(resolve => {
-      const unsubscribe = auth.onAuthStateChanged(user => {
-        unsubscribe();
-        resolve(user || null);
-      });
-    }));
+    .catch(error => { console.error("Firebase persistence setup failed:", error); })
+    .then(() => Promise.race([
+      new Promise(resolve => {
+        let unsubscribe = () => {};
+        unsubscribe = auth.onAuthStateChanged(user => { unsubscribe(); resolve(user || null); },
+          error => { unsubscribe(); console.error("Firebase auth state error:", error); resolve(auth.currentUser || null); });
+      }),
+      new Promise(resolve => setTimeout(() => {
+        console.warn("Firebase auth state was slow; continuing with the current session snapshot.");
+        resolve(auth.currentUser || null);
+      }, 8000))
+    ]));
 
   // Shared session policy: 60 minutes without activity, or 30 minutes after
   // the last open app tab is closed. Activity is synchronised across tabs.
@@ -240,9 +243,11 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       }
       beginFreshSession();
       const credential = await auth.signInWithEmailAndPassword(email.trim(), password);
-      if (!credential.user.emailVerified) {
+      await credential.user.reload();
+      const refreshedUser = auth.currentUser || credential.user;
+      if (!refreshedUser.emailVerified) {
         let sendError = null;
-        try { await studioAuth.sendVerificationEmail(credential.user); } catch (error) { sendError = error; }
+        try { await studioAuth.sendVerificationEmail(refreshedUser); } catch (error) { sendError = error; }
         await auth.signOut();
         if (sendError) throw new Error("Your email is not verified, and the verification email could not be sent: " + sendError.message);
         throw new Error(organisation
