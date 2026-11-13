@@ -40,7 +40,7 @@ body.page-body{background:radial-gradient(ellipse at 8% 0%,#4535a322,transparent
  }
  const fallback="data:image/svg+xml;charset=utf-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" rx="60" fill="#24283a"/><text x="60" y="75" text-anchor="middle" font-size="52" fill="#a99fff">✦</text></svg>');
  try{
-  user=await studioAuth.currentUser();if(!user){location.replace(window.getAppUrl("/auth/personal/login/"));return}
+  user=await studioAuth.currentUser();if(!user){try{sessionStorage.setItem("studio_return_to",location.pathname+location.search+location.hash)}catch(_){}location.replace(window.getAppUrl("/auth/personal/login/"));return}
   const db=firebase.firestore(),ref=db.collection("userProfiles").doc(user.uid);
   const snap=await ref.get();profile=snap.exists?snap.data():{};
   $("display-name").value=profile.displayName||user.displayName||"";
