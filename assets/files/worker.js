@@ -122,9 +122,10 @@ async function serveWebsite(request, env, hostnameOverride) {
 }
 async function proxyStudioApp(request) {
   const incoming = new URL(request.url);
+  const requestHost = String(request.headers.get("X-IS-Original-Host") || incoming.hostname).toLowerCase();
   let pathname = incoming.pathname;
   const params = new URLSearchParams(incoming.search);
-  if (incoming.hostname.toLowerCase() === HELP_HOST) pathname = "/help/index.html";
+  if (requestHost === HELP_HOST) pathname = "/help/index.html";
   else if (pathname === "/help" || pathname === "/help/") return Response.redirect("https://" + HELP_HOST + "/", 302);
   let match;
   // Clean, ID-based application URLs are mapped to static GitHub Pages entry points.
