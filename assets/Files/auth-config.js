@@ -225,7 +225,11 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       localStorage.setItem("is_user_plan", profile.plan);
       localStorage.setItem("is_user_provider", profile.provider);
       localStorage.setItem("is_user_account_type", organisation ? "organisation" : "personal");
-      window.location.replace(appUrl("/dashboard/"));
+      const requested = sessionStorage.getItem("studio_return_to") || "";
+      sessionStorage.removeItem("studio_return_to");
+      const destination = requested.startsWith("/") && !requested.startsWith("//") && !requested.startsWith("/auth/")
+        ? requested : "/dashboard/";
+      window.location.replace(appUrl(destination));
     },
     async signInEmail(email, password, organisation = false) {
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
