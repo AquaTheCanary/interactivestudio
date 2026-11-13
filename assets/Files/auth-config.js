@@ -227,8 +227,10 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       localStorage.setItem("is_user_account_type", organisation ? "organisation" : "personal");
       const requested = sessionStorage.getItem("studio_return_to") || "";
       sessionStorage.removeItem("studio_return_to");
-      const destination = requested.startsWith("/") && !requested.startsWith("//") && !requested.startsWith("/auth/")
-        ? requested : "/dashboard/";
+      const basePath = window.APP_BASE_PATH || "";
+      const route = basePath && requested.startsWith(basePath + "/") ? requested.slice(basePath.length) : requested;
+      const destination = route.startsWith("/") && !route.startsWith("//") && !route.startsWith("/auth/")
+        ? route : "/dashboard/";
       window.location.replace(appUrl(destination));
     },
     async signInEmail(email, password, organisation = false) {
