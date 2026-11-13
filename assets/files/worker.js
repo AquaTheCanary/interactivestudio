@@ -411,19 +411,19 @@ async function adminRequest(request, user, env) {
   }
   const url = new URL(request.url), body = await request.json().catch(()=>({}));
   if (url.pathname === "/admin/users/list") {
-    const result = await firebaseAdminRequest("projects/"+FIREBASE_PROJECT_ID+"/accounts:query",{method:"POST",body:JSON.stringify({returnUserInfo:true})},env);
+    const result = await firebaseAdminRequest("projects/"+FIREBASE_PROJECT_ID+"/accounts:query",{method:"POST",body:JSON.stringify({returnUserInfo:true,limit:"500"})},env);
     const users = (result.users||[]).map(u=>({uid:u.localId,email:u.email||"",name:u.displayName||"",disabled:!!u.disabled,emailVerified:!!u.emailVerified,createdAt:u.createdAt||"",lastLoginAt:u.lastLoginAt||""}));
     return json({users},200,request.headers.get("Origin")||"");
   }
   if (url.pathname === "/admin/users/update") {
     if (typeof body.uid!=="string" || !body.uid || typeof body.disabled!=="boolean") return json({error:"A user ID and disabled boolean are required."},400,request.headers.get("Origin")||"");
     if (body.uid === user.uid) return json({error:"You cannot ban your own admin account."},400,request.headers.get("Origin")||"");
-    const result = await firebaseAdminRequest("accounts:update",{method:"POST",body:JSON.stringify({localId:body.uid,disable:body.disabled})},env);
+    const result = await firebaseAdminRequest("projects/"+FIREBASE_PROJECT_ID+"/accounts:update",{method:"POST",body:JSON.stringify({localId:body.uid,disableUser:body.disabled})},env);
     return json({ok:true,disabled:!!result.disabled},200,request.headers.get("Origin")||"");
   }
   if (url.pathname === "/admin/users/delete") {
     if (typeof body.uid!=="string" || !body.uid || body.uid===user.uid) return json({error:"A different user ID is required."},400,request.headers.get("Origin")||"");
-    await firebaseAdminRequest("accounts:delete",{method:"POST",body:JSON.stringify({localId:body.uid})},env);
+    await firebaseAdminRequest("projects/"+FIREBASE_PROJECT_ID+"/accounts:delete",{method:"POST",body:JSON.stringify({localId:body.uid})},env);
     return json({ok:true},200,request.headers.get("Origin")||"");
   }
   if (url.pathname === "/admin/websites/list") {
