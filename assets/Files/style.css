@@ -108,3 +108,15 @@ html[data-theme="light"] .mobile-menu-button,html[data-theme="light"] .btn-secon
 html[data-theme="light"] .site-footer,html[data-theme="light"] footer{color:#667085;border-color:#e5e7ef}
 html[data-theme="light"] .theme-toggle{background:#fff;color:#202431;border-color:#dfe3eb}
 html[data-theme="light"] body:before{opacity:.28}
+
+/* Refined motion language shared by the entire Studio, including app and auth routes. */
+@keyframes studioPageIn{from{opacity:0;transform:translateY(9px) scale(.997)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes studioCardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+body:not([data-no-motion]) main,body:not([data-no-motion]) .shell,body:not([data-no-motion]) .auth-layout,body:not([data-no-motion]) .admin-shell{animation:studioPageIn .48s cubic-bezier(.2,.7,.2,1) both}
+body:not([data-no-motion]) .panel,body:not([data-no-motion]) .card,body:not([data-no-motion]) .dashboard-card,body:not([data-no-motion]) .feature-card,body:not([data-no-motion]) .editor-panel{animation:studioCardIn .55s cubic-bezier(.2,.7,.2,1) both}
+body:not([data-no-motion]) .panel:nth-of-type(2),body:not([data-no-motion]) .card:nth-of-type(2){animation-delay:.05s}
+body:not([data-no-motion]) .panel:nth-of-type(3),body:not([data-no-motion]) .card:nth-of-type(3){animation-delay:.1s}
+body:not([data-no-motion]) .panel:nth-of-type(4),body:not([data-no-motion]) .card:nth-of-type(4){animation-delay:.15s}
+body:not([data-no-motion]) .site-header,body:not([data-no-motion]) .home-nav,body:not([data-no-motion]) .app-header{animation:studioPageIn .4s ease both}
+a,button,.btn,.toolbtn,.layer-item{ -webkit-tap-highlight-color:transparent}
+@media(prefers-reduced-motion:reduce){body:not([data-no-motion]) main,body:not([data-no-motion]) .shell,body:not([data-no-motion]) .auth-layout,body:not([data-no-motion]) .admin-shell,body:not([data-no-motion]) .panel,body:not([data-no-motion]) .card,body:not([data-no-motion]) .dashboard-card,body:not([data-no-motion]) .feature-card,body:not([data-no-motion]) .editor-panel,body:not([data-no-motion]) .site-header,body:not([data-no-motion]) .home-nav,body:not([data-no-motion]) .app-header{animation:none!important}}
