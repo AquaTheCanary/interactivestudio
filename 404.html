@@ -1,12 +1,43 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Loading presentation | Interactive Studio</title></head><body><p>Loading presentation…</p><script>
-(function(){
- const path=location.pathname;
- const match=path.match(/^(.*)\/view\/(\d{6})\/?$/);
- if(!match){location.replace((location.pathname.split("/").slice(0,2).join("/")||"")+"/");return}
- const base=location.hostname.endsWith(".github.io")?"/interactivestudio":"";
- fetch(base+"/view/index.html",{cache:"no-store"}).then(response=>{if(!response.ok)throw new Error("Viewer page unavailable");return response.text()}).then(html=>{
-  html=html.replace("<head>","<head><base href=\""+base+"/\">");
-  document.open();document.write(html);document.close();
- }).catch(error=>{document.body.textContent="Could not open this presentation: "+error.message;});
-})();
-</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0a0a0c">
+  <title>Page | Interactive Studio</title>
+</head>
+<body>
+  <p>Loading page…</p>
+  <script>
+  (async function () {
+    const isGitHubPages = location.hostname.toLowerCase().endsWith(".github.io");
+    const base = isGitHubPages ? "/interactivestudio" : "";
+    const path = location.pathname.replace(/\\/+$/, "") || "/";
+    const presentation = path.match(/^(?:\\/interactivestudio)?\\/view\\/(\\d{6})$/);
+
+    try {
+      let target;
+      if (presentation) {
+        target = base + "/view/index.html";
+      } else {
+        const appPath = isGitHubPages && path.startsWith(base + "/")
+          ? path.slice(base.length)
+          : path;
+        target = base + (appPath === "/" ? "/index.html" : appPath + "/index.html");
+      }
+
+      const response = await fetch(target, { cache: "no-store" });
+      if (!response.ok) throw new Error("Page not found");
+      let html = await response.text();
+      html = html.replace("<head>", '<head><base href="' + base + '/">');
+      document.open();
+      document.write(html);
+      document.close();
+    } catch (error) {
+      document.title = "Page not found | Interactive Studio";
+      document.body.innerHTML = '<main style="font:16px system-ui;max-width:620px;margin:12vh auto;padding:24px;color:#eee;background:#111;border-radius:16px"><h1>Page not found</h1><p>We couldn’t find that page. Check the address or return to Interactive Studio.</p><a style="color:#8ab4ff" href="' + base + '/">Go to homepage</a></main>';
+    }
+  })();
+  </script>
+</body>
+</html>
