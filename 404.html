@@ -7,13 +7,13 @@
   <title>Page | Interactive Studio</title>
 </head>
 <body>
-  <p>Loading presentations…</p>
+  <p>Loading page…</p>
   <script>
   (async function () {
     const isGitHubPages = location.hostname.toLowerCase().endsWith(".github.io");
     const base = isGitHubPages ? "/interactivestudio" : "";
-    const path = location.pathname.replace(/\\/+$/, "") || "/";
-    const presentation = path.match(/^(?:\\/interactivestudio)?\\/view\\/(\\d{6})$/);
+    const path = location.pathname.replace(/\/+$/, "") || "/";
+    const presentation = path.match(/^(?:\/interactivestudio)?\/view\/(\d{6})$/);
 
     try {
       let target;
