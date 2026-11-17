@@ -1,1 +1,23 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>New presentation | Interactive Studio</title><script src="../../assets/Files/router.js"></script></head><body><script>const id="deck_"+(crypto.randomUUID?crypto.randomUUID().replace(/-/g,""):Date.now());localStorage.setItem("studio_active_project",id);location.replace(window.getAppUrl("/presentations/editor/")+"?id="+encodeURIComponent(id));</script><p>Creating your presentation…</p></body></html>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>New presentation | Interactive Studio</title>
+<script src="../../assets/Files/router.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="../../assets/Files/auth-config.js"></script>
+<style>body{margin:0;background:#f5f6fa;color:#252638;font:15px Arial,sans-serif;display:grid;min-height:100vh;place-items:center}.box{background:white;border:1px solid #e6e8ef;border-radius:14px;padding:28px;max-width:360px;text-align:center}.muted{color:#73788a;font-size:13px}</style></head>
+<body><main class="box"><h2>Preparing your presentation…</h2><p class="muted" id="status">Setting up your workspace.</p></main>
+<script>
+(async()=>{const status=document.getElementById("status");try{
+ const user=await window.studioAuth.currentUser();
+ if(!user){sessionStorage.setItem("studio_return_to",location.pathname+location.search);location.replace(window.getAppUrl("/auth/personal/login/"));return;}
+ const params=new URLSearchParams(location.search);
+ const id=params.get("id")||("deck_"+(crypto.randomUUID?crypto.randomUUID().replace(/-/g,""):Date.now()+"_"+Math.random().toString(36).slice(2)));
+ localStorage.setItem("studio_active_project",id);
+ const key="studio_projects_"+user.uid;let projects=[];
+ try{projects=JSON.parse(localStorage.getItem(key)||"[]");if(!Array.isArray(projects))projects=[]}catch(_){}
+ if(!projects.some(p=>p.id===id)){projects.unshift({id,title:"Untitled presentation",updatedAt:new Date().toISOString()});}
+ localStorage.setItem(key,JSON.stringify(projects.slice(0,100)));
+ location.replace(window.getAppUrl("/presentations/editor/")+"?id="+encodeURIComponent(id));
+ }catch(error){console.error("Could not prepare presentation:",error);status.textContent="We couldn't open the editor. Please return to your workspace and try again.";}})();
+</script></body></html>
