@@ -26,7 +26,7 @@
 
   // Apply the saved appearance before paint, then expose the toggle in every page footer.
   const themeKey = "is-theme";
-  document.documentElement.dataset.theme = localStorage.getItem(themeKey) === "light" ? "light" : "dark";
+  document.documentElement.dataset.theme = localStorage.getItem(themeKey) === "dark" ? "dark" : "light";
   function installThemeToggle() {
     let footer = document.querySelector("footer");
     if (!footer) {
