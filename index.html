@@ -83,6 +83,18 @@
 .marketing-footer a{color:#666570;text-decoration:none}
 @media(max-width:900px){.marketing-nav{padding:0 22px}.marketing-navlinks{gap:17px}.marketing-hero{grid-template-columns:1fr;padding:76px 24px 58px;gap:30px}.hero-copy{max-width:720px}.hero-art{min-height:420px}.product-window{max-width:620px}.marketing-section,.workflow-inner{padding:76px 24px}.workflow-inner{grid-template-columns:1fr;gap:35px}}
 @media(max-width:650px){.marketing-nav{height:66px;padding:0 16px}.marketing-navlinks{display:none}.marketing-actions{gap:12px}.marketing-signin{display:none}.marketing-cta{min-height:40px;padding:0 14px}.marketing-brand{font-size:14px}.marketing-hero{padding:65px 20px 44px}.hero-copy h1{font-size:clamp(48px,13vw,68px)}.hero-copy>p{font-size:15px}.hero-art{min-height:300px;margin:0 -8px}.window-body{grid-template-columns:78px minmax(0,1fr)}.window-side.right{display:none}.window-side{padding:13px 7px}.window-canvas{padding:14px}.float-note{right:0;bottom:16px}.marketing-proof{padding:22px 20px}.marketing-section,.workflow-inner{padding:68px 20px}.product-grid{grid-template-columns:1fr}.product-card{min-height:0}.marketing-bottom{padding:70px 20px}.marketing-footer{padding:24px 20px;align-items:flex-start;flex-direction:column}}
+
+/* Homepage full-bleed header: keep the bar attached to the viewport, not a centred content column. */
+html,body.marketing{width:100%!important;max-width:none!important;margin:0!important;padding-left:0!important;padding-right:0!important;box-sizing:border-box!important}
+body.marketing{overflow-x:hidden!important}
+body.marketing>.marketing-nav{
+  display:flex!important;position:relative!important;left:50%!important;
+  transform:translateX(-50%)!important;
+  width:100vw!important;max-width:none!important;min-width:100vw!important;
+  margin:0!important;box-sizing:border-box!important;
+  border-left:0!important;border-right:0!important;border-radius:0!important;
+}
+
 </style>
 </head>
 <body class="page-body marketing">
