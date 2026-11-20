@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Verify your email | Interactive Studio</title>
+<title>Verify your email | Project</title>
 <link rel="icon" href="../../assets/images/tablogo.png">
 <link rel="stylesheet" href="../../assets/Files/style.css">
 <script src="../../assets/Files/router.js"></script>
@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="../../assets/Files/design-system.css"></head>
 <body class="auth-page">
 <main class="auth-container" style="max-width:520px;margin:10vh auto;text-align:center">
-<img src="../../assets/images/headerlogo.png" alt="Interactive Studio" style="width:170px;max-width:70%;margin:0 auto 28px">
+<img src="../../assets/images/headerlogo.png" alt="Project" style="width:170px;max-width:70%;margin:0 auto 28px">
 <div class="section-kicker">Account security</div>
 <h1 id="action-title">Verifying your email…</h1>
 <p id="action-message" role="status" aria-live="polite">Please keep this page open while we confirm your address.</p>
@@ -39,7 +39,7 @@
      const user=firebase.auth().currentUser;
      if(user){await user.reload();await user.getIdToken(true);}
    }catch(_){}
-   setResult("Email address verified","Your email address has been confirmed. Sign in again to refresh your Interactive Studio session.");
+   setResult("Email address verified","Your email address has been confirmed. Sign in again to refresh your Project session.");
    link.href=window.getAppUrl("/auth/personal/login/");
    if(continueUrl){
      try{
@@ -56,6 +56,6 @@
  }
 })();
 </script>
-<footer><div class="footer-inner"><div>© 2026 Interactive Studio. All rights reserved.</div><a href="https://github.com/AquaTheCanary/interactivestudio" target="_blank" rel="noopener">View on GitHub</a></div></footer>
+<footer><div class="footer-inner"><div>© 2026 Project. All rights reserved.</div><a href="https://github.com/AquaTheCanary/project" target="_blank" rel="noopener">View on GitHub</a></div></footer>
 </body>
 </html>
