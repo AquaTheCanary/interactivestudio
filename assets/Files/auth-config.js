@@ -43,16 +43,14 @@ const firebaseProduct = firebaseHost.includes("cloudbase") ? "cloudbase"
   : firebaseHost.includes("siteify") ? "siteify"
   : firebaseHost.includes("presentr") ? "presentr" : null;
 const firebaseConfig = firebaseProduct ? firebaseApps[firebaseProduct] : {
-  // Main Project web app config is still pending. This fallback is retained
-  // temporarily so existing Project pages are not silently switched to a
-  // product's Firebase Web App registration.
-  apiKey: "AIzaSyAHQDuRXq77XRZvnE-dDuoy8A1TLLtfSy8",
-  authDomain: "interactive-studio-convexllc.firebaseapp.com",
-  projectId: "interactive-studio-convexllc",
-  storageBucket: "interactive-studio-convexllc.firebasestorage.app",
-  messagingSenderId: "405382386557",
-  appId: "1:405382386557:web:bd91219c8797218fb2b214",
-  measurementId: "G-9JSV264WHB"
+  // The main Project platform has not yet been registered as a separate Web App.
+  // Firebase Auth and Firestore can use the shared project's valid web config
+  // while retaining the product-specific app registrations above.
+  apiKey: "AIzaSyAU1ClFXmG9z2q4vjhrsCgcJVNJFq1Ubj0",
+  authDomain: "convexllc-project.firebaseapp.com",
+  projectId: "convexllc-project",
+  storageBucket: "convexllc-project.firebasestorage.app",
+  messagingSenderId: "82355515745"
 };
 if (!window.firebase) throw new Error("Load Firebase App and Auth compat SDK before auth-config.js.");
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
@@ -348,6 +346,15 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       provider.addScope("user:email");
       return studioAuth.runSSO(provider, organisation);
     },
+    async signInMicrosoft(organisation = false) {
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      beginFreshSession();
+      const provider = new firebase.auth.OAuthProvider("microsoft.com");
+      provider.setCustomParameters({ prompt: "select_account" });
+      provider.addScope("email");
+      provider.addScope("profile");
+      return studioAuth.runSSO(provider, organisation);
+    },
     async runSSO(provider, organisation) {
       try {
         const credential = await auth.signInWithPopup(provider);
@@ -417,9 +424,11 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   window.studioAuth = studioAuth;
   window.loginWithGoogle = organisation => studioAuth.signInGoogle(!!organisation).catch(showAuthError);
   window.loginWithGithub = organisation => studioAuth.signInGithub(!!organisation).catch(showAuthError);
+  window.loginWithMicrosoft = organisation => studioAuth.signInMicrosoft(!!organisation).catch(showAuthError);
   window.showAuthError = showAuthError;
   function showAuthError(error) {
     const messages = {
+      "auth/api-key-not-valid": "This app is using an invalid Firebase API key. Refresh the page after the Firebase configuration has been updated, and check the Browser key in Google Cloud Console if the error continues.",
       "auth/unauthorized-domain": "This website domain is not authorised in Firebase. Add interactivestudio.abrdns.com and aquathecanary.github.io under Firebase Authentication → Settings → Authorised domains.",
       "auth/operation-not-allowed": "This sign-in provider is not enabled yet. Enable Google or GitHub in Firebase Authentication → Sign-in providers.",
       "auth/invalid-oauth-client-id": "GitHub sign-in is not configured correctly. Check the GitHub Client ID in Firebase Authentication → Sign-in providers → GitHub.",
