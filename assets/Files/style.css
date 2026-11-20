@@ -556,3 +556,6 @@ body.auth-page .auth-form{padding-bottom:4px}
   body.auth-page>.auth-layout{width:100%!important}
   body.auth-page>footer{width:calc(100% + 24px)!important;margin:24px -12px 0!important}
 }
+
+/* Avoid flashing the sign-in form while Firebase restores an existing session. */
+body.auth-checking{visibility:hidden!important}
