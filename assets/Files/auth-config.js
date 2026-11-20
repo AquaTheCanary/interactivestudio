@@ -176,10 +176,14 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       if (!activeUser) return false;
       // Refresh both the Firebase user record and its ID token. The emailVerified
       // property on an already-loaded client session can otherwise remain stale.
-      await activeUser.reload();
-      const liveUser = auth.currentUser || activeUser;
-      await liveUser.getIdToken(true);
-      return !!((auth.currentUser || liveUser).emailVerified);
+      // Always reload the actual Firebase Auth session, then force a fresh
+      // token. The token's email_verified claim is the server-issued source
+      // of truth and avoids relying on a stale User object after action-code use.
+      const sessionUser = auth.currentUser || activeUser;
+      await sessionUser.reload();
+      const liveUser = auth.currentUser || sessionUser;
+      const tokenResult = await liveUser.getIdTokenResult(true);
+      return tokenResult.claims.email_verified === true || !!liveUser.emailVerified;
     },
     async getProfile(user) {
       const activeUser = user || await studioAuth.currentUser();
@@ -196,7 +200,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         email: refreshedUser.email || "",
         name: refreshedUser.displayName || refreshedUser.email || "Creator",
         photoURL: refreshedUser.photoURL || "",
-        emailVerified: !!refreshedUser.emailVerified,
+        emailVerified: claims.email_verified === true || !!refreshedUser.emailVerified,
         provider: refreshedUser.providerData?.[0]?.providerId || "password",
         plan: verifiedPlan,
         organisationId: claims.organisationId || null
