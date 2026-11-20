@@ -2,7 +2,7 @@
 
 This repository uses one Firebase project for the Project platform and its four products.
 
-- Firebase project ID: `interactive-studio-convexllc` (the Firebase display name can be Project).
+- Firebase project ID: `convexllc-project` (project number `82355515745`).
 - Project: user profiles, workspaces and organisations.
 - Presentr: `presentations` and nested `slides`.
 - Siteify: `siteProjects` and nested `pages`.
@@ -14,11 +14,11 @@ This repository uses one Firebase project for the Project platform and its four 
 1. Install Node.js 20 and the Firebase CLI.
 2. From the repository root run `npm install -g firebase-tools`.
 3. Sign in with `firebase login`.
-4. Confirm the selected project with `firebase projects:list`.
+4. Confirm the selected project with `firebase projects:list`; the configured default is `convexllc-project`.
 5. Deploy rules first: `firebase deploy --only firestore:rules,storage`.
 6. Deploy Functions separately after reviewing required secrets and billing: `firebase deploy --only functions`.
 
-The root `firebase.json` and `.firebaserc` select the existing Firebase project. The Firebase web configuration remains in `assets/Files/auth-config.js`; the API key there is a public web-app identifier, not a server secret.
+The root `firebase.json` and `.firebaserc` select the existing Firebase project. The Firebase web configuration in `assets/Files/auth-config.js` and `assets/files/auth-config.js` still needs to be replaced with the Web App config from this new Firebase project. Do not reuse the previous project's API key or app ID. The API key is a public web-app identifier, not a server secret.
 
 ## Important
 
