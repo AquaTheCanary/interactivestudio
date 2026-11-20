@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Website editor | Interactive Studio</title><link rel="icon" href="../assets/images/tablogo.png">
+<title>Siteify | Project</title><link rel="icon" href="../assets/images/tablogo.png">
 <link rel="stylesheet" href="../assets/Files/style.css"><script src="../assets/Files/router.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -384,13 +384,13 @@ body[data-website-page="editor"] .hidden{display:none!important}
 
 </style><link rel="stylesheet" href="../assets/Files/design-system.css"></head>
 <body class="page-body" data-website-page="editor">
-<header class="home-nav"><div class="nav-brand"><a data-route="/home/"><img src="../assets/images/headerlogo.png" class="brand-logo" alt="Interactive Studio"></a><span class="brand-name">Websites</span></div><nav class="nav-links"><a data-route="/dashboard/">Workspace</a><a data-route="/presentations/editor/">Presentations</a><a data-route="/websites/" class="active">Websites</a><a data-route="/settings/">Settings</a></nav><div class="nav-actions"><span class="user-email-badge" id="account">Loading account…</span></div></header>
+<header class="home-nav"><div class="nav-brand"><a data-route="/home/"><img src="../assets/images/headerlogo.png" class="brand-logo" alt="Project"></a><span class="brand-name">Websites</span></div><nav class="nav-links"><a data-route="/dashboard/">Workspace</a><a data-route="/presentations/editor/">Presentations</a><a data-route="/websites/" class="active">Websites</a><a data-route="/settings/">Settings</a></nav><div class="nav-actions"><span class="user-email-badge" id="account">Loading account…</span></div></header>
 <main class="shell">
 <div class="head"><div><div class="section-kicker">PUBLISHING STUDIO</div><h1>Your websites.</h1><p>Build, preview and publish a website with its own address.</p></div><button class="btn primary" id="new" disabled>＋ Create website</button></div>
 <div class="layout">
 <aside class="panel list"><div class="panel-title">YOUR WEBSITES</div><div class="items" id="items"><p class="muted">Loading websites…</p></div></aside>
 <section class="panel main">
-<div class="empty" id="empty"><h2>Make your first website.</h2><p>Create a responsive website, edit its content and colours, then publish it to a free Interactive Studio address. You can connect a domain you already own too.</p><div class="message" id="create-message" aria-live="polite"></div><button class="btn primary" id="first" disabled>Loading your workspace…</button></div>
+<div class="empty" id="empty"><h2>Make your first website.</h2><p>Create a responsive website, edit its content and colours, then publish it to a free Project address. You can connect a domain you already own too.</p><div class="message" id="create-message" aria-live="polite"></div><button class="btn primary" id="first" disabled>Loading your workspace…</button></div>
 <div id="editor" class="hidden">
 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap"><div><div class="section-kicker">WEBSITE EDITOR</div><h2 id="editor-title" style="font-size:25px;letter-spacing:-.05em;margin:5px 0">Untitled website</h2><span id="site-status" class="status">Draft</span></div><a id="open-live" class="btn hidden" target="_blank" rel="noopener">Open published site ↗</a></div>
 <div class="builder-top" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:16px 0">
@@ -413,13 +413,13 @@ body[data-website-page="editor"] .hidden{display:none!important}
     <div class="publish-modal-kicker">PUBLISHING STUDIO</div>
     <h2 id="publish-title">Publish your website</h2>
     <p>Choose where this website will live. Its website name and web address are independent.</p>
-    <label class="field"><span>Publish destination</span><select id="publish-target"><option value="builtin">Free Interactive Studio address</option><option value="custom">A custom domain I own</option></select></label>
+    <label class="field"><span>Publish destination</span><select id="publish-target"><option value="builtin">Free Project address</option><option value="custom">A custom domain I own</option></select></label>
     <div id="builtin-publish-fields">
       <label class="field"><span>Subdomain name</span><input id="publish-subdomain" maxlength="40" placeholder="your-site" autocomplete="off"></label>
       <p class="muted">Your free address will be <strong>your-site.is-sites.abrdns.com</strong>.</p>
     </div>
     <div id="custom-publish-fields" class="hidden">
-      <div class="domainbox"><h4>Connect a domain you own</h4><p class="muted">Enter a hostname such as www.example.com. If it is in your connected ClouDNS account, Interactive Studio will create the exact CNAME and certificate-validation records automatically. Otherwise, the DNS records you need will be shown here. Free Interactive Studio addresses use wildcard DNS and HTTPS, so they are ready without per-site setup. Custom domains are separate: connect a domain you own, point its CNAME to the target shown, and complete the DNS verification records. Automatic HTTPS for custom domains requires the platform custom-hostname service to be configured.</p>
+      <div class="domainbox"><h4>Connect a domain you own</h4><p class="muted">Enter a hostname such as www.example.com. If it is in your connected ClouDNS account, Project will create the exact CNAME and certificate-validation records automatically. Otherwise, the DNS records you need will be shown here. Free Project addresses use wildcard DNS and HTTPS, so they are ready without per-site setup. Custom domains are separate: connect a domain you own, point its CNAME to the target shown, and complete the DNS verification records. Automatic HTTPS for custom domains requires the platform custom-hostname service to be configured.</p>
         <label class="field"><span>Custom domain</span><input id="custom-domain" maxlength="253" placeholder="www.example.com" autocomplete="url"></label>
         <div class="actions"><button class="btn" id="connect">Connect domain</button><button class="btn hidden" id="check">Check DNS & SSL</button></div>
         <div class="callout hidden" id="dns"></div><div class="message" id="domain-message" aria-live="polite"></div>
@@ -499,7 +499,7 @@ function address(){const host=active?.publishedHostname;$("built-url").textConte
 function list(items){const box=$("items");box.replaceChildren();if(!items.length){const p=document.createElement("p");p.className="muted";p.textContent="No websites yet. Create one to get started.";box.append(p);return}items.forEach(site=>{const b=document.createElement("button");b.className="item"+(active&&active.slug===site.slug?" active":"");const strong=document.createElement("strong");strong.textContent=site.siteName||site.slug;const small=document.createElement("small");small.textContent=(site.status==="published"?"Published":"Draft")+" · "+site.slug;b.append(strong,small);b.onclick=()=>load(site.slug).catch(e=>msg("save-message",e.message,"error"));box.append(b)})}
 function fill(site){$("editor").classList.remove("hidden");$("empty").classList.add("hidden");$("editor-title").textContent=site.siteName||site.slug;$("builder-site-name").value=site.siteName||site.slug;$("builder-handle-note").textContent=profileHandle?"Publishing handle: @"+profileHandle+" · change it in Settings.":"Set your public handle in Settings before publishing.";$("slug").value=site.slug;$("slug").disabled=true;sections=Array.isArray(site.sections)&&site.sections.length?site.sections.map(x=>({...x})):legacySections(site);selectedSection=0;historyStack=[];historyIndex=-1;pushHistory();address();renderBuilder();loadDomain(site.slug)}
 function legacySections(site){const a=[{type:"hero",eyebrow:site.eyebrow||"WELCOME",title:site.headline||site.siteName||"Welcome",text:site.subheadline||"",background:site.background||"#f7f8fc",accent:site.accent||"#635bff",align:"center"}];if(site.body)a.push({type:"text",title:"About",text:site.body,background:"#fff",accent:"#252638",align:"left"});if(site.buttonLabel)a.push({type:"button",title:"",buttonLabel:site.buttonLabel,buttonUrl:site.buttonUrl||"",background:"#f7f8fc",accent:site.accent||"#635bff",align:"center"});return a}
-function loadDomain(slug){const d=Object.values(domains).find(x=>x.websiteSlug===slug);$("custom-domain").value=d?d.hostname:"";$("check").classList.toggle("hidden",!d);$("dns").classList.toggle("hidden",!d);if(d)$("dns").textContent="CNAME record: point "+d.hostname+" to "+(d.cnameTarget||"the CNAME target shown by Interactive Studio")+". Status: "+d.status+". After DNS is set, check DNS & SSL.";else msg("domain-message","No custom domain connected to this website.")}
+function loadDomain(slug){const d=Object.values(domains).find(x=>x.websiteSlug===slug);$("custom-domain").value=d?d.hostname:"";$("check").classList.toggle("hidden",!d);$("dns").classList.toggle("hidden",!d);if(d)$("dns").textContent="CNAME record: point "+d.hostname+" to "+(d.cnameTarget||"the CNAME target shown by Project")+". Status: "+d.status+". After DNS is set, check DNS & SSL.";else msg("domain-message","No custom domain connected to this website.")}
 let websiteCache=[];
 async function reload(){
  const timed=(promise,label)=>Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error(label+" timed out. You can still create a new website.")),8000))]);
