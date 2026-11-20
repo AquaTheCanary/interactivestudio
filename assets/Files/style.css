@@ -851,3 +851,6 @@ body.auth-page .auth-header>a{display:none}
 
 /* Respect the HTML hidden attribute even when component styles set display:flex/grid. */
 [hidden]{display:none!important}
+
+/* Keep native hidden state authoritative for components with explicit display rules. */
+[hidden]{display:none!important}
