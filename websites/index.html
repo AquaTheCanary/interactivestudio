@@ -337,7 +337,7 @@ function fill(site){$("editor").classList.remove("hidden");$("empty").classList.
 function legacySections(site){const a=[{type:"hero",eyebrow:site.eyebrow||"WELCOME",title:site.headline||site.siteName||"Welcome",text:site.subheadline||"",background:site.background||"#f7f8fc",accent:site.accent||"#635bff",align:"center"}];if(site.body)a.push({type:"text",title:"About",text:site.body,background:"#fff",accent:"#252638",align:"left"});if(site.buttonLabel)a.push({type:"button",title:"",buttonLabel:site.buttonLabel,buttonUrl:site.buttonUrl||"",background:"#f7f8fc",accent:site.accent||"#635bff",align:"center"});return a}
 function loadDomain(slug){const d=Object.values(domains).find(x=>x.websiteSlug===slug);$("custom-domain").value=d?d.hostname:"";$("check").classList.toggle("hidden",!d);$("dns").classList.toggle("hidden",!d);if(d)$("dns").textContent="CNAME record: point "+d.hostname+" to "+(d.cnameTarget||"the CNAME target shown by Interactive Studio")+". Status: "+d.status+". After DNS is set, check DNS & SSL.";else msg("domain-message","No custom domain connected to this website.")}
 let websiteCache=[];
-async function reload(){const [snap,ds]=await Promise.all([db.collection("websites").where("ownerUid","==",user.uid).get(),db.collection("websiteDomains").where("ownerUid","==",user.uid).get()]);websiteCache=snap.docs.map(x=>x.data());domains={};ds.docs.forEach(x=>domains[x.id]=x.data());list(websiteCache);if(!active&&websiteCache.length){active=websiteCache[0];fill(active)}if(!websiteCache.length){$("editor").classList.add("hidden");$("empty").classList.remove("hidden")}}
+async function reload(){const snap=await db.collection("websites").where("ownerUid","==",user.uid).get();websiteCache=snap.docs.map(x=>x.data());domains={};try{const ds=await db.collection("websiteDomains").where("ownerUid","==",user.uid).get();ds.docs.forEach(x=>domains[x.id]=x.data())}catch(domainError){console.warn("Custom-domain records could not be loaded; continuing with website drafts:",domainError);msg("domain-message","Your websites loaded, but custom-domain details could not be retrieved. Check the websiteDomains Firestore rules.","error")}list(websiteCache);if(!active&&websiteCache.length){active=websiteCache[0];fill(active)}if(!websiteCache.length){$("editor").classList.add("hidden");$("empty").classList.remove("hidden")}}
 async function load(slug){let site=websiteCache.find(x=>x.slug===slug);if(!site){const snap=await db.collection("websites").doc(slug).get();if(!snap.exists)throw new Error("That website no longer exists.");site=snap.data()}active=site;fill(active);list(websiteCache.length?websiteCache:[site])}
 async function save(status){
  if(!active)throw new Error("Create a website first.");
@@ -375,7 +375,6 @@ $("publish").onclick=()=>{
  $("confirm-publish").textContent="Publish website ↗";
  preview();
  $("publish-subdomain").value=active.domainSubdomain||"";
- $("publish-format").value=active.domainFormat||"handle-subdomain";
  $("custom-domain").value=active.customDomain||"";
  $("publish-target").value=active.publishTarget||"builtin";
  if(active.publishedHostname&&!active.publishedHostname.endsWith("."+PLATFORM))$("publish-target").value="custom";
@@ -384,7 +383,6 @@ $("publish").onclick=()=>{
 };
 $("publish-target").addEventListener("change",updatePublishPreview);
 $("publish-subdomain").addEventListener("input",updatePublishPreview);
-$("publish-format").addEventListener("change",updatePublishPreview);
 $("custom-domain").addEventListener("input",updatePublishPreview);
 $("confirm-publish").onclick=async()=>{
  const button=$("confirm-publish");
