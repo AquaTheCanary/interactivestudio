@@ -59,6 +59,36 @@ service cloud.firestore {
       }
     }
 
+
+    match /forms/{formId} {
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.title is string
+        && request.resource.data.title.size() <= 160
+        && request.resource.data.fields is list
+        && request.resource.data.fields.size() <= 40;
+      allow read: if (signedIn() && resource.data.ownerUid == request.auth.uid)
+        || resource.data.published == true;
+      allow update, delete: if signedIn()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.fields is list
+        && request.resource.data.fields.size() <= 40;
+    }
+    match /formResponses/{responseId} {
+      function publishedForm() {
+        return exists(/databases/$(database)/documents/forms/$(request.resource.data.formId))
+          && get(/databases/$(database)/documents/forms/$(request.resource.data.formId)).data.published == true;
+      }
+      allow create: if publishedForm()
+        && request.resource.data.answers is map
+        && request.resource.data.answers.size() <= 40;
+      allow read: if signedIn()
+        && exists(/databases/$(database)/documents/forms/$(resource.data.formId))
+        && get(/databases/$(database)/documents/forms/$(resource.data.formId)).data.ownerUid == request.auth.uid;
+      allow update, delete: if false;
+    }
+
     match /websites/{slug} {
       allow create: if signedIn()
         && request.resource.data.ownerUid == request.auth.uid
