@@ -25,5 +25,5 @@ The root `firebase.json` and `.firebaserc` select the existing Firebase project.
 - Do not put Admin SDK credentials or service-account JSON in the website.
 - Firestore and Storage rules are the security boundary. Keep new collections private by default.
 - The current legacy collections (`rooms`, `forms`, `websites`, and related collections) are retained while the product apps migrate to the product-specific collections above.
-- Cloud Functions deployment may require the Blaze billing plan. The client-side Firebase Auth, Firestore and Storage SDKs and security rules can be used without deploying Functions, subject to Firebase Spark quotas and service availability.
+- **Billing constraint (important):** Firebase Cloud Storage requires the Blaze plan to provision or access buckets (requirement effective February 3, 2026). Cloud Functions deployment also requires Blaze. Do not upgrade or add billing unless you explicitly choose to. On Spark, the Cloudbase Storage rules can be prepared in this repository, but Firebase Storage uploads/downloads will not work. We can keep Cloudbase metadata in Firestore and later connect a no-Blaze object-storage provider such as Cloudflare R2 for file bytes.
 - Authentication providers (Google, email/password, Microsoft if configured through OIDC) must be enabled in Firebase Console. Rules do not enable providers automatically.
