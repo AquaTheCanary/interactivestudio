@@ -205,3 +205,17 @@ footer a:hover{color:var(--accent)!important}
 .theme-toggle:hover{color:var(--ink)!important;border-color:var(--accent)!important}
 @media(max-width:760px){.nav-links{background:var(--surface)!important;border-color:var(--line)!important}.footer-inner{gap:14px;flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* App directory surfaces participate in the same appearance tokens. */
+.apps-hero h1,.apps-toolbar h2,.app-card h3,.panel-head h2{color:var(--ink)!important}
+.apps-hero p,.app-card p,.muted{color:var(--muted)!important}
+.apps-toolbar,.apps-grid,.tool-panel{color:var(--ink)}
+.app-card,.tool-panel{background:var(--surface)!important;color:var(--ink)!important;border-color:var(--line)!important;box-shadow:var(--shadow-card)!important}
+.app-card:hover{border-color:var(--accent)!important;box-shadow:var(--shadow-float)!important}
+.app-icon{background:var(--accent-wash)!important;color:var(--accent)!important}
+.app-card button,.tool-content button:not(.close),.action{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important}
+.filter,.search,.tool-content textarea,.tool-content input,.tool-content select,.tool-item{background:var(--surface)!important;color:var(--ink)!important;border-color:var(--line)!important}
+.filter{color:var(--muted)!important}.filter.active,.filter:hover{background:var(--accent-wash)!important;color:var(--accent)!important;border-color:var(--accent)!important}
+.tool-item{background:var(--surface-2)!important}
+html[data-theme="dark"] [style*="background:#fff"],html[data-theme="dark"] [style*="background: #fff"],html[data-theme="dark"] [style*="background:white"]{background:var(--surface)!important;color:var(--ink)!important;border-color:var(--line)!important}
+html[data-theme="dark"] [style*="color:#202"],html[data-theme="dark"] [style*="color:#303"],html[data-theme="dark"] [style*="color:#171"]{color:var(--ink)!important}
