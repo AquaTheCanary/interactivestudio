@@ -69,11 +69,12 @@ service cloud.firestore {
         && request.resource.data.fields.size() <= 40;
       allow read: if (signedIn() && resource.data.ownerUid == request.auth.uid)
         || resource.data.published == true;
-      allow update, delete: if signedIn()
+      allow update: if signedIn()
         && resource.data.ownerUid == request.auth.uid
         && request.resource.data.ownerUid == resource.data.ownerUid
         && request.resource.data.fields is list
         && request.resource.data.fields.size() <= 40;
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
     }
     match /formResponses/{responseId} {
       function publishedForm() {
