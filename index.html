@@ -96,7 +96,21 @@ body.marketing>.marketing-nav{
 }
 
 </style>
-<link rel="stylesheet" href="assets/Files/design-system.css"></head>
+<link rel="stylesheet" href="assets/Files/design-system.css"><script>
+/* Route dedicated product hostnames into their existing Project application areas. */
+(function () {
+  var productRoutes = {
+    "www.presentr.convex-project.abrdns.com": "/presentations/editor/",
+    "www.siteify.convex-project.abrdns.com": "/websites/",
+    "www.formr.convex-project.abrdns.com": "/forms/"
+  };
+  var target = productRoutes[window.location.hostname.toLowerCase()];
+  if (target && (window.location.pathname === "/" || window.location.pathname === "/index.html")) {
+    window.location.replace(target);
+  }
+})();
+</script>
+</head>
 <body class="page-body marketing">
 <header class="marketing-nav">
 <a class="marketing-brand" data-route="/" aria-label="Project home"><img src="assets/images/interactive-studio-icon.svg" alt=""><span>Project</span></a>
