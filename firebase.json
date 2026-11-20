@@ -1,0 +1,12 @@
+{
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs20"
+  },
+  "firestore": {
+    "rules": "assets/files/firestore.rules"
+  },
+  "storage": {
+    "rules": "assets/files/storage.rules"
+  }
+}
