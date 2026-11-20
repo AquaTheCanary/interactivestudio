@@ -625,3 +625,109 @@ body.auth-page .auth-header>a{display:none}
  .nav-actions{gap:6px}
  .nav-actions .user-email-badge{max-width:38vw}
 }
+
+
+/* Unified navigation polish — consistent alignment, spacing and responsive behaviour */
+.site-header,.home-nav,.app-header{
+  position:sticky!important;top:0!important;z-index:500!important;
+  min-height:68px!important;height:auto!important;
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  gap:clamp(14px,2.2vw,30px)!important;
+  padding:10px clamp(18px,4vw,58px)!important;
+  background:rgba(255,255,255,.96)!important;
+  color:#202027!important;border:0!important;border-bottom:1px solid #e9e8ed!important;
+  box-shadow:0 1px 0 rgba(20,20,30,.015)!important;
+  backdrop-filter:saturate(180%) blur(18px)!important;
+  -webkit-backdrop-filter:saturate(180%) blur(18px)!important;
+}
+.site-header .nav-brand,.home-nav .nav-brand,.app-header .nav-brand{
+  display:flex!important;align-items:center!important;gap:11px!important;
+  flex:0 0 auto!important;min-width:max-content!important;
+}
+.site-header .nav-brand>a,.home-nav .nav-brand>a,.app-header .nav-brand>a{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  flex:0 0 auto!important;line-height:0!important;
+}
+.site-header .brand-logo,.home-nav .brand-logo,.app-header .brand-logo{
+  display:block!important;width:auto!important;height:30px!important;max-width:150px!important;
+  object-fit:contain!important;
+}
+.site-header .brand-name,.home-nav .brand-name,.app-header .brand-name{
+  color:#24232b!important;font-size:13px!important;font-weight:650!important;
+  letter-spacing:-.035em!important;white-space:nowrap!important;line-height:1.2!important;
+}
+.site-header .nav-links,.home-nav .nav-links,.app-header .nav-links{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  gap:clamp(12px,1.8vw,25px)!important;flex:1 1 auto!important;
+}
+.site-header .nav-links a,.home-nav .nav-links a,.app-header .nav-links a{
+  display:inline-flex!important;align-items:center!important;min-height:38px!important;
+  padding:0 2px!important;color:#686773!important;font-size:12px!important;
+  font-weight:560!important;text-decoration:none!important;white-space:nowrap!important;
+  border-bottom:2px solid transparent!important;transition:color .16s,border-color .16s!important;
+}
+.site-header .nav-links a:hover,.home-nav .nav-links a:hover,.app-header .nav-links a:hover,
+.site-header .nav-links a.active,.home-nav .nav-links a.active,.app-header .nav-links a.active{
+  color:#625bf6!important;border-bottom-color:#625bf6!important;
+}
+.site-header .nav-actions,.home-nav .nav-actions,.app-header .nav-actions{
+  display:flex!important;align-items:center!important;justify-content:flex-end!important;
+  gap:9px!important;flex:0 0 auto!important;min-width:0!important;
+}
+.site-header .nav-actions .btn-secondary-small,.home-nav .nav-actions .btn-secondary-small,
+.app-header .nav-actions .btn-secondary-small{
+  min-height:36px!important;padding:8px 12px!important;border-radius:7px!important;
+  font-size:11px!important;background:#fff!important;color:#373640!important;
+  border:1px solid #e5e4ea!important;
+}
+.site-header .nav-actions .btn-launch,.home-nav .nav-actions .btn-launch,
+.app-header .nav-actions .btn-launch,.site-header .nav-actions .btn-primary-small,
+.home-nav .nav-actions .btn-primary-small,.app-header .nav-actions .btn-primary-small{
+  min-height:36px!important;padding:8px 13px!important;border-radius:7px!important;
+  font-size:11px!important;background:#625bf6!important;color:#fff!important;
+  border:1px solid #625bf6!important;
+}
+.site-header .user-email-badge,.home-nav .user-email-badge,.app-header .user-email-badge{
+  display:inline-block!important;max-width:min(24vw,250px)!important;
+  overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+  padding:7px 10px!important;border:1px solid #e9e8ed!important;border-radius:7px!important;
+  background:#fafafd!important;color:#65636f!important;font-size:10px!important;font-weight:600!important;
+}
+.site-header .mobile-menu-button,.home-nav .mobile-menu-button,.app-header .mobile-menu-button{
+  min-height:36px!important;padding:7px 11px!important;border:1px solid #e6e5eb!important;
+  border-radius:7px!important;background:#fff!important;color:#393842!important;
+  font-size:11px!important;font-weight:600!important;
+}
+@media(max-width:760px){
+  .site-header,.home-nav,.app-header{
+    min-height:60px!important;padding:9px 14px!important;gap:9px!important;
+  }
+  .site-header .nav-brand,.home-nav .nav-brand,.app-header .nav-brand{gap:8px!important}
+  .site-header .brand-logo,.home-nav .brand-logo,.app-header .brand-logo{height:27px!important;max-width:112px!important}
+  .site-header .brand-name,.home-nav .brand-name,.app-header .brand-name{font-size:12px!important}
+  .site-header .nav-links,.home-nav .nav-links,.app-header .nav-links{
+    display:none!important;position:absolute!important;top:calc(100% + 7px)!important;
+    left:12px!important;right:12px!important;width:auto!important;max-width:none!important;
+    padding:9px!important;gap:2px!important;align-items:stretch!important;justify-content:flex-start!important;
+    flex-direction:column!important;background:#fff!important;border:1px solid #e9e8ed!important;
+    border-radius:10px!important;box-shadow:0 16px 40px rgba(25,24,45,.12)!important;
+  }
+  .site-header .nav-links.is-open,.home-nav .nav-links.is-open,.app-header .nav-links.is-open{display:flex!important}
+  .site-header .nav-links a,.home-nav .nav-links a,.app-header .nav-links a{
+    min-height:42px!important;padding:0 12px!important;border:0!important;border-radius:6px!important;
+    font-size:13px!important;
+  }
+  .site-header .nav-links a:hover,.home-nav .nav-links a:hover,.app-header .nav-links a:hover,
+  .site-header .nav-links a.active,.home-nav .nav-links a.active,.app-header .nav-links a.active{
+    background:#f4f3ff!important;color:#5149e7!important;
+  }
+  .site-header .nav-actions,.home-nav .nav-actions,.app-header .nav-actions{gap:6px!important}
+  .site-header .user-email-badge,.home-nav .user-email-badge,.app-header .user-email-badge{max-width:30vw!important}
+}
+@media(max-width:420px){
+  .site-header,.home-nav,.app-header{padding-inline:10px!important}
+  .site-header .nav-brand,.home-nav .nav-brand,.app-header .nav-brand{min-width:0!important}
+  .site-header .brand-name,.home-nav .brand-name,.app-header .brand-name{max-width:105px!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  .site-header .nav-actions .btn-secondary-small,.home-nav .nav-actions .btn-secondary-small,
+  .app-header .nav-actions .btn-secondary-small{padding-inline:8px!important;font-size:10px!important}
+}
