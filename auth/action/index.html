@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Verify your email | Interactive Studio</title>
+<link rel="icon" href="../../assets/images/tablogo.png">
+<link rel="stylesheet" href="../../assets/Files/style.css">
+<script src="../../assets/Files/router.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="../../assets/Files/auth-config.js"></script>
+</head>
+<body class="auth-page">
+<main class="auth-container" style="max-width:520px;margin:10vh auto;text-align:center">
+<img src="../../assets/images/headerlogo.png" alt="Interactive Studio" style="width:170px;max-width:70%;margin:0 auto 28px">
+<div class="section-kicker">Account security</div>
+<h1 id="action-title">Verifying your email…</h1>
+<p id="action-message" role="status" aria-live="polite">Please keep this page open while we confirm your address.</p>
+<a id="action-link" class="btn-primary-large" data-route="/auth/personal/login/" hidden>Continue to sign in</a>
+</main>
+<script>
+(async function(){
+ const title=document.getElementById("action-title");
+ const message=document.getElementById("action-message");
+ const link=document.getElementById("action-link");
+ const params=new URLSearchParams(location.search);
+ const mode=params.get("mode");
+ const code=params.get("oobCode");
+ const continueUrl=params.get("continueUrl")||"";
+ const setResult=(heading,copy)=>{title.textContent=heading;message.textContent=copy;link.hidden=false;};
+ if(mode!=="verifyEmail"||!code){
+   setResult("Verification link not recognised","This link is incomplete or is not an email-verification link. Request a new verification email and open the newest message.");
+   return;
+ }
+ try{
+   await firebase.auth().applyActionCode(code);
+   try{
+     const user=firebase.auth().currentUser;
+     if(user){await user.reload();await user.getIdToken(true);}
+   }catch(_){}
+   setResult("Email address verified","Your email address has been confirmed. Sign in again to refresh your Interactive Studio session.");
+   link.href=window.getAppUrl("/auth/personal/login/");
+   if(continueUrl){
+     try{
+       const destination=new URL(continueUrl,location.origin);
+       if(destination.origin===location.origin&&destination.pathname.includes("/auth/"))link.href=destination.href;
+     }catch(_){}
+   }
+ }catch(error){
+   console.error("Email action failed:",error);
+   const copy=error.code==="auth/expired-action-code"||error.code==="auth/invalid-action-code"
+     ?"This verification link has expired or has already been used. Sign in and request a fresh verification email."
+     :(error.message||"We couldn't verify this email address. Request a new verification email and try again.");
+   setResult("Could not verify email",copy);
+ }
+})();
+</script>
+<footer><div class="footer-inner"><div>© 2026 Interactive Studio. All rights reserved.</div><a href="https://github.com/AquaTheCanary/interactivestudio" target="_blank" rel="noopener">View on GitHub</a></div></footer>
+</body>
+</html>
