@@ -138,7 +138,7 @@ async function proxyStudioApp(request) {
   } else if (pathname === "/editor" || pathname === "/editor/") {
     pathname = "/presentations/editor/";
   } else if (pathname === "/websites" || pathname === "/websites/") {
-    pathname = "/websites/new/";
+    pathname = "/websites/";
   }
   const query = params.toString();
   const target = new URL("https://aquathecanary.github.io/interactivestudio" + pathname + (query ? "?" + query : ""));
