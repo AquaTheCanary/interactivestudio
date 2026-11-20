@@ -40,12 +40,10 @@
       await loadScript(appPath("/assets/Files/auth-config.js"));
     }
     if (!window.studioAuth) throw new Error("Interactive Studio authentication did not initialise.");
-    await window.studioAuth.ready;
-    let user = firebase.auth().currentUser;
-    if (!user) {
-      const credential = await firebase.auth().signInAnonymously();
-      user = credential.user;
-    }
+    // Resolve Firebase persistence and redirect sign-in before choosing an identity.
+    // Presenter/owner operations must use the real account; anonymous auth is only
+    // a fallback for an audience member who is not signed in.
+    const user = await window.studioAuth.currentUser() || (await firebase.auth().signInAnonymously()).user;
     return { db: firebase.firestore(), user };
   }
 
