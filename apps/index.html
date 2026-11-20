@@ -1,34 +1,35 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b0d12">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ffffff">
 <title>Apps & tools | Interactive Studio</title>
 <link rel="icon" href="../assets/images/tablogo.png"><link rel="stylesheet" href="../assets/Files/style.css">
 <script src="../assets/Files/router.js" defer></script><script src="../assets/Files/app.js" defer></script>
 <style>
-:root{color-scheme:dark}body{background:radial-gradient(ellipse at 15% 0%,#1b2944 0,transparent 38%),#0b0d12;color:#f3f5f9}
-.apps-hero{max-width:1180px;margin:auto;padding:76px 24px 38px}.apps-hero h1{font-size:clamp(42px,7vw,76px);letter-spacing:-.075em;line-height:1.02;margin:18px 0}.apps-hero p{color:#a4adbc;max-width:680px;line-height:1.75}
-.apps-wrap{max-width:1180px;margin:auto;padding:20px 24px 90px}.apps-toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:22px 0}.search{background:#141b27;border:1px solid #303b4b;color:#fff;padding:13px 16px;border-radius:12px;min-width:min(100%,320px);outline:none}.filters{display:flex;gap:7px;flex-wrap:wrap}.filter{border:1px solid #303b4b;background:#121924;color:#aeb8c8;border-radius:999px;padding:9px 13px;cursor:pointer}.filter.active{background:#28254b;border-color:#7167ff;color:#fff}
-.apps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:15px}.app-card{border:1px solid #293444;background:linear-gradient(145deg,#151d2a,#10151e);border-radius:18px;padding:22px;min-height:205px;display:flex;flex-direction:column;transition:.2s}.app-card:hover{transform:translateY(-4px);border-color:#7167ff;box-shadow:0 18px 40px #0004}.app-icon{width:43px;height:43px;border-radius:13px;background:#28264a;color:#b4adff;display:grid;place-items:center;font-size:21px}.app-card h3{margin:17px 0 7px;font-size:17px}.app-card p{color:#9ca7b7;font-size:13px;line-height:1.6;margin:0 0 18px}.app-card button{margin-top:auto;align-self:flex-start;background:#29264f;color:white;border:1px solid #514a9b;border-radius:10px;padding:10px 13px;cursor:pointer}
-.tool-panel{display:none;margin-top:24px;border:1px solid #303b4b;background:#121a26;border-radius:18px;padding:22px}.tool-panel.open{display:block}.panel-head{display:flex;justify-content:space-between;gap:12px;align-items:center}.panel-head h2{margin:0;font-size:22px}.close{background:transparent;color:#aab3c1;border:1px solid #3a4555;border-radius:9px;padding:8px 11px;cursor:pointer}
-.tool-content{margin-top:18px}.tool-content textarea,.tool-content input,.tool-content select{width:100%;background:#0c121b;border:1px solid #354153;color:#f3f5f9;border-radius:10px;padding:12px;margin:5px 0 12px;box-sizing:border-box}.tool-content textarea{min-height:130px;resize:vertical}.tool-content button,.action{background:#655cf5;border:0;color:white;padding:10px 14px;border-radius:9px;cursor:pointer}.muted{color:#98a4b5;font-size:13px}.tool-list{display:grid;gap:8px;margin-top:12px}.tool-item{display:flex;justify-content:space-between;gap:12px;padding:12px;background:#192332;border:1px solid #2d394a;border-radius:10px}.tool-item button{background:transparent;border:1px solid #4a5668;color:#cbd3df;border-radius:8px;padding:5px 9px}.timer{font-size:64px;font-weight:750;letter-spacing:-3px;margin:18px 0}.swatches{display:flex;gap:8px;flex-wrap:wrap}.swatch{width:58px;height:58px;border-radius:12px;border:1px solid #ffffff22;cursor:pointer}
-.site-footer{color:#8e99aa}
-@media(max-width:650px){.apps-hero{padding-top:50px}.apps-wrap{padding-left:16px;padding-right:16px}.tool-panel{padding:15px}.timer{font-size:48px}}
-
-/* Clean white Apps directory */
-body{background:#fff!important;color:#202431!important}
-.apps-hero{padding-top:88px}.apps-hero h1{color:#202431;letter-spacing:-.065em}.apps-hero p{color:#697386}
-.apps-toolbar h2{color:#202431}.search{background:#fff;color:#202431;border-color:#e4e7ee;box-shadow:0 3px 14px #20294208}.search::placeholder{color:#929aaa}
-.filter{background:#fff;color:#687184;border-color:#e4e7ee;transition:all .18s ease}.filter:hover,.filter.active{background:#f0efff;border-color:#d7d3ff;color:#5148d9}
-.app-card{background:#fff;border:1px solid #e8eaf0;box-shadow:0 4px 18px rgba(30,40,70,.035);border-radius:17px}.app-card:hover{border-color:#d6d3ff;box-shadow:0 18px 42px rgba(42,43,90,.09)}
-.app-card h3{color:#202431}.app-card p,.muted{color:#697386}.app-icon{background:#f0efff;color:#635bff}
-.app-card button,.tool-content button:not(.close){background:#635bff;color:#fff;border:1px solid #635bff}
-.tool-panel{background:#fff;border-color:#e8eaf0;box-shadow:0 15px 45px rgba(30,40,70,.07)}.panel-head h2{color:#202431}
-.close{background:#fff;color:#687184;border-color:#e4e7ee}
-.tool-content textarea,.tool-content input,.tool-content select{background:#fff;color:#202431;border-color:#dfe3eb}
-.tool-item{background:#f8f9fc;border-color:#e8eaf0;color:#303648}.tool-content pre{background:#f7f8fc!important;color:#303648!important}
-footer{background:#fff;color:#818a9a}
-@media(prefers-reduced-motion:no-preference){.app-card{animation:studioCardIn .5s both}.app-card:nth-child(2){animation-delay:.04s}.app-card:nth-child(3){animation-delay:.08s}.app-card:nth-child(4){animation-delay:.12s}.app-card:nth-child(5){animation-delay:.16s}.app-card:nth-child(6){animation-delay:.2s}}
+.apps-hero{max-width:1180px;margin:auto;padding:82px 24px 38px}
+.apps-hero h1{font-size:clamp(42px,7vw,72px);letter-spacing:-.07em;line-height:1.04;margin:18px 0}
+.apps-hero p{max-width:660px;line-height:1.75}
+.apps-wrap{max-width:1180px;margin:auto;padding:20px 24px 90px}
+.apps-toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:22px 0}
+.search{min-width:min(100%,320px);padding:12px 15px;border:1px solid var(--line);border-radius:10px;outline:none}
+.filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}
+.filter{padding:8px 13px;border:1px solid var(--line);border-radius:999px;cursor:pointer}
+.apps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:14px}
+.app-card{border:1px solid var(--line);border-radius:14px;padding:22px;min-height:205px;display:flex;flex-direction:column;transition:transform .18s,border-color .18s,box-shadow .18s}
+.app-icon{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;font-size:20px}
+.app-card h3{margin:16px 0 7px;font-size:16px;letter-spacing:-.3px}
+.app-card p{font-size:13px;line-height:1.65;margin:0 0 18px}
+.app-card button{margin-top:auto;align-self:flex-start;padding:9px 12px;border-radius:8px;cursor:pointer}
+.tool-panel{display:none;margin-top:24px;border:1px solid var(--line);border-radius:14px;padding:22px}
+.tool-panel.open{display:block}.panel-head{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.panel-head h2{margin:0;font-size:21px}.close{border:1px solid var(--line);border-radius:8px;padding:7px 10px;cursor:pointer}
+.tool-content{margin-top:18px}.tool-content textarea,.tool-content input,.tool-content select{width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:5px 0 12px;box-sizing:border-box}
+.tool-content textarea{min-height:130px;resize:vertical}.tool-content button,.action{padding:9px 13px;border-radius:8px;cursor:pointer}
+.muted{font-size:13px}.tool-list{display:grid;gap:8px;margin-top:12px}
+.tool-item{display:flex;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--line);border-radius:9px}
+.timer{font-size:60px;font-weight:750;letter-spacing:-3px;margin:18px 0}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}.swatch{width:58px;height:58px;border-radius:10px;border:1px solid var(--line);cursor:pointer}
+@media(max-width:650px){.apps-hero{padding:52px 18px 30px}.apps-wrap{padding:18px 16px 65px}.tool-panel{padding:15px}.timer{font-size:46px}}
 </style></head>
 <body class="page-body">
 <header class="home-nav"><div class="nav-brand"><a data-route="/home/"><img src="../assets/images/headerlogo.png" class="brand-logo" alt="Interactive Studio"></a><span class="brand-name">Interactive Studio</span></div><button class="mobile-menu-button" aria-label="Toggle navigation" aria-expanded="false">Menu</button><nav class="nav-links"><a data-route="/products/">Product</a><a data-route="/apps/" class="active">Apps</a><a data-route="/solutions/">Solutions</a><a data-route="/resources/">Resources</a><a data-route="/contact/">Contact</a></nav><div class="nav-actions"><a data-route="/auth/personal/login/" class="btn-secondary-small">Sign in</a><a data-route="/auth/personal/register/" class="btn-launch">Get started</a></div></header>
