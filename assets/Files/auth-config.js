@@ -1,6 +1,51 @@
 // Interactive Studio authentication shared by every account page.
 // Google, GitHub and email/password are the supported sign-in methods.
-const firebaseConfig = {
+// Each product has its own Firebase Web App registration in the shared
+// convexllc-project Firebase project. Authentication and Firestore data remain
+// shared at project level; appId identifies the specific web app.
+const firebaseApps = {
+  cloudbase: {
+    apiKey: "AIzaSyAU1ClFXmG9z2q4vjhrsCgcJVNJFq1Ubj0",
+    authDomain: "convexllc-project.firebaseapp.com",
+    projectId: "convexllc-project",
+    storageBucket: "convexllc-project.firebasestorage.app",
+    messagingSenderId: "82355515745",
+    appId: "1:82355515745:web:dad89a2cc52d065bc89520"
+  },
+  formr: {
+    apiKey: "AIzaSyAU1ClFXmG9z2q4vjhrsCgcJVNJFq1Ubj0",
+    authDomain: "convexllc-project.firebaseapp.com",
+    projectId: "convexllc-project",
+    storageBucket: "convexllc-project.firebasestorage.app",
+    messagingSenderId: "82355515745",
+    appId: "1:82355515745:web:f7c14659f4a6aab0c89520"
+  },
+  siteify: {
+    apiKey: "AIzaSyAU1ClFXmG9z2q4vjhrsCgcJVNJFq1Ubj0",
+    authDomain: "convexllc-project.firebaseapp.com",
+    projectId: "convexllc-project",
+    storageBucket: "convexllc-project.firebasestorage.app",
+    messagingSenderId: "82355515745",
+    appId: "1:82355515745:web:ccce127331752422c89520"
+  },
+  presentr: {
+    apiKey: "AIzaSyAU1ClFXmG9z2q4vjhrsCgcJVNJFq1Ubj0",
+    authDomain: "convexllc-project.firebaseapp.com",
+    projectId: "convexllc-project",
+    storageBucket: "convexllc-project.firebasestorage.app",
+    messagingSenderId: "82355515745",
+    appId: "1:82355515745:web:688a127209384981c89520"
+  }
+};
+const firebaseHost = window.location.hostname.toLowerCase();
+const firebaseProduct = firebaseHost.includes("cloudbase") ? "cloudbase"
+  : firebaseHost.includes("formr") ? "formr"
+  : firebaseHost.includes("siteify") ? "siteify"
+  : firebaseHost.includes("presentr") ? "presentr" : null;
+const firebaseConfig = firebaseProduct ? firebaseApps[firebaseProduct] : {
+  // Main Project web app config is still pending. This fallback is retained
+  // temporarily so existing Project pages are not silently switched to a
+  // product's Firebase Web App registration.
   apiKey: "AIzaSyAHQDuRXq77XRZvnE-dDuoy8A1TLLtfSy8",
   authDomain: "interactive-studio-convexllc.firebaseapp.com",
   projectId: "interactive-studio-convexllc",
