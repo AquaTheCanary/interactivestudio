@@ -609,3 +609,19 @@ body.auth-page .footer-inner{max-width:1040px}
   body.auth-page>.auth-layout{width:100%!important}
   body.auth-page>footer{width:calc(100% + 24px)!important;margin:20px -12px 0!important;padding:16px 12px!important}
 }
+
+/* Auth branding: one clear brand header on desktop, compact logo header on mobile. */
+body.auth-page .auth-header>a{display:none}
+@media(max-width:700px){body.auth-page .auth-header>a{display:block}}
+/* Keep navigation controls aligned without squeezing or overflowing the header. */
+.site-header,.home-nav,.app-header{gap:clamp(10px,2vw,24px)}
+.nav-brand>a{display:inline-flex;align-items:center;flex:0 0 auto}
+.nav-actions{flex:0 0 auto;min-width:0}
+.nav-actions .user-email-badge{max-width:min(32vw,260px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:700px){
+ .site-header,.home-nav,.app-header{gap:10px;padding-inline:12px!important}
+ .nav-brand{gap:7px}
+ .nav-brand .brand-name{white-space:nowrap}
+ .nav-actions{gap:6px}
+ .nav-actions .user-email-badge{max-width:38vw}
+}
