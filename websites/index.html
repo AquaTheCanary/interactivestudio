@@ -249,6 +249,47 @@ body[data-website-page="editor"]{display:flex;flex-direction:column;background:#
 .builder-stage{min-height:560px}
 .builder-canvas{min-height:620px}
 @media(max-width:900px){html,body{height:auto;overflow:auto}.shell{padding:16px}.layout{grid-template-columns:1fr}.layout>.list{max-height:180px}.builder{grid-template-columns:1fr}.builder-stage{min-height:480px}}
+
+/* Full-screen visual website workspace */
+html,body{width:100%;height:100%;min-height:100%;overflow:hidden}
+body[data-website-page="editor"]{display:flex;flex-direction:column;background:#f5f5f7;color:#1d1d1f}
+body[data-website-page="editor"]>.home-nav{height:54px;min-height:54px;padding:0 18px;background:#fff;border-bottom:1px solid #e6e6e9;box-shadow:none}
+body[data-website-page="editor"] .home-nav .nav-links{gap:20px}
+body[data-website-page="editor"] .home-nav .nav-links a{font-size:12px}
+body[data-website-page="editor"] .shell{width:100%;max-width:none;height:calc(100vh - 54px);min-height:0;flex:1;padding:0;margin:0;display:flex;flex-direction:column}
+body[data-website-page="editor"] .head,body[data-website-page="editor"] .list{display:none!important}
+body[data-website-page="editor"] .layout{display:block;flex:1;min-height:0;height:100%;margin:0}
+body[data-website-page="editor"] .main{height:100%;min-height:0;overflow:auto;padding:0;border:0;border-radius:0;box-shadow:none;background:#f5f5f7}
+body[data-website-page="editor"] #editor{height:100%;min-height:0;display:flex;flex-direction:column}
+body[data-website-page="editor"] #editor.hidden{display:none!important}
+body[data-website-page="editor"] #editor>div:first-child{height:58px;min-height:58px;align-items:center!important;padding:0 18px;background:#fff;border-bottom:1px solid #e5e5e8}
+body[data-website-page="editor"] #editor>div:first-child .section-kicker{display:none}
+body[data-website-page="editor"] #editor-title{font-size:14px!important;font-weight:650;letter-spacing:-.02em!important}
+body[data-website-page="editor"] .builder-top{height:46px;min-height:46px;align-items:center!important;margin:0!important;padding:0 18px;background:#fff;border-bottom:1px solid #e8e8eb}
+body[data-website-page="editor"] .builder-top .muted:last-child{display:none}
+body[data-website-page="editor"] .site-name-edit{width:220px;border:0;background:#f5f5f7;border-radius:7px;font-size:12px}
+body[data-website-page="editor"] .design-toolbar{height:48px;min-height:48px;margin:0;border:0;border-bottom:1px solid #e4e4e8;border-radius:0;background:#fff;color:#25252b;box-shadow:none;padding:0 16px}
+body[data-website-page="editor"] .toolbar-label{color:#85858d}
+body[data-website-page="editor"] .toolbar-divider{background:#e4e4e8}
+body[data-website-page="editor"] .toolbtn.compact{background:#fff;border:1px solid #e4e4e8;color:#444;border-radius:7px}
+body[data-website-page="editor"] .toolbtn.compact.active{background:#f0efff;color:#5b50df;border-color:#d7d2ff}
+body[data-website-page="editor"] .builder{flex:1;min-height:0;grid-template-columns:238px minmax(0,1fr) 270px;margin:0;border:0;border-radius:0;box-shadow:none;overflow:hidden}
+body[data-website-page="editor"] .builder-tools,body[data-website-page="editor"] .builder-properties{min-height:0;overflow:auto;padding:18px 15px;background:#fff;border:0;border-radius:0}
+body[data-website-page="editor"] .builder-tools{border-right:1px solid #e7e7ea}
+body[data-website-page="editor"] .builder-properties{border-left:1px solid #e7e7ea}
+body[data-website-page="editor"] .builder-tools h3,body[data-website-page="editor"] .builder-properties h3{font-size:10px;letter-spacing:.08em;color:#777780}
+body[data-website-page="editor"] .builder-tools .toolbtn{background:#fff;border:1px solid transparent;color:#38383f;border-radius:7px;box-shadow:none;padding:9px 10px}
+body[data-website-page="editor"] .builder-tools .toolbtn:hover{background:#f5f4ff;border-color:#e5e2ff;transform:none}
+body[data-website-page="editor"] .layer-item{border-radius:7px}
+body[data-website-page="editor"] .builder-stage{min-height:0;height:100%;padding:24px;background:#f1f1f4;background-image:radial-gradient(#d1d1d8 .8px,transparent .8px);background-size:16px 16px}
+body[data-website-page="editor"] .stage-top{max-width:100%;font-size:10px}
+body[data-website-page="editor"] .builder-canvas{min-height:680px;max-width:1100px;border-radius:2px;box-shadow:0 2px 12px #00000012}
+body[data-website-page="editor"] #editor>.actions,body[data-website-page="editor"] #editor>.message,body[data-website-page="editor"] #editor>.sectionhead,body[data-website-page="editor"] #editor>.callout,body[data-website-page="editor"] #editor>.previewwrap{display:none!important}
+body[data-website-page="editor"] .create-overlay{z-index:10000}
+body[data-website-page="editor"] .create-modal{border:1px solid #e8e8ec;border-radius:12px;box-shadow:0 24px 80px #0002}
+@media(max-width:900px){body[data-website-page="editor"] .builder{grid-template-columns:190px minmax(0,1fr)}body[data-website-page="editor"] .builder-properties{display:none}body[data-website-page="editor"] .builder-stage{padding:12px}}
+@media(max-width:620px){body[data-website-page="editor"]>.home-nav{padding:0 10px}body[data-website-page="editor"] .home-nav .nav-links{display:none}body[data-website-page="editor"] #editor>div:first-child{padding:0 10px}body[data-website-page="editor"] .builder-top{padding:0 10px}body[data-website-page="editor"] .builder{grid-template-columns:1fr}body[data-website-page="editor"] .builder-tools{max-height:145px;border-bottom:1px solid #e7e7ea}body[data-website-page="editor"] .builder-stage{min-height:0}body[data-website-page="editor"] .builder-canvas{min-height:520px}}
+
 </style></head>
 <body class="page-body" data-website-page="editor">
 <header class="home-nav"><div class="nav-brand"><a data-route="/home/"><img src="../assets/images/headerlogo.png" class="brand-logo" alt="Interactive Studio"></a><span class="brand-name">Websites</span></div><nav class="nav-links"><a data-route="/dashboard/">Workspace</a><a data-route="/presentations/editor/">Presentations</a><a data-route="/websites/" class="active">Websites</a><a data-route="/settings/">Settings</a></nav><div class="nav-actions"><span class="user-email-badge" id="account">Loading account…</span></div></header>
