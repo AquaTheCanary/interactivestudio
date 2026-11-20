@@ -23,7 +23,7 @@
   function enforceLightAppearance() {
     const root = document.documentElement;
     if (root.dataset.theme !== "light") root.dataset.theme = "light";
-    root.style.colorScheme = "light";
+    if (root.style.colorScheme !== "light") root.style.colorScheme = "light";
     try { if (localStorage.getItem("is-theme") !== "light") localStorage.setItem("is-theme", "light"); } catch (_) {}
   }
   enforceLightAppearance();
