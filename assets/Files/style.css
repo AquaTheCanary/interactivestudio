@@ -559,3 +559,53 @@ body.auth-page .auth-form{padding-bottom:4px}
 
 /* Avoid flashing the sign-in form while Firebase restores an existing session. */
 body.auth-checking{visibility:hidden!important}
+
+
+/* Final layout correction: consistent site headers/footers and a genuinely scrollable auth page. */
+html{height:auto!important;min-height:100%!important;overflow-x:hidden!important;overflow-y:auto!important}
+.site-header,.home-nav,.app-header{
+  width:100%;min-height:64px;box-sizing:border-box;
+  flex-wrap:nowrap;isolation:isolate;
+}
+.site-header .nav-brand,.home-nav .nav-brand,.app-header .nav-brand{min-width:0}
+.site-header .nav-links,.home-nav .nav-links,.app-header .nav-links{min-width:0}
+footer{
+  width:100%;box-sizing:border-box;flex-shrink:0;
+  margin-top:auto;padding:22px clamp(16px,4vw,48px);
+  border-top:1px solid var(--line,#e6e8ed);
+  background:#fff;color:#697180;
+}
+.footer-inner{
+  width:min(1320px,100%);min-height:28px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px 24px;flex-wrap:wrap;
+}
+.footer-inner a{white-space:nowrap;color:#625bf6;text-decoration:none}
+.footer-inner a:hover{text-decoration:underline}
+body.auth-page{
+  display:flex!important;flex-direction:column!important;
+  justify-content:flex-start!important;align-items:stretch!important;
+  width:100%;min-height:100vh!important;min-height:100svh!important;
+  height:auto!important;max-height:none!important;
+  overflow:visible!important;overflow-x:hidden!important;overflow-y:visible!important;
+  padding:clamp(16px,4vh,42px) 18px 0!important;
+}
+body.auth-page>.auth-layout{
+  flex:0 0 auto!important;width:min(1040px,100%)!important;
+  margin:0 auto!important;overflow:visible!important;
+}
+body.auth-page .auth-aside{border-radius:22px 0 0 22px}
+body.auth-page .auth-container{align-self:stretch;min-width:0}
+body.auth-page>footer{
+  flex:0 0 auto!important;width:calc(100% + 36px)!important;
+  margin:clamp(22px,4vh,38px) -18px 0!important;
+  padding:18px 22px!important;
+}
+body.auth-page .footer-inner{max-width:1040px}
+@media(max-width:700px){
+  .site-header,.home-nav,.app-header{min-height:58px}
+  .footer-inner{justify-content:center;text-align:center}
+  body.auth-page{padding:12px 12px 0!important}
+  body.auth-page>.auth-layout{width:100%!important}
+  body.auth-page>footer{width:calc(100% + 24px)!important;margin:20px -12px 0!important;padding:16px 12px!important}
+}
