@@ -171,12 +171,22 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       if (studioAuth.redirectReady) await studioAuth.redirectReady;
       return auth.currentUser;
     },
+    async refreshEmailVerification(user) {
+      const activeUser = user || await studioAuth.currentUser();
+      if (!activeUser) return false;
+      // Refresh both the Firebase user record and its ID token. The emailVerified
+      // property on an already-loaded client session can otherwise remain stale.
+      await activeUser.reload();
+      const liveUser = auth.currentUser || activeUser;
+      await liveUser.getIdToken(true);
+      return !!((auth.currentUser || liveUser).emailVerified);
+    },
     async getProfile(user) {
       const activeUser = user || await studioAuth.currentUser();
       if (!activeUser) return null;
       // Firebase keeps emailVerified cached until the account is reloaded.
       // Refresh the live Auth user and ID token before reporting verification.
-      try { await activeUser.reload(); } catch (error) { console.warn("Could not refresh Firebase account status:", error); }
+      try { await studioAuth.refreshEmailVerification(activeUser); } catch (error) { console.warn("Could not refresh Firebase account status:", error); }
       const refreshedUser = auth.currentUser || activeUser;
       let claims = {};
       try { claims = (await refreshedUser.getIdTokenResult(true)).claims || {}; } catch (_) {}
@@ -247,7 +257,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       }
       beginFreshSession();
       const credential = await auth.signInWithEmailAndPassword(email.trim(), password);
-      await credential.user.reload();
+      await studioAuth.refreshEmailVerification(credential.user);
       const refreshedUser = auth.currentUser || credential.user;
       if (!refreshedUser.emailVerified) {
         let sendError = null;
