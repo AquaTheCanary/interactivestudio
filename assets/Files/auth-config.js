@@ -174,16 +174,20 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     async getProfile(user) {
       const activeUser = user || await studioAuth.currentUser();
       if (!activeUser) return null;
+      // Firebase keeps emailVerified cached until the account is reloaded.
+      // Refresh the live Auth user and ID token before reporting verification.
+      try { await activeUser.reload(); } catch (error) { console.warn("Could not refresh Firebase account status:", error); }
+      const refreshedUser = auth.currentUser || activeUser;
       let claims = {};
-      try { claims = (await activeUser.getIdTokenResult()).claims || {}; } catch (_) {}
+      try { claims = (await refreshedUser.getIdTokenResult(true)).claims || {}; } catch (_) {}
       const verifiedPlan = "Free";
       return {
-        uid: activeUser.uid,
-        email: activeUser.email || "",
-        name: activeUser.displayName || activeUser.email || "Creator",
-        photoURL: activeUser.photoURL || "",
-        emailVerified: !!activeUser.emailVerified,
-        provider: activeUser.providerData?.[0]?.providerId || "password",
+        uid: refreshedUser.uid,
+        email: refreshedUser.email || "",
+        name: refreshedUser.displayName || refreshedUser.email || "Creator",
+        photoURL: refreshedUser.photoURL || "",
+        emailVerified: !!refreshedUser.emailVerified,
+        provider: refreshedUser.providerData?.[0]?.providerId || "password",
         plan: verifiedPlan,
         organisationId: claims.organisationId || null
       };
@@ -254,7 +258,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
           ? "Your work email is not verified yet. We sent a fresh verification link. Verify it, then sign in again."
           : "Your email is not verified yet. We sent a fresh verification link. Verify it, then sign in again.");
       }
-      await studioAuth.finishSignIn(credential.user, organisation);
+      await studioAuth.finishSignIn(refreshedUser, organisation);
     },
     async completeRedirectSignIn() {
       await authReady;
