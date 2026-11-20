@@ -9,7 +9,6 @@
     const clean = "/" + value.replace(/^\/+/, "");
     return repositoryBase + (clean === "/" ? "/" : clean);
   };
-
   function applyRoutes(root = document) {
     root.querySelectorAll("a[data-route]").forEach(anchor => {
       const route = anchor.getAttribute("data-route");
@@ -20,9 +19,24 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => applyRoutes());
   else applyRoutes();
 
-  // Interactive Studio uses one consistent, light appearance across every page.
-  // Preserve the old preference key for compatibility, but always apply light mode.
-  try { localStorage.setItem("is-theme", "light"); } catch (_) {}
-  document.documentElement.dataset.theme = "light";
-  document.documentElement.style.colorScheme = "light";
+  // Light mode is the platform-wide default and is intentionally not user-toggleable.
+  function enforceLightAppearance() {
+    const root = document.documentElement;
+    if (root.dataset.theme !== "light") root.dataset.theme = "light";
+    root.style.colorScheme = "light";
+    try { if (localStorage.getItem("is-theme") !== "light") localStorage.setItem("is-theme", "light"); } catch (_) {}
+  }
+  enforceLightAppearance();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", enforceLightAppearance, { once: true });
+  }
+  // Prevent older page scripts or stored preferences from re-applying dark mode.
+  try {
+    new MutationObserver(enforceLightAppearance).observe(document.documentElement, {
+      attributes: true, attributeFilter: ["data-theme", "style"]
+    });
+  } catch (_) {}
+  window.addEventListener("storage", event => {
+    if (event.key === "is-theme" && event.newValue !== "light") enforceLightAppearance();
+  });
 })();
