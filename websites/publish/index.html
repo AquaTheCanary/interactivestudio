@@ -376,7 +376,6 @@ $("publish").onclick=()=>{
  $("confirm-publish").textContent="Publish website ↗";
  preview();
  $("publish-subdomain").value=active.domainSubdomain||"";
- $("publish-format").value=active.domainFormat||"handle-subdomain";
  $("custom-domain").value=active.customDomain||"";
  $("publish-target").value=active.publishTarget||"builtin";
  if(active.publishedHostname&&!active.publishedHostname.endsWith("."+PLATFORM))$("publish-target").value="custom";
@@ -385,7 +384,6 @@ $("publish").onclick=()=>{
 };
 $("publish-target").addEventListener("change",updatePublishPreview);
 $("publish-subdomain").addEventListener("input",updatePublishPreview);
-$("publish-format").addEventListener("change",updatePublishPreview);
 $("custom-domain").addEventListener("input",updatePublishPreview);
 $("confirm-publish").onclick=async()=>{
  const button=$("confirm-publish");
