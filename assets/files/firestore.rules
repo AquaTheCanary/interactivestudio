@@ -162,5 +162,115 @@ service cloud.firestore {
       allow delete: if signedIn() && resource.data.uid == request.auth.uid;
     }
 
+
+    // Project account and workspace foundation.
+    match /users/{uid} {
+      allow read, create, update: if signedIn() && request.auth.uid == uid;
+      allow delete: if false;
+    }
+
+    match /workspaces/{workspaceId} {
+      function isMember() {
+        return signedIn() && (
+          resource.data.ownerUid == request.auth.uid ||
+          (resource.data.memberUids is list && request.auth.uid in resource.data.memberUids)
+        );
+      }
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.memberUids is list
+        && request.auth.uid in request.resource.data.memberUids;
+      allow read: if isMember();
+      allow update: if signedIn()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid;
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+    }
+
+    match /organisations/{organisationId} {
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 160;
+      allow read: if signedIn() && (
+        resource.data.ownerUid == request.auth.uid ||
+        (resource.data.memberUids is list && request.auth.uid in resource.data.memberUids)
+      );
+      allow update: if signedIn()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid;
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+    }
+
+    // Presentr
+    match /presentations/{presentationId} {
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.title is string
+        && request.resource.data.title.size() <= 160;
+      allow read, update, delete: if signedIn()
+        && resource.data.ownerUid == request.auth.uid
+        && (request.method != 'update' || request.resource.data.ownerUid == resource.data.ownerUid);
+      match /slides/{slideId} {
+        function presentationOwner() {
+          return signedIn() && get(/databases/$(database)/documents/presentations/$(presentationId)).data.ownerUid == request.auth.uid;
+        }
+        allow read, write: if presentationOwner();
+      }
+    }
+
+    // Siteify
+    match /siteProjects/{siteId} {
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 160;
+      allow read, update, delete: if signedIn()
+        && resource.data.ownerUid == request.auth.uid
+        && (request.method != 'update' || request.resource.data.ownerUid == resource.data.ownerUid);
+      match /pages/{pageId} {
+        function siteOwner() {
+          return signedIn() && get(/databases/$(database)/documents/siteProjects/$(siteId)).data.ownerUid == request.auth.uid;
+        }
+        allow read, write: if siteOwner();
+      }
+    }
+
+    // Formr (new product-specific form collection; legacy /forms remains supported).
+    match /formProjects/{formId} {
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.title is string
+        && request.resource.data.title.size() <= 160;
+      allow read, update, delete: if signedIn()
+        && resource.data.ownerUid == request.auth.uid
+        && (request.method != 'update' || request.resource.data.ownerUid == resource.data.ownerUid);
+      match /responses/{responseId} {
+        allow read: if signedIn()
+          && get(/databases/$(database)/documents/formProjects/$(formId)).data.ownerUid == request.auth.uid;
+        allow create: if request.resource.data.answers is map
+          && request.resource.data.answers.size() <= 60;
+        allow update, delete: if false;
+      }
+    }
+
+    // Cloudbase file metadata. File bytes live in Firebase Storage.
+    match /cloudbaseFiles/{fileId} {
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 255
+        && request.resource.data.storagePath is string
+        && request.resource.data.storagePath.matches('users/' + request.auth.uid + '/cloudbase/.*');
+      allow read, update, delete: if signedIn()
+        && resource.data.ownerUid == request.auth.uid
+        && (request.method != 'update' ||
+          (request.resource.data.ownerUid == resource.data.ownerUid
+           && request.resource.data.storagePath == resource.data.storagePath));
+    }
+
   }
 }
