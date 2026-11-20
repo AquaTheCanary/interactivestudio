@@ -821,3 +821,30 @@ body.auth-page .auth-header>a{display:none}
   .marketing-signin{display:inline!important;font-size:11px!important}
   .marketing-cta{min-height:34px!important;padding:0 10px!important;font-size:11px!important}
 }
+
+
+/* Full-bleed header: remove inherited max-width/container constraints. */
+.site-header,.home-nav,.app-header,.marketing-nav{
+  display:flex!important;
+  box-sizing:border-box!important;
+  width:100vw!important;
+  max-width:none!important;
+  margin-left:calc(50% - 50vw)!important;
+  margin-right:calc(50% - 50vw)!important;
+  border-radius:0!important;
+}
+.site-header,.home-nav,.app-header{
+  padding-left:clamp(16px,4vw,58px)!important;
+  padding-right:clamp(16px,4vw,58px)!important;
+}
+.marketing-nav{
+  padding-left:clamp(18px,4vw,44px)!important;
+  padding-right:clamp(18px,4vw,44px)!important;
+}
+@media(max-width:760px){
+  .site-header,.home-nav,.app-header,.marketing-nav{
+    width:100vw!important;max-width:none!important;
+    margin-left:calc(50% - 50vw)!important;
+    margin-right:calc(50% - 50vw)!important;
+  }
+}
