@@ -50,7 +50,8 @@ const firebaseConfig = firebaseProduct ? firebaseApps[firebaseProduct] : {
   authDomain: "convexllc-project.firebaseapp.com",
   projectId: "convexllc-project",
   storageBucket: "convexllc-project.firebasestorage.app",
-  messagingSenderId: "82355515745"
+  messagingSenderId: "82355515745",
+  appId: "1:82355515745:web:e839271f484f1a5cc89520"
 };
 if (!window.firebase) throw new Error("Load Firebase App and Auth compat SDK before auth-config.js.");
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
