@@ -33,3 +33,36 @@ footer{width:100%;background:#fff!important;border-top:1px solid var(--is-line)!
 .form-field,.field,.response-row,.response,.list button,.form-list-item{border-color:var(--is-line)!important;border-radius:9px!important;box-shadow:none!important}button:disabled{opacity:.55;cursor:not-allowed!important}
 @media(max-width:760px){.site-header,.home-nav,.app-header,.marketing-nav{min-height:60px!important;flex-wrap:wrap!important;gap:0 10px!important;padding:8px 14px 0!important}.nav-brand,.marketing-brand{order:1!important;min-height:38px!important;max-width:calc(100% - 120px)!important}.nav-actions,.marketing-actions{order:2!important;margin-left:auto!important;min-height:38px!important;gap:6px!important;max-width:55%!important}.nav-links,.marketing-navlinks{order:3!important;display:flex!important;flex:0 0 calc(100% + 28px)!important;width:calc(100% + 28px)!important;max-width:none!important;margin:7px -14px 0!important;padding:0 14px 8px!important;justify-content:flex-start!important;gap:5px!important;overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important;border:0!important;border-top:1px solid var(--is-line)!important;background:#fff!important;scrollbar-width:none!important}.nav-links::-webkit-scrollbar,.marketing-navlinks::-webkit-scrollbar{display:none}.nav-links a,.marketing-navlinks a{flex:0 0 auto!important;min-height:33px!important;padding:0 10px!important;font-size:11px!important}.mobile-menu-button{display:none!important}.user-email-badge{max-width:28vw!important}.footer-inner{width:calc(100% - 32px)!important;flex-wrap:wrap!important}}
 @media(max-width:420px){.site-header,.home-nav,.app-header,.marketing-nav{padding-inline:10px!important}.nav-actions,.marketing-actions{gap:4px!important}.brand-name{max-width:95px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+
+/* Page-specific components share the same geometry and visual weight */
+.apps-hero,.apps-wrap,.settings-shell,.forms-shell,.shell{max-width:1200px}
+.apps-hero{padding-top:64px!important;padding-bottom:28px!important}
+.apps-hero h1,.settings-head h1,.forms-heading h1,.hero h1{font-size:clamp(32px,4.4vw,48px)!important;line-height:1.08!important;letter-spacing:-.052em!important;font-weight:650!important}
+.apps-hero p,.settings-head p,.forms-heading p,.hero p{font-size:13px!important;color:var(--is-muted)!important;line-height:1.7!important}
+.apps-grid,.projects-grid,.product-grid,.detail-grid,.principles-grid{gap:14px!important}
+.app-card,.project-card,.product-card,.feature-card,.settings-card{padding:20px!important;border-radius:12px!important}
+.app-card h3,.project-card h3,.product-card h3,.feature-card h3{font-size:14px!important;font-weight:650!important;letter-spacing:-.02em!important}
+.app-card p,.project-card p,.product-card p,.feature-card p{font-size:12px!important;line-height:1.65!important;color:var(--is-muted)!important}
+.project-card,.app-card,.product-card{transition:border-color .15s,box-shadow .15s!important}
+.project-card:hover,.app-card:hover,.product-card:hover{border-color:#d9d8e8!important;box-shadow:0 5px 18px rgba(28,30,48,.045)!important;transform:translateY(-1px)!important}
+.card-thumb{border-radius:8px!important;overflow:hidden!important}
+.settings-shell{padding-top:38px!important}
+.settings-card{margin:12px 0!important;padding:22px!important}
+.apps-toolbar{margin:18px 0!important}
+.search{border-radius:8px!important;border-color:var(--is-line)!important}
+.filters .filter{border-radius:7px!important;background:#fff!important;border-color:var(--is-line)!important;color:var(--is-muted)!important;font-size:11px!important}
+.filters .filter.active,.filters .filter[aria-pressed=true]{background:var(--is-accent-soft)!important;border-color:#d9d6ff!important;color:var(--is-accent-hover)!important}
+.shell,.forms-shell{margin-top:36px!important}
+.forms-layout{gap:14px!important}
+.forms-layout>.panel,.forms-layout>.forms-panel{border-radius:12px!important;padding:16px!important}
+.forms-field,.field{background:#fff!important}
+body.marketing{background:#fff!important}
+.marketing-hero{padding-top:clamp(64px,9vw,112px)!important;padding-bottom:clamp(68px,9vw,112px)!important}
+.marketing-hero h1{font-weight:650!important;letter-spacing:-.06em!important}
+.marketing-section,.detail-section,.showcase-section,.principles-section,.faq-section{padding-top:76px!important;padding-bottom:76px!important}
+.marketing-section h2,.detail-section h2,.showcase-section h2,.principles-section h2,.faq-section h2{font-size:clamp(25px,3.4vw,38px)!important;letter-spacing:-.045em!important;font-weight:640!important}
+.marketing-section p,.detail-section p,.showcase-section p,.principles-section p,.faq-section p{color:var(--is-muted)}
+/* Editors retain their purpose-built canvas, but share the same shell controls */
+.design-toolbar,.toolbar,.editor-toolbar{border-radius:9px!important;box-shadow:none!important}
+.toolbtn{min-height:32px!important}
+.panel,.tool-panel{border-radius:11px!important}
