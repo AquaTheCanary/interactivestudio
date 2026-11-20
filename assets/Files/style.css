@@ -848,3 +848,6 @@ body.auth-page .auth-header>a{display:none}
     margin-right:calc(50% - 50vw)!important;
   }
 }
+
+/* Respect the HTML hidden attribute even when component styles set display:flex/grid. */
+[hidden]{display:none!important}
