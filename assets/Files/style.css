@@ -284,3 +284,95 @@ body:before{display:none!important}
 .domainbox,.previewwrap{background:#fafbfc!important;border-color:#e8eaee!important}
 .create-modal,.publish-modal{background:#fff!important;color:#20232b!important;border:1px solid #e8eaee!important;box-shadow:0 18px 60px rgba(20,25,35,.16)!important}
 @media(max-width:850px){.work{height:auto!important;min-height:calc(100vh - 64px)!important}.work .canvas-wrap{padding:14px!important}.builder-stage{padding:12px!important}.shell{padding:22px 16px 44px!important}}
+
+
+/* =========================================================
+   INTERACTIVE STUDIO — unified light design system
+   This is the final shared layer: every route uses these tokens.
+   ========================================================= */
+:root,html[data-theme="light"],html[data-theme="dark"]{
+ color-scheme:light!important;
+ --page:#f7f8fa!important;--surface:#fff!important;--surface-2:#f5f6f8!important;
+ --surface-3:#eef0f3!important;--ink:#20232b!important;--muted:#697180!important;
+ --soft:#9299a5!important;--line:#e6e8ed!important;--accent:#625bf6!important;
+ --accent-hover:#5149e7!important;--accent-wash:#f1f0ff!important;
+ --shadow-card:0 1px 3px rgba(20,25,35,.035)!important;
+ --shadow-float:0 12px 34px rgba(20,25,35,.075)!important;
+}
+html,html[data-theme="dark"],body,body.page-body{
+ color-scheme:light!important;background:var(--page)!important;color:var(--ink)!important;
+}
+body{font-family:Inter,'DM Sans',system-ui,sans-serif!important}
+body:before{display:none!important}
+.site-header,.home-nav,.app-header{
+ background:rgba(255,255,255,.96)!important;color:var(--ink)!important;
+ border-bottom:1px solid var(--line)!important;box-shadow:none!important;
+ backdrop-filter:blur(18px)!important;
+}
+.brand-name,.nav-links a,.nav-links a:hover,.nav-links a.active{color:var(--ink)!important}
+.nav-links a{opacity:.72}.nav-links a:hover,.nav-links a.active{opacity:1}
+button,input,select,textarea{font-family:inherit}
+input,select,textarea,.form-control,.prop-field input,.prop-field textarea,.prop-field select{
+ background:#fff!important;color:var(--ink)!important;border-color:#dfe2e8!important;
+}
+input::placeholder,textarea::placeholder{color:#969daa!important}
+button,.btn,.toolbtn,.thumb{box-shadow:none}
+.btn,.btn-secondary-small,.btn-secondary-large,.mobile-menu-button{
+ background:#fff!important;color:#343946!important;border:1px solid var(--line)!important;
+}
+.btn.primary,.btn-primary-small,.btn-primary-large,.btn-submit,.btn-launch,.primary{
+ background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important;
+}
+.btn.primary:hover,.btn-primary-small:hover,.btn-primary-large:hover,.btn-submit:hover,.btn-launch:hover,.primary:hover{
+ background:var(--accent-hover)!important;border-color:var(--accent-hover)!important;
+}
+.panel,.main,.list,.settings-card,.feature-card,.pricing-card,.solution-card,.contact-card,
+.download-card,.dashboard-card,.card,.modal-content,.editor-panel,.project-card,.app-card,
+.tool-panel,.auth-container,.ai-sidebar,.ai-chat{
+ background:#fff!important;color:var(--ink)!important;border:1px solid var(--line)!important;
+ box-shadow:var(--shadow-card)!important;
+}
+.panel p,.muted,.settings-card>p,.settings-head p,.head p{color:var(--muted)!important}
+footer,.site-footer{background:#fff!important;color:var(--muted)!important;border-color:var(--line)!important}
+footer a{color:var(--accent)!important}
+.theme-toggle{display:none!important}
+@media(max-width:760px){.nav-links{background:#fff!important;border-color:var(--line)!important}}
+/* Presentation editor */
+body:has(.work) .work{background:#f5f6f8!important;color:var(--ink)!important}
+.work .bar,.work .tools,.work .side,.work .foot{background:#fff!important;color:var(--ink)!important;border-color:var(--line)!important}
+.work .stage,.work .canvas-wrap{background:#f1f2f5!important}
+.work .canvas{background:#fff!important;border-color:var(--line)!important;color:var(--ink)!important;box-shadow:0 8px 28px rgba(20,25,35,.09)!important}
+.work .thumb{background:#fafbfc!important;color:var(--ink)!important;border-color:var(--line)!important}
+.work .thumb.active{background:var(--accent-wash)!important;border-color:#aaa5ff!important}
+.work .label{color:#858b98!important}
+.work .inspector label{color:#4d5360!important}
+/* Website editor */
+body[data-website-page="editor"]{background:#f5f6f8!important;color:var(--ink)!important}
+body[data-website-page="editor"] .builder-tools,
+body[data-website-page="editor"] .builder-properties,
+body[data-website-page="editor"] .design-toolbar{background:#fff!important;color:var(--ink)!important;border-color:var(--line)!important}
+body[data-website-page="editor"] .builder-stage{background:#f1f2f5!important}
+body[data-website-page="editor"] .builder-canvas{background:#fff!important;border-color:var(--line)!important}
+body[data-website-page="editor"] .toolbtn,
+body[data-website-page="editor"] .toolbtn.compact{background:#fff!important;color:#454a56!important;border-color:var(--line)!important}
+body[data-website-page="editor"] .toolbtn.active,
+body[data-website-page="editor"] .toolbtn.compact.active,
+body[data-website-page="editor"] .layer-item.active{background:var(--accent-wash)!important;color:#5149d8!important;border-color:#d8d4ff!important}
+body[data-website-page="editor"] .layer-item{color:#4b5160!important}
+body[data-website-page="editor"] .builder-tools h3,
+body[data-website-page="editor"] .builder-properties h3,
+body[data-website-page="editor"] .toolbar-label,
+body[data-website-page="editor"] .stage-top{color:#858b98!important}
+/* Account settings */
+.settings-shell{color:var(--ink)!important}
+.settings-head p{color:var(--muted)!important}
+.settings-card{border-radius:12px!important}
+.settings-card h2{color:var(--ink)!important}
+.settings-field span{color:#4d5360!important}
+.settings-field input{background:#fff!important;color:var(--ink)!important;border-color:var(--line)!important}
+.settings-field small{color:var(--muted)!important}
+.upload-label{background:#fff!important;color:#343946!important;border:1px solid var(--line)!important;border-radius:8px!important}
+.settings-message{color:var(--muted)!important}
+.settings-message.error{color:#c43d4b!important}
+.settings-message.success,.verified{color:#21845b!important}
+.unverified{color:#9a6500!important}
